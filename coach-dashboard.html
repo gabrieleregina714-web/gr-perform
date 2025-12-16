@@ -46,7 +46,6 @@
 
         .logo {
             width: 44px; height: 44px;
-            background: linear-gradient(135deg, #E63946, #FF6B6B);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -54,6 +53,13 @@
             font-weight: 900;
             margin-bottom: 40px;
             cursor: pointer;
+            overflow: hidden;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .nav-item {
@@ -397,6 +403,19 @@
             .content { padding: 24px; }
             .actions-grid { grid-template-columns: 1fr; }
             .action-card.featured { grid-column: span 1; }
+            .athletes-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .athlete-card { padding: 16px; }
+            .athlete-avatar { width: 40px; height: 40px; font-size: 14px; }
+            .athlete-name { font-size: 14px; }
+            .athlete-meta { font-size: 11px; }
+            .section-title { font-size: 18px; }
+        }
+
+        @media (max-width: 480px) {
+            .athletes-grid { grid-template-columns: 1fr; }
+            .hero-stats { flex-direction: column; gap: 12px; text-align: center; }
+            .hero-title { font-size: 28px; }
+            .hero-subtitle { font-size: 14px; }
         }
     </style>
 </head>
@@ -521,88 +540,114 @@
                 }
 
                 // Load athletes
-                const athletes = await supabase.fetch('athletes', '?select=*&order=created_at.desc');
-                document.getElementById('stat-athletes').textContent = athletes.length;
+                let athletes = [];
+                try {
+                    athletes = await supabase.fetch('athletes', '?select=*&order=created_at.desc');
+                    document.getElementById('stat-athletes').textContent = athletes?.length || 0;
+                } catch(e) {
+                    console.log('Error loading athletes:', e);
+                    document.getElementById('stat-athletes').textContent = '0';
+                }
                 
                 // Load workouts
-                const workouts = await supabase.fetch('workouts', '?select=id');
-                document.getElementById('stat-workouts').textContent = workouts.length;
+                try {
+                    const workouts = await supabase.fetch('workouts', '?select=id');
+                    document.getElementById('stat-workouts').textContent = workouts?.length || 0;
+                } catch(e) {
+                    document.getElementById('stat-workouts').textContent = '0';
+                }
                 
-                // Load pending feedback
-                const pending = await supabase.fetch('feedback', '?reviewed=eq.false&select=id');
-                const pendingCount = pending?.length || 0;
-                document.getElementById('stat-pending').textContent = pendingCount;
-                document.getElementById('pending-text').textContent = `${pendingCount} feedback da rivedere`;
-                
-                // Load unread messages
-                const unread = await supabase.fetch('chat_messages', '?sender=eq.athlete&read=eq.false&select=id');
-                const unreadCount = unread?.length || 0;
-                if (unreadCount > 0) {
-                    document.getElementById('chat-badge').style.display = 'block';
-                    document.getElementById('messages-text').textContent = `${unreadCount} messaggi non letti`;
+                // Load pending feedback (with error handling)
+                try {
+                    const pending = await supabase.fetch('feedback', '?reviewed=eq.false&select=id');
+                    const pendingCount = pending?.length || 0;
+                    document.getElementById('stat-pending').textContent = pendingCount;
+                } catch(e) {
+                    document.getElementById('stat-pending').textContent = '0';
                 }
                 
                 // Render athletes (max 6)
                 const grid = document.getElementById('athletes-grid');
-                grid.innerHTML = athletes.slice(0, 6).map(a => {
-                    const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
-                    const hasPhoto = a.profile_photo;
-                    const status = a.workouts_completed > 5 ? 'green' : a.workouts_completed > 0 ? 'yellow' : 'red';
-                    const statusText = status === 'green' ? 'Attivo' : status === 'yellow' ? 'In Progress' : 'Nuovo';
-                    return `
-                        <div class="athlete-card" onclick="location.href='coach-clients.html'">
-                            <div class="athlete-top">
-                                <div class="athlete-avatar" style="overflow:hidden;">
-                                    ${hasPhoto ? `<img src="${a.profile_photo}" style="width:100%;height:100%;object-fit:cover;">` : initials}
-                                </div>
-                                <div>
-                                    <div class="athlete-name">${a.first_name} ${a.last_name}</div>
-                                    <div class="athlete-meta">${a.sport || 'Fitness'} • Livello ${a.level || 1}</div>
-                                </div>
-                            </div>
-                            <div class="athlete-stats">
-                                <div>
-                                    <div class="athlete-stat-value">${a.workouts_completed || 0}</div>
-                                    <div class="athlete-stat-label">Workout</div>
-                                </div>
-                                <div>
-                                    <div class="athlete-stat-value">${a.xp || 0}</div>
-                                    <div class="athlete-stat-label">XP</div>
-                                </div>
-                                <div>
-                                    <div class="athlete-stat-value">${a.level || 1}</div>
-                                    <div class="athlete-stat-label">Livello</div>
-                                </div>
-                            </div>
-                            <span class="tag ${status}">${statusText}</span>
-                        </div>
-                    `;
-                }).join('');
-                
-                // Load recent activity (messages + feedback)
-                const messages = await supabase.fetch('chat_messages', '?select=*,athletes(first_name,last_name)&order=created_at.desc&limit=5');
-                const activityList = document.getElementById('activity-list');
-                
-                if (messages && messages.length > 0) {
-                    activityList.innerHTML = messages.map(m => {
-                        const name = m.athletes ? `${m.athletes.first_name} ${m.athletes.last_name}` : 'Atleta';
-                        const time = new Date(m.created_at).toLocaleString('it-IT', { 
-                            hour: '2-digit', 
-                            minute: '2-digit',
-                            day: '2-digit',
-                            month: 'short'
-                        });
-                        const icon = m.sender === 'athlete' ? 'message' : 'workout';
-                        const iconClass = m.sender === 'athlete' ? 'fa-comment' : 'fa-reply';
+                if (athletes && athletes.length > 0) {
+                    grid.innerHTML = athletes.slice(0, 6).map(a => {
+                        const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+                        const hasPhoto = a.profile_photo;
+                        const status = a.workouts_completed > 5 ? 'green' : a.workouts_completed > 0 ? 'yellow' : 'red';
+                        const statusText = status === 'green' ? 'Attivo' : status === 'yellow' ? 'In Progress' : 'Nuovo';
                         return `
-                            <div class="activity-item">
-                                <div class="activity-icon ${icon}"><i class="fas ${iconClass}"></i></div>
-                                <div class="activity-text"><strong>${name}</strong> ${m.sender === 'athlete' ? 'ha inviato un messaggio' : 'ha ricevuto risposta'}</div>
-                                <div class="activity-time">${time}</div>
+                            <div class="athlete-card" onclick="location.href='coach-clients.html'">
+                                <div class="athlete-top">
+                                    <div class="athlete-avatar" style="overflow:hidden;">
+                                        ${hasPhoto ? `<img src="${a.profile_photo}" style="width:100%;height:100%;object-fit:cover;">` : initials}
+                                    </div>
+                                    <div>
+                                        <div class="athlete-name">${a.first_name} ${a.last_name}</div>
+                                        <div class="athlete-meta">${a.sport || 'Fitness'} • Livello ${a.level || 1}</div>
+                                    </div>
+                                </div>
+                                <div class="athlete-stats">
+                                    <div>
+                                        <div class="athlete-stat-value">${a.workouts_completed || 0}</div>
+                                        <div class="athlete-stat-label">Workout</div>
+                                    </div>
+                                    <div>
+                                        <div class="athlete-stat-value">${a.xp || 0}</div>
+                                        <div class="athlete-stat-label">XP</div>
+                                    </div>
+                                    <div>
+                                        <div class="athlete-stat-value">${a.level || 1}</div>
+                                        <div class="athlete-stat-label">Livello</div>
+                                    </div>
+                                </div>
+                                <span class="tag ${status}">${statusText}</span>
                             </div>
                         `;
                     }).join('');
                 } else {
+                    grid.innerHTML = '<p style="color: var(--gray-400); padding: 20px; grid-column: span 3;">Nessun atleta trovato. Aggiungi atleti per iniziare.</p>';
+                }
+                
+                // Load recent activity (messages + feedback)
+                const activityList = document.getElementById('activity-list');
+                try {
+                    const messages = await supabase.fetch('chat_messages', '?select=*&order=created_at.desc&limit=5');
+                    
+                    if (messages && messages.length > 0) {
+                        // Get athlete names for messages
+                        const athleteIds = [...new Set(messages.map(m => m.athlete_id).filter(Boolean))];
+                        const athleteMap = {};
+                        for (const id of athleteIds) {
+                            try {
+                                const athlete = await supabase.fetch('athletes', `?id=eq.${id}&select=first_name,last_name`);
+                                if (athlete && athlete[0]) {
+                                    athleteMap[id] = `${athlete[0].first_name} ${athlete[0].last_name}`;
+                                }
+                            } catch(e) {}
+                        }
+                        
+                        activityList.innerHTML = messages.map(m => {
+                            const name = athleteMap[m.athlete_id] || 'Atleta';
+                            const time = new Date(m.created_at).toLocaleString('it-IT', { 
+                                hour: '2-digit', 
+                                minute: '2-digit',
+                                day: '2-digit',
+                                month: 'short'
+                            });
+                            const icon = m.sender === 'athlete' ? 'message' : 'workout';
+                            const iconClass = m.sender === 'athlete' ? 'fa-comment' : 'fa-reply';
+                            return `
+                                <div class="activity-item">
+                                    <div class="activity-icon ${icon}"><i class="fas ${iconClass}"></i></div>
+                                    <div class="activity-text"><strong>${name}</strong> ${m.sender === 'athlete' ? 'ha inviato un messaggio' : 'ha ricevuto risposta'}</div>
+                                    <div class="activity-time">${time}</div>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        activityList.innerHTML = '<div class="activity-item"><div class="activity-text" style="color: var(--gray-400);">Nessuna attività recente</div></div>';
+                    }
+                } catch (error) {
+                    console.log('Error loading activity:', error);
                     activityList.innerHTML = '<div class="activity-item"><div class="activity-text" style="color: var(--gray-400);">Nessuna attività recente</div></div>';
                 }
                 
