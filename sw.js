@@ -1,7 +1,7 @@
 // GR Perform - Service Worker v1.4
-const CACHE_NAME = 'gr-perform-v8';
-const STATIC_CACHE = 'gr-perform-static-v8';
-const DYNAMIC_CACHE = 'gr-perform-dynamic-v8';
+const CACHE_NAME = 'gr-perform-v9';
+const STATIC_CACHE = 'gr-perform-static-v9';
+const DYNAMIC_CACHE = 'gr-perform-dynamic-v9';
 
 // Files to cache for offline use
 const STATIC_FILES = [

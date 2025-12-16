@@ -1,8 +1,6 @@
 // GR Perform - AI Workout Generator
 // Sistema di generazione schede con LLM Council (Groq)
 
-const GROQ_API_KEY = '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';
-
 // Modelli disponibili su Groq
 const MODELS = {
     main: 'llama-3.3-70b-versatile',    // Ragionamento principale
@@ -280,11 +278,10 @@ REGOLE FONDAMENTALI:
     },
     
     async callGroq(model, prompt, systemPrompt = null) {
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const response = await fetch('/api/ai/groq-chat', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${GROQ_API_KEY}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 model: model,
@@ -301,8 +298,8 @@ REGOLE FONDAMENTALI:
         });
         
         if (!response.ok) {
-            const err = await response.text();
-            throw new Error(`Groq API error: ${err}`);
+            const errText = await response.text();
+            throw new Error(`Groq proxy error: ${errText}`);
         }
         
         const data = await response.json();

@@ -1,7 +1,6 @@
 // GR Perform - Sistema AI Elite
 // Generazione adattiva multi-fase
 
-const GROQ_API_KEY = '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';
 const MODELS = {
     main: 'llama-3.3-70b-versatile',
     fast: 'llama-3.1-8b-instant'
@@ -217,11 +216,10 @@ Genera ${this.getAvailableDays(schedule).length} workout completi con 5-6 eserci
     
     // Chiamata Groq
     async callGroq(prompt) {
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const response = await fetch('/api/ai/groq-chat', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${GROQ_API_KEY}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 model: MODELS.main,
@@ -234,6 +232,11 @@ Genera ${this.getAvailableDays(schedule).length} workout completi con 5-6 eserci
             })
         });
         
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`Groq proxy error: ${errText}`);
+        }
+
         const data = await response.json();
         const content = data.choices[0].message.content;
         const jsonMatch = content.match(/\{[\s\S]*\}/);
