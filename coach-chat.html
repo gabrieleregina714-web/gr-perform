@@ -40,12 +40,158 @@
             border-right: 1px solid var(--gray-600);
             display: flex;
             flex-direction: column;
-            .chat-container {
-                margin-left: 72px;
-                height: 100vh;
-                display: grid;
-                grid-template-columns: 1fr;
-            }
+            align-items: center;
+            padding: 20px 0;
+            z-index: 100;
+        }
+
+        .logo {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #E63946, #FF6B6B);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            margin-bottom: 40px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .nav-item {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .nav-item:hover { background: var(--gray-700); color: var(--white); }
+        .nav-item.active { background: var(--gray-700); color: var(--white); }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        /* CHAT LAYOUT */
+        .chat-container {
+            margin-left: 72px;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        /* CONTACTS LIST */
+        .contacts {
+            background: var(--gray-900);
+            border-right: 1px solid var(--gray-700);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contacts-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .contacts-header h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contacts-header h2 span {
+            background: var(--red);
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            border-radius: 12px;
+            padding: 12px 16px;
+        }
+
+        .search-box i { color: var(--gray-500); }
+
+        .search-box input {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .filter-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            color: var(--gray-400);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--white);
+            color: var(--black);
+            border-color: var(--white);
+        }
+
+        .contacts-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+
+        .contact-item:hover { background: var(--gray-800); }
+        .contact-item.active { 
+            background: var(--gray-800); 
+            border-left-color: var(--red);
+        }
 
         .contact-avatar {
             width: 50px; height: 50px;
@@ -117,6 +263,19 @@
             align-items: center;
             gap: 16px;
             background: var(--gray-900);
+        }
+
+        .mobile-back-btn {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--gray-800);
+            border: none;
+            color: var(--white);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
         }
 
         .chat-header-avatar {
@@ -568,6 +727,15 @@
         /* RESPONSIVE */
         @media (max-width: 900px) {
             .chat-container { grid-template-columns: 1fr; }
+            .contacts { display: none; }
+            .contacts.mobile-show {
+                display: flex;
+                position: fixed;
+                inset: 0;
+                bottom: 70px;
+                z-index: 50;
+                background: var(--gray-900);
+            }
         }
 
         @media (max-width: 768px) {
@@ -599,26 +767,30 @@
             .chat-container { margin-left: 0; margin-bottom: 70px; height: calc(100vh - 70px); }
         }
 
-        /* Mobile FAB */
-        .mobile-fab {
-            display: none;
-            position: fixed;
-            bottom: 86px;
-            right: 16px;
-            width: 56px;
-            height: 56px;
-            background: var(--red);
-            border-radius: 50%;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(230,57,70,0.4);
-            z-index: 40;
-            align-items: center;
-            justify-content: center;
+        @media (max-width: 900px) {
+            .mobile-back-btn { display: flex; }
         }
-        
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <a href="coach-dashboard.html" class="logo" style="overflow:hidden;border-radius:12px;background:none;">
+            <img src="https://cdn.shopify.com/s/files/1/0969/1801/2243/files/Black_White_Bold_Modern_Clothing_Brand_Logo_97389bbf-665b-4465-82ec-d71a0fa4b35e.png?v=1758700090" alt="GR" style="width:100%;height:100%;object-fit:cover;">
+        </a>
+        <a href="coach-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i></a>
+        <a href="coach-clients.html" class="nav-item"><i class="fas fa-users"></i></a>
+        <a href="coach-generate.html" class="nav-item"><i class="fas fa-bolt"></i></a>
+        <div class="nav-spacer"></div>
+        <a href="#" onclick="coachLogout(event)" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
+    </nav>
+
+    <div class="chat-container">
+        <div class="chat-area" id="chat-area">
+            <div class="empty-chat">
+                <i class="fas fa-comments"></i>
+                <h3>Apri una chat</h3>
+                <p>Vai da un profilo atleta e tocca Chat</p>
+                <a href="coach-clients.html" style="margin-top:16px;display:inline-block;padding:10px 16px;background:var(--red);color:white;border-radius:12px;text-decoration:none;font-weight:700;">Vai a Clienti</a>
             </div>
         </div>
     </div>
@@ -650,20 +822,19 @@
         let cameFromProfile = false;
         let currentAthlete = null;
 
-        // Go back from chat
-        function goBackFromChat() {
-            window.location.href = 'coach-clients.html';
-        }
-
         function showMissing(message = 'Apri la chat dal profilo di un atleta') {
             document.getElementById('chat-area').innerHTML = `
                 <div class="empty-chat">
                     <i class="fas fa-comments"></i>
                     <h3>${message}</h3>
                     <p>Vai su Clienti, apri un profilo e premi Chat</p>
-                    <a href="coach-clients.html" class="cta-btn" style="margin-top:16px;display:inline-block;padding:10px 16px;background:var(--red);color:white;border-radius:12px;text-decoration:none;font-weight:700;">Vai a Clienti</a>
+                    <a href="coach-clients.html" style="margin-top:16px;display:inline-block;padding:10px 16px;background:var(--red);color:white;border-radius:12px;text-decoration:none;font-weight:700;">Vai a Clienti</a>
                 </div>
             `;
+        }
+
+        function goBackFromChat() {
+            window.location.href = 'coach-clients.html';
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -676,16 +847,7 @@
             }
 
             cameFromProfile = true;
-            selectedAthleteId = String(athleteId);
-
-            const fetched = await supabase.fetch('athletes', `?id=eq.${selectedAthleteId}&select=*`);
-            if (!fetched || !fetched[0]) {
-                showMissing('Atleta non trovato');
-                return;
-            }
-
-            currentAthlete = { ...fetched[0], id: String(fetched[0].id) };
-            await selectAthlete(selectedAthleteId);
+            await selectAthlete(String(athleteId));
         });
 
         function formatTime(dateStr) {
@@ -705,7 +867,7 @@
         async function selectAthlete(id) {
             id = String(id);
             selectedAthleteId = id;
-            let athlete = currentAthlete && currentAthlete.id === id ? currentAthlete : null;
+            let athlete = currentAthlete && String(currentAthlete.id) === id ? currentAthlete : null;
             if (!athlete) {
                 const fetched = await supabase.fetch('athletes', `?id=eq.${id}&select=*`);
                 if (fetched && fetched[0]) {
@@ -722,8 +884,8 @@
                 method: 'PATCH',
                 headers: {
                     'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVua3pqbmxyb3JsdXpmYWhtaXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3OTQ3MTIsImV4cCI6MjA4MTM3MDcxMn0.c1utLN0YO2k6K-8cFokp7LaTD2ND6Mb0l2BxeFW4oxM',
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVua3pqbmxyb3JsdXpmYWhtaXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3OTQ3MTIsImV4cCI6MjA4MTM3MDcxMn0.c1utLN0YO2k6K-8cFokp7LaTD2ND6Mb0l2BxeFW4oxM',
-                'Content-Type': 'application/json'
+                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVua3pqbmxyb3JsdXpmYWhtaXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3OTQ3MTIsImV4cCI6MjA4MTM3MDcxMn0.c1utLN0YO2k6K-8cFokp7LaTD2ND6Mb0l2BxeFW4oxM',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ read: true })
             });
@@ -778,7 +940,6 @@
             `;
 
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
-            renderContacts(athletes);
         }
 
         function renderMessages(messages) {
