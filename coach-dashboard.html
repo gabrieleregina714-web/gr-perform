@@ -575,20 +575,6 @@
                 <p class="hero-label">Coach Dashboard</p>
                 <h1 class="hero-title">Buongiorno,<br>Gabriele</h1>
                 <p class="hero-subtitle">Gestisci i tuoi atleti, crea workout e monitora i progressi</p>
-                <div class="hero-stats">
-                    <div>
-                        <div class="hero-stat-value" id="stat-athletes">-</div>
-                        <div class="hero-stat-label">Atleti Attivi</div>
-                    </div>
-                    <div>
-                        <div class="hero-stat-value" id="stat-workouts">-</div>
-                        <div class="hero-stat-label">Workout Totali</div>
-                    </div>
-                    <div>
-                        <div class="hero-stat-value" id="stat-pending">-</div>
-                        <div class="hero-stat-label">Da Revieware</div>
-                    </div>
-                </div>
             </div>
         </section>
 
@@ -667,24 +653,9 @@
                 let athletes = [];
                 try {
                     athletes = await supabase.fetch('athletes', '?select=*&order=created_at.desc');
-                    document.getElementById('stat-athletes').textContent = athletes?.length || 0;
                 } catch(e) {
                     console.log('Error loading athletes:', e);
-                    document.getElementById('stat-athletes').textContent = '0';
                 }
-                
-                // Load workouts
-                try {
-                    const workouts = await supabase.fetch('workouts', '?select=*');
-                    console.log('Dashboard - All workouts:', workouts);
-                    document.getElementById('stat-workouts').textContent = Array.isArray(workouts) ? workouts.length : 0;
-                } catch(e) {
-                    console.error('Error loading workouts count:', e);
-                    document.getElementById('stat-workouts').textContent = '0';
-                }
-                
-                // Pending reviews - feedback table doesn't exist yet
-                document.getElementById('stat-pending').textContent = '0';
                 
                 // Render athletes (max 6)
                 const grid = document.getElementById('athletes-grid');
