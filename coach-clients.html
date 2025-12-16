@@ -1297,26 +1297,30 @@
         async function loadProfileTab() {
             const a = selectedAthlete;
             
-            // Carica dati aggiuntivi
+            // Carica dati aggiuntivi (con gestione errori per tabelle mancanti)
             let sportData = {};
             let scheduleData = {};
             let goals = [];
             let injuries = [];
             
+            // Carica ogni tabella separatamente per evitare errori totali
             try {
-                const [sportRes, scheduleRes, goalsRes, injuriesRes] = await Promise.all([
-                    supabase.fetch('sport_specific_data', `?athlete_id=eq.${a.id}`).catch(() => []),
-                    supabase.fetch('weekly_schedule', `?athlete_id=eq.${a.id}`).catch(() => []),
-                    supabase.fetch('athlete_goals', `?athlete_id=eq.${a.id}&select=*,goals(name)`).catch(() => []),
-                    supabase.fetch('injuries_conditions', `?athlete_id=eq.${a.id}`).catch(() => [])
-                ]);
-                sportData = sportRes?.[0] || {};
-                scheduleData = scheduleRes?.[0] || {};
-                goals = goalsRes || [];
-                injuries = injuriesRes || [];
-            } catch (e) {
-                console.log('Error loading extra data:', e);
-            }
+                const res = await supabase.fetch('sport_specific_data', `?athlete_id=eq.${a.id}`);
+                sportData = res?.[0] || {};
+            } catch (e) { console.log('sport_specific_data not available'); }
+            
+            try {
+                const res = await supabase.fetch('weekly_schedule', `?athlete_id=eq.${a.id}`);
+                scheduleData = res?.[0] || {};
+            } catch (e) { console.log('weekly_schedule not available'); }
+            
+            try {
+                goals = await supabase.fetch('athlete_goals', `?athlete_id=eq.${a.id}`);
+            } catch (e) { console.log('athlete_goals not available'); }
+            
+            try {
+                injuries = await supabase.fetch('injuries_conditions', `?athlete_id=eq.${a.id}`);
+            } catch (e) { console.log('injuries_conditions not available'); }
             
             // Calcola età
             let age = '-';
@@ -1397,10 +1401,16 @@
             }
             
             // Prepara obiettivi
-            const goalsText = goals.map(g => g.goals?.name || g.goal_id).join(', ') || 'Non specificati';
+            let goalsText = 'Non specificati';
+            if (goals && goals.length > 0) {
+                goalsText = goals.map(g => g.goal_id || 'Obiettivo').join(', ');
+            }
             
             // Prepara infortuni
-            const injuriesText = injuries.map(i => i.notes || i.injury_type).join(', ') || 'Nessuno';
+            let injuriesText = 'Nessuno';
+            if (injuries && injuries.length > 0) {
+                injuriesText = injuries.map(i => i.notes || i.injury_type || 'Nota').join(', ');
+            }
             
             document.getElementById('tab-profile').innerHTML = `
                 <div class="stats-grid">
