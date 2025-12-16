@@ -283,6 +283,8 @@
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 16px;
+            max-width: 920px;
+            margin: 0 auto;
         }
 
         .action-card {
@@ -547,8 +549,23 @@
                 opacity: 0.85;
             }
             .content { padding: 20px; }
-            .actions-grid { grid-template-columns: 1fr; }
-            .action-card { aspect-ratio: 1 / 1; }
+            .actions-grid {
+                display: flex;
+                gap: 14px;
+                overflow-x: auto;
+                padding-bottom: 6px;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                max-width: none;
+                margin: 0;
+            }
+            .actions-grid::-webkit-scrollbar { height: 0; }
+            .action-card {
+                flex: 0 0 78%;
+                max-width: 340px;
+                scroll-snap-align: start;
+                aspect-ratio: 1 / 1;
+            }
             .athletes-grid { grid-template-columns: 1fr; gap: 12px; }
             .athlete-card { padding: 16px; }
             .athlete-avatar { width: 40px; height: 40px; font-size: 14px; }
@@ -610,7 +627,7 @@
                 </div>
                 <div class="actions-grid">
                     <a href="coach-clients.html" class="action-card">
-                        <img class="action-bg" src="assets/sport-calcio.jpg" alt="" onerror="this.onerror=null; this.src='assets/pexels-gabin-cobret-430175667-32948745.jpg';">
+                        <img class="action-bg" src="assets/pexels-cottonbro-6767008.jpg" alt="" onerror="this.onerror=null; this.src='assets/sport-calcio.jpg';">
                         <div class="action-overlay"></div>
                         <div class="action-content">
                             <div class="action-top-row">
@@ -623,7 +640,7 @@
                     </a>
 
                     <a href="coach-generate.html" class="action-card">
-                        <img class="action-bg" src="assets/sport-palestra.jpg" alt="" onerror="this.onerror=null; this.src='assets/pexels-cottonbro-5741289.jpg';">
+                        <img class="action-bg" src="assets/pexels-matthew-jesus-468170389-35201873.jpg" alt="" onerror="this.onerror=null; this.src='assets/sport-palestra.jpg';">
                         <div class="action-overlay"></div>
                         <div class="action-content">
                             <div class="action-top-row">
