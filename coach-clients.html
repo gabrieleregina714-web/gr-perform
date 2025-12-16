@@ -1479,6 +1479,35 @@
             padding: 32px 24px;
             background: linear-gradient(180deg, var(--gray-800) 0%, var(--black) 100%);
             text-align: center;
+            overflow: hidden;
+        }
+
+        .athlete-hero-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.32;
+            transform: scale(1.04);
+        }
+
+        .athlete-hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                rgba(0,0,0,0.10) 0%,
+                rgba(0,0,0,0.55) 55%,
+                rgba(0,0,0,0.98) 100%
+            );
+        }
+
+        .athlete-hero-avatar,
+        .athlete-hero-name,
+        .athlete-hero-meta {
+            position: relative;
+            z-index: 1;
         }
         
         .athlete-hero-avatar {
@@ -2229,6 +2258,18 @@
 
                 const data = await supabase.fetch('athletes', '?select=*&order=first_name.asc');
                 allAthletes = Array.isArray(data) ? data : [];
+
+                // Prefetch sport-specific data (so we can display gym_primary_goal in list)
+                try {
+                    const sportDataRows = await supabase.fetch('sport_specific_data', '?select=athlete_id,gym_primary_goal');
+                    sportSpecificByAthleteId = {};
+                    (Array.isArray(sportDataRows) ? sportDataRows : []).forEach(r => {
+                        if (r?.athlete_id) sportSpecificByAthleteId[r.athlete_id] = r;
+                    });
+                } catch (e) {
+                    sportSpecificByAthleteId = {};
+                }
+
                 updateSportCounts();
                 if (allAthletes.length === 0) {
                     setLoadStatus('0 atleti trovati. Se sai che esistono già, prova a ricaricare o chiudere/riaprire l\'app (cache).', true);
@@ -2296,6 +2337,7 @@
             
             container.innerHTML = athletes.map(a => {
                 const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+                const goalLabel = getAthletePrimaryGoalLabel(a) || (a.package_type || 'Performance');
                 return `
                     <div class="athlete-card" onclick="openAthleteDetail('${a.id}')">
                         <div class="athlete-avatar">
@@ -2303,7 +2345,7 @@
                         </div>
                         <div class="athlete-info">
                             <div class="athlete-name">${a.first_name} ${a.last_name}</div>
-                            <div class="athlete-meta">${a.goal || 'Performance'} • Lv. ${a.level || 1}</div>
+                            <div class="athlete-meta">${goalLabel} • Lv. ${a.level || 1}</div>
                         </div>
                         <div class="athlete-arrow"><i class="fas fa-chevron-right"></i></div>
                     </div>
@@ -2359,15 +2401,18 @@
             const a = selectedAthlete;
             const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
             const hasPhoto = a.profile_photo;
+            const bgUrl = getSportBackgroundUrl(a.sport);
+            const metaFallback = `${formatSportLabel(a.sport)} • ${(a.package_type || 'Performance')}`;
 
             document.getElementById('detail-content').innerHTML = `
                 <!-- Hero Section -->
                 <div class="athlete-hero">
+                    <div class="athlete-hero-bg" style="background-image:url('${bgUrl}')"></div>
                     <div class="athlete-hero-avatar">
                         ${hasPhoto ? `<img src="${a.profile_photo}" alt="">` : initials}
                     </div>
                     <h1 class="athlete-hero-name">${a.first_name} ${a.last_name}</h1>
-                    <p class="athlete-hero-meta">${a.sport || 'Fitness'} • ${a.goal || 'Performance'}</p>
+                    <p class="athlete-hero-meta" id="athlete-hero-meta">${metaFallback}</p>
                 </div>
                 
                 <!-- Stats Bar -->
@@ -2460,6 +2505,10 @@
                 injuries = await supabase.fetch('injuries_conditions', `?athlete_id=eq.${a.id}`);
             } catch (e) { console.log('injuries_conditions not available'); }
             
+            // Risolvi goal_id -> goal_name (se la tabella esiste)
+            const goalIdList = (Array.isArray(goals) ? goals : []).map(g => g.goal_id).filter(Boolean);
+            const goalsById = await fetchGoalNamesById(goalIdList);
+
             // Calcola età
             let age = '-';
             if (a.birth_date) {
@@ -2540,8 +2589,13 @@
             
             // Prepara obiettivi
             let goalsText = 'Non specificati';
-            if (goals && goals.length > 0) {
-                goalsText = goals.map(g => g.goal_id || 'Obiettivo').join(', ');
+            if (goalIdList.length > 0) {
+                const resolved = goalIdList
+                    .map(id => goalsById[id])
+                    .filter(Boolean);
+                goalsText = (resolved.length > 0)
+                    ? resolved.slice(0, 3).join(', ') + (resolved.length > 3 ? '…' : '')
+                    : 'Obiettivi salvati';
             }
             
             // Prepara infortuni
@@ -2568,7 +2622,7 @@
                         </div>
                         <div class="profile-item">
                             <span class="profile-item-label">Sesso</span>
-                            <span class="profile-item-value">${a.gender === 'male' ? 'Maschio' : a.gender === 'female' ? 'Femmina' : '-'}</span>
+                            <span class="profile-item-value">${formatGenderLabel(a.gender)}</span>
                         </div>
                         <div class="profile-item">
                             <span class="profile-item-label">Altezza</span>
@@ -2613,6 +2667,8 @@
                     </div>
                 </div>
 
+                <div class="profile-section" id="profile-progress-section"></div>
+
                 <div class="profile-section">
                     <h3 class="profile-section-title"><i class="fas fa-notes-medical"></i> Note</h3>
                     <div class="profile-grid">
@@ -2621,6 +2677,145 @@
                             <span class="profile-item-value">${injuriesText}</span>
                         </div>
                     </div>
+                </div>
+            `;
+
+            // Aggiorna meta in hero con obiettivo principale (se disponibile)
+            const heroMeta = document.getElementById('athlete-hero-meta');
+            if (heroMeta) {
+                const primaryGoal = getPrimaryGoalFromData(a, sportData, goalIdList, goalsById);
+                heroMeta.textContent = `${formatSportLabel(a.sport)} • ${primaryGoal || (a.package_type || 'Performance')}`;
+            }
+
+            // Progressi (se presenti)
+            await renderProgressMetricsSection(a);
+        }
+
+        function formatGenderLabel(value) {
+            const v = (value ?? '').toString().trim().toLowerCase();
+            if (v === 'male' || v === 'm' || v === 'maschio') return 'Maschio';
+            if (v === 'female' || v === 'f' || v === 'femmina') return 'Femmina';
+            if (v === 'other') return 'Altro';
+            return '-';
+        }
+
+        function formatSportLabel(value) {
+            const v = normalizeSport(value);
+            const map = { calcio: 'Calcio', basket: 'Basket', boxe: 'Boxe', palestra: 'Palestra' };
+            return map[v] || (value || 'Fitness');
+        }
+
+        function formatReadableLabel(value) {
+            return (value ?? '')
+                .toString()
+                .trim()
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, m => m.toUpperCase());
+        }
+
+        function getSportBackgroundUrl(sport) {
+            const s = normalizeSport(sport);
+            const map = {
+                calcio: 'assets/pexels-chuck-2820899.jpg',
+                basket: 'assets/pexels-gasparzaldo-13464777.jpg',
+                boxe: 'assets/pexels-fari-9765649.jpg',
+                palestra: 'assets/pexels-cottonbro-5274989.jpg'
+            };
+            return map[s] || 'assets/pexels-cottonbro-5274989.jpg';
+        }
+
+        function getPrimaryGoalFromData(athlete, sportData, goalIds, goalsById) {
+            const sport = normalizeSport(athlete?.sport);
+            if (sport === 'palestra' && sportData?.gym_primary_goal) {
+                return formatReadableLabel(sportData.gym_primary_goal);
+            }
+            if (Array.isArray(goalIds) && goalIds.length > 0) {
+                const resolved = goalIds.map(id => goalsById?.[id]).filter(Boolean);
+                if (resolved.length > 0) return resolved[0];
+            }
+            return null;
+        }
+
+        let sportSpecificByAthleteId = {};
+
+        function getAthletePrimaryGoalLabel(a) {
+            const sport = normalizeSport(a?.sport);
+            const sportData = sportSpecificByAthleteId?.[a?.id];
+            if (sport === 'palestra' && sportData?.gym_primary_goal) {
+                return formatReadableLabel(sportData.gym_primary_goal);
+            }
+            return null;
+        }
+
+        async function fetchGoalNamesById(goalIds) {
+            const ids = Array.isArray(goalIds) ? goalIds.filter(Boolean) : [];
+            if (ids.length === 0) return {};
+
+            try {
+                const res = await supabase.fetch('role_specific_goals', `?select=id,goal_name&id=in.(${ids.join(',')})`);
+                const map = {};
+                (Array.isArray(res) ? res : []).forEach(g => {
+                    if (g?.id) map[g.id] = g.goal_name;
+                });
+                return map;
+            } catch (e) {
+                console.log('role_specific_goals not available');
+                return {};
+            }
+        }
+
+        async function renderProgressMetricsSection(a) {
+            const container = document.getElementById('profile-progress-section');
+            if (!container) return;
+
+            let metrics = [];
+            try {
+                metrics = await supabase.fetch('progress_metrics', `?athlete_id=eq.${a.id}&order=recorded_at.asc`);
+            } catch (e) {
+                metrics = [];
+            }
+
+            if (!Array.isArray(metrics) || metrics.length === 0) {
+                container.innerHTML = `
+                    <h3 class="profile-section-title"><i class="fas fa-chart-line"></i> Progressi</h3>
+                    <div class="profile-grid">
+                        <div class="profile-item" style="grid-column: span 2;">
+                            <span class="profile-item-label">Dati</span>
+                            <span class="profile-item-value">Nessun dato inserito</span>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by metric_name
+            const byName = {};
+            metrics.forEach(m => {
+                const name = m.metric_name || m.metric_type || 'Metrica';
+                if (!byName[name]) byName[name] = [];
+                byName[name].push(m);
+            });
+
+            const names = Object.keys(byName).slice(0, 4);
+            const cards = names.map(name => {
+                const series = byName[name]
+                    .filter(x => typeof x.value === 'number' || (x.value && !isNaN(parseFloat(x.value))))
+                    .map(x => ({ value: Number(x.value), unit: x.unit || '' }))
+                    .slice(-12);
+
+                const last = series[series.length - 1];
+                return `
+                    <div class="profile-item" style="grid-column: span 2;">
+                        <span class="profile-item-label">${name}</span>
+                        <span class="profile-item-value">${last ? `${last.value}${last.unit ? ' ' + last.unit : ''}` : '-'}</span>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <h3 class="profile-section-title"><i class="fas fa-chart-line"></i> Progressi</h3>
+                <div class="profile-grid">
+                    ${cards}
                 </div>
             `;
         }

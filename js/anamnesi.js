@@ -330,6 +330,31 @@ function loadSummary() {
 
 async function submitForm() {
     const getValue = id => document.getElementById(id)?.value || null;
+
+    const toIntOrNull = (v) => {
+        const n = parseInt(v, 10);
+        return Number.isFinite(n) ? n : null;
+    };
+
+    const toFloatOrNull = (v) => {
+        const n = parseFloat(v);
+        return Number.isFinite(n) ? n : null;
+    };
+
+    const normalizeGender = (v) => {
+        const s = (v ?? '').toString().trim().toLowerCase();
+        if (s === 'male' || s === 'm' || s === 'maschio') return 'male';
+        if (s === 'female' || s === 'f' || s === 'femmina') return 'female';
+        if (s) return 'other';
+        return null;
+    };
+
+    const normalizeExperience = (v) => {
+        const s = (v ?? '').toString().trim().toLowerCase();
+        if (!s) return null;
+        if (s === 'esperto') return 'elite';
+        return s;
+    };
     
     // Collect schedule
     document.querySelectorAll('.day-activity').forEach(select => {
@@ -343,13 +368,13 @@ async function submitForm() {
             first_name: getValue('firstName'),
             last_name: getValue('lastName'),
             birth_date: getValue('birthDate'),
-            gender: getValue('gender'),
+            gender: normalizeGender(getValue('gender')),
             phone: getValue('phone'),
-            height_cm: parseInt(getValue('height')),
-            weight_kg: parseFloat(getValue('weight')),
+            height_cm: toIntOrNull(getValue('height')),
+            weight_kg: toFloatOrNull(getValue('weight')),
             sport: formData.sport,
             package_type: formData.package,
-            experience_level: getValue('experience'),
+            experience_level: normalizeExperience(getValue('experience')),
             status: 'active'
         };
         
@@ -364,13 +389,13 @@ async function submitForm() {
             sportData.football_team_name = getValue('teamName');
             sportData.football_team_level = getValue('teamLevel');
             sportData.football_match_day = getValue('matchDay');
-            sportData.football_weekly_team_sessions = parseInt(getValue('teamSessions'));
+            sportData.football_weekly_team_sessions = toIntOrNull(getValue('teamSessions'));
         } else if (formData.sport === 'basket') {
             sportData.basket_role = formData.role;
             sportData.basket_team_name = getValue('teamName');
             sportData.basket_team_level = getValue('teamLevel');
             sportData.basket_match_day = getValue('matchDay');
-            sportData.basket_weekly_team_sessions = parseInt(getValue('teamSessions'));
+            sportData.basket_weekly_team_sessions = toIntOrNull(getValue('teamSessions'));
         } else if (formData.sport === 'boxe') {
             sportData.boxing_weight_class = formData.role;
             sportData.boxing_stance = getValue('stance');
@@ -392,7 +417,7 @@ async function submitForm() {
             friday: formData.schedule.friday,
             saturday: formData.schedule.saturday,
             sunday: formData.schedule.sunday,
-            max_gr_sessions_per_week: parseInt(getValue('maxSessions'))
+            max_gr_sessions_per_week: toIntOrNull(getValue('maxSessions'))
         };
         
         await supabase.insert('weekly_schedule', scheduleData);
