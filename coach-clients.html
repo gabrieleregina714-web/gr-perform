@@ -1717,6 +1717,10 @@
         }
 
         @media (max-width: 900px) {
+            :root {
+                --mobile-bottom-nav: 70px;
+            }
+
             .sidebar { 
                 position: fixed;
                 left: 0;
@@ -1747,7 +1751,8 @@
                 margin-left: 0;
                 margin-bottom: 70px;
                 padding: 20px;
-                height: calc(100vh - 70px);
+                height: calc(100vh - var(--mobile-bottom-nav));
+                height: calc(100dvh - var(--mobile-bottom-nav));
             }
             
             .landing-header {
@@ -1778,7 +1783,8 @@
             .athletes-view {
                 margin-left: 0;
                 margin-bottom: 70px;
-                height: calc(100vh - 70px);
+                height: calc(100vh - var(--mobile-bottom-nav));
+                height: calc(100dvh - var(--mobile-bottom-nav));
             }
             
             .athletes-header {
@@ -1797,7 +1803,13 @@
             .detail-view {
                 margin-left: 0;
                 margin-bottom: 70px;
-                height: calc(100vh - 70px);
+                height: calc(100vh - var(--mobile-bottom-nav));
+                height: calc(100dvh - var(--mobile-bottom-nav));
+            }
+
+            /* Ensure the fixed bottom nav never covers the end of scrollable content */
+            .detail-content {
+                padding-bottom: calc(var(--mobile-bottom-nav) + env(safe-area-inset-bottom) + 16px);
             }
             
             .athletes-header {
