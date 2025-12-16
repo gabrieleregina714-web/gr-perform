@@ -2021,28 +2021,28 @@
         </div>
         <div class="sports-grid">
             <div class="sport-big-card" onclick="openSportView('calcio')">
-                <img src="assets/pexels-gabin-cobret-430175667-32948745.jpg" alt="Calcio">
+                <img src="assets/sport-calcio.jpg" alt="Calcio" onerror="this.onerror=null; this.src='assets/pexels-gabin-cobret-430175667-32948745.jpg';">
                 <div class="sport-card-content">
                     <div class="sport-card-title">Calcio</div>
                     <div class="sport-card-count"><span id="count-calcio">0</span> atleti</div>
                 </div>
             </div>
             <div class="sport-big-card" onclick="openSportView('basket')">
-                <img src="assets/pexels-gasparzaldo-13464777.jpg" alt="Basket">
+                <img src="assets/sport-basket.jpg" alt="Basket" onerror="this.onerror=null; this.src='assets/pexels-gasparzaldo-13464777.jpg';">
                 <div class="sport-card-content">
                     <div class="sport-card-title">Basket</div>
                     <div class="sport-card-count"><span id="count-basket">0</span> atleti</div>
                 </div>
             </div>
             <div class="sport-big-card" onclick="openSportView('boxe')">
-                <img src="assets/pexels-dany-lovehill-10341870.jpg" alt="Boxe">
+                <img src="assets/sport-boxe.jpg" alt="Boxe" onerror="this.onerror=null; this.src='assets/pexels-dany-lovehill-10341870.jpg';">
                 <div class="sport-card-content">
                     <div class="sport-card-title">Boxe</div>
                     <div class="sport-card-count"><span id="count-boxe">0</span> atleti</div>
                 </div>
             </div>
             <div class="sport-big-card" onclick="openSportView('palestra')">
-                <img src="assets/pexels-cottonbro-5741289.jpg" alt="Palestra">
+                <img src="assets/sport-palestra.jpg" alt="Palestra" onerror="this.onerror=null; this.src='assets/pexels-cottonbro-5741289.jpg';">
                 <div class="sport-card-content">
                     <div class="sport-card-title">Palestra</div>
                     <div class="sport-card-count"><span id="count-palestra">0</span> atleti</div>
@@ -2729,27 +2729,20 @@
         function getSportBackgroundImages(sport) {
             const s = normalizeSport(sport);
 
-            // Primary = the specific photo you requested (if present in assets)
+            // Primary = the custom sport images you provided (drop them into assets/)
             // Fallback = an existing local asset so the UI always has a background
             const primaryBySport = {
-                // Mustafa Fatemi (Pexels id 29873486)
-                calcio: 'assets/pexels-mustafa-fatemi-383794430-29873486.jpg',
-
-                // Markus Spiske (Pexels id 1752757) -> add this file to assets if you want the exact image
-                basket: 'assets/pexels-markus-spiske-1752757.jpg',
-
-                // Dany Lovehill (Pexels id 10341870) -> add this file to assets if you want the exact image
-                boxe: 'assets/pexels-dany-lovehill-10341870.jpg',
-
-                // Victor Freitas (Pexels id 931321) -> add this file to assets if you want the exact image
-                palestra: 'assets/pexels-victor-freitas-931321.jpg'
+                calcio: 'assets/sport-calcio.jpg',
+                basket: 'assets/sport-basket.jpg',
+                boxe: 'assets/sport-boxe.jpg',
+                palestra: 'assets/sport-palestra.jpg'
             };
 
             const fallbackBySport = {
-                calcio: 'assets/pexels-chuck-2820899.jpg',
+                calcio: 'assets/pexels-gabin-cobret-430175667-32948745.jpg',
                 basket: 'assets/pexels-gasparzaldo-13464777.jpg',
-                boxe: 'assets/pexels-dany-lovehill-141442867-10341872.jpg',
-                palestra: 'assets/pexels-victorfreitas-949132.jpg'
+                boxe: 'assets/pexels-dany-lovehill-10341870.jpg',
+                palestra: 'assets/pexels-cottonbro-5741289.jpg'
             };
 
             const primary = primaryBySport[s] || 'assets/pexels-cottonbro-5274989.jpg';
