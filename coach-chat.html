@@ -709,11 +709,12 @@
         .input-actions {
             display: flex;
             gap: 4px;
+            align-items: center;
         }
 
         .input-action {
-            width: 44px; height: 44px;
-            border-radius: 12px;
+            width: 38px; height: 38px;
+            border-radius: 999px;
             background: #202c33;
             border: none;
             color: var(--gray-400);
@@ -739,10 +740,10 @@
             flex: 1;
             background: var(--gray-800);
             border: 1px solid var(--gray-600);
-            border-radius: 24px;
+            border-radius: 999px;
             display: flex;
             align-items: flex-end;
-            padding: 6px 6px 6px 20px;
+            padding: 4px 6px 4px 14px;
             transition: border-color 0.2s;
         }
 
@@ -757,17 +758,17 @@
             outline: none;
             resize: none;
             max-height: 120px;
-            padding: 10px 0;
+            padding: 8px 0;
             font-family: inherit;
         }
 
         .send-btn {
-            width: 40px; height: 40px;
+            width: 34px; height: 34px;
             border-radius: 50%;
             background: var(--red);
             border: none;
             color: var(--white);
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
@@ -891,36 +892,12 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar { 
-                position: fixed;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                top: auto;
-                width: 100%;
-                height: var(--bottom-nav-height);
-                flex-direction: row;
-                padding: 0 0 env(safe-area-inset-bottom) 0;
-                justify-content: space-around;
-                align-items: center;
-                border-right: none;
-                border-top: 1px solid var(--gray-700);
-                background: var(--black);
-            }
-            .logo { display: none; }
-            .nav-item { 
-                margin-bottom: 0;
-                width: 50px;
-                height: 50px;
-                font-size: 18px;
-            }
-            .nav-item.active::before { display: none; }
-            .nav-spacer { display: none; }
-            :root { --bottom-nav-height: calc(70px + env(safe-area-inset-bottom)); }
+            .sidebar { display: none; }
+            :root { --bottom-nav-height: 0px; }
             .chat-container {
                 margin-left: 0;
-                margin-bottom: var(--bottom-nav-height);
-                height: calc(var(--app-height) - var(--bottom-nav-height));
+                margin-bottom: 0;
+                height: var(--app-height);
             }
         }
 
@@ -1178,7 +1155,7 @@
             const month = (document.getElementById('media-filter-month')?.value || '').trim();
             const date = (document.getElementById('media-filter-date')?.value || '').trim();
 
-            const media = (currentMessages || []).filter(m => m.media_type && m.media_url);
+            const media = (currentMessages || []).filter(m => m.image_url);
 
             const filtered = media.filter(m => {
                 const d = new Date(m.created_at);
@@ -1215,13 +1192,10 @@
                 html += `<div class="media-day">${label}</div>`;
                 for (const m of groups.get(key)) {
                     const t = new Date(m.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-                    const typeLabel = m.media_type === 'image' ? 'Foto' : (m.media_type === 'video' ? 'Video' : 'File');
-                    const name = m.file_name || typeLabel;
-                    const thumb = m.media_type === 'image' ? `<img src="${m.media_url}" alt="">` : `<i class="fas fa-${m.media_type === 'video' ? 'video' : 'file'}" style="color:var(--gray-400);"></i>`;
-
-                    const onClick = m.media_type === 'image'
-                        ? `openLightbox('${m.media_url.replace(/'/g, "\\'")}')`
-                        : `window.open('${m.media_url.replace(/'/g, "\\'")}')`;
+                    const typeLabel = 'Foto';
+                    const name = 'Immagine';
+                    const thumb = `<img src="${m.image_url}" alt="">`;
+                    const onClick = `openLightbox('${String(m.image_url).replace(/'/g, "\\'")}')`;
 
                     html += `
                         <div class="media-item" onclick="${onClick}">
@@ -1252,39 +1226,11 @@
 
                 const isSent = m.sender === 'coach';
                 const time = new Date(m.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-                
-                // Read receipt status
-                let receiptClass = 'sent';
-                if (m.delivered) receiptClass = 'delivered';
-                if (m.read) receiptClass = 'read';
-                
+
                 let mediaHtml = '';
-                if (m.media_type === 'image' && m.media_url) {
-                    mediaHtml = `<div class="message-media"><img src="${m.media_url}" onclick="openLightbox('${m.media_url}')"></div>`;
-                } else if (m.media_type === 'video' && m.media_url) {
-                    mediaHtml = `<div class="message-media"><video controls src="${m.media_url}"></video></div>`;
-                } else if (m.media_type === 'file' && m.media_url) {
-                    const ext = m.file_name?.split('.').pop() || 'pdf';
-                    mediaHtml = `
-                        <div class="message-file" onclick="window.open('${m.media_url}')">
-                            <div class="file-icon ${ext}"><i class="fas fa-file-${ext === 'pdf' ? 'pdf' : 'alt'}"></i></div>
-                            <div class="file-info">
-                                <div class="file-name">${m.file_name || 'Documento'}</div>
-                                <div class="file-size">${m.file_size || 'PDF'}</div>
-                            </div>
-                            <i class="fas fa-download" style="color: var(--gray-400);"></i>
-                        </div>
-                    `;
-                } else if (m.media_type === 'voice') {
-                    mediaHtml = `
-                        <div class="voice-message">
-                            <button class="voice-play"><i class="fas fa-play"></i></button>
-                            <div class="voice-waveform">
-                                ${Array(20).fill().map(() => `<div class="voice-bar" style="height: ${Math.random() * 20 + 10}px;"></div>`).join('')}
-                            </div>
-                            <span class="voice-duration">${m.voice_duration || '0:00'}</span>
-                        </div>
-                    `;
+                if (m.image_url) {
+                    const safeUrl = String(m.image_url).replace(/'/g, "\\'");
+                    mediaHtml = `<div class="message-media"><img src="${m.image_url}" onclick="openLightbox('${safeUrl}')"></div>`;
                 }
 
                 html += `
@@ -1296,7 +1242,7 @@
                         <div class="message-footer">
                             <span>${time}</span>
                             ${isSent ? `
-                                <span class="read-receipt ${receiptClass}">
+                                <span class="read-receipt ${m.read ? 'read' : 'sent'}">
                                     <i class="fas fa-check${m.read ? '-double' : ''}"></i>
                                 </span>
                             ` : ''}
@@ -1322,13 +1268,56 @@
 
         function handleImageSelect(e) {
             const files = Array.from(e.target.files);
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    pendingMedia.push({ type: 'image', url: ev.target.result, file });
+            files.forEach(async (file) => {
+                try {
+                    const compressed = await compressImageToDataUrl(file);
+                    pendingMedia.push({ type: 'image', url: compressed, file });
                     updateMediaPreview();
+                } catch (err) {
+                    console.error('Image compress failed:', err);
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        pendingMedia.push({ type: 'image', url: ev.target.result, file });
+                        updateMediaPreview();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function compressImageToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+
+                img.onload = () => {
+                    try {
+                        const maxDim = 1280;
+                        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+                        const w = Math.max(1, Math.round(img.width * scale));
+                        const h = Math.max(1, Math.round(img.height * scale));
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                        URL.revokeObjectURL(url);
+                        resolve(dataUrl);
+                    } catch (e) {
+                        URL.revokeObjectURL(url);
+                        reject(e);
+                    }
                 };
-                reader.readAsDataURL(file);
+
+                img.onerror = (e) => {
+                    URL.revokeObjectURL(url);
+                    reject(e);
+                };
+
+                img.src = url;
             });
         }
 
@@ -1401,36 +1390,39 @@
             input.value = '';
             input.style.height = 'auto';
 
-            // Send text message
+            const errors = [];
+
+            // Send text
             if (message) {
-                await supabase.insert('chat_messages', {
+                const res = await supabase.insert('chat_messages', {
                     athlete_id: selectedAthleteId,
                     sender: 'coach',
                     message: message,
-                    read: false,
-                    delivered: true
+                    read: false
                 });
+                if (res?.error) errors.push(res.message || 'Invio messaggio fallito');
             }
 
-            // Send media messages
+            // Send images (schema: image_url)
             for (const media of pendingMedia) {
-                // In a real app, upload to storage first
-                // For demo, we'll save with placeholder URL
-                await supabase.insert('chat_messages', {
+                if (media.type !== 'image') continue;
+                const res = await supabase.insert('chat_messages', {
                     athlete_id: selectedAthleteId,
                     sender: 'coach',
                     message: '',
-                    media_type: media.type,
-                    media_url: media.url || null,
-                    file_name: media.name || null,
-                    read: false,
-                    delivered: true
+                    image_url: media.url,
+                    read: false
                 });
+                if (res?.error) errors.push(res.message || 'Invio immagine fallito');
             }
 
             pendingMedia = [];
             updateMediaPreview();
             selectAthlete(selectedAthleteId);
+
+            if (errors.length) {
+                alert(errors[0]);
+            }
         }
 
         function openLightbox(url) {
