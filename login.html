@@ -305,6 +305,169 @@
         .title { animation-delay: 0.2s; opacity: 0; }
         .subtitle { animation-delay: 0.3s; opacity: 0; }
         .btn-group { animation-delay: 0.4s; opacity: 0; }
+
+        /* MOBILE OPTIMIZATIONS */
+        @media (max-width: 380px) {
+            .header {
+                padding: 16px;
+            }
+            
+            .logo {
+                height: 60px;
+            }
+            
+            .content {
+                padding: 24px 20px 40px;
+            }
+            
+            .tagline {
+                font-size: 10px;
+                letter-spacing: 2px;
+                margin-bottom: 12px;
+            }
+            
+            .title {
+                font-size: 38px;
+                letter-spacing: -1px;
+                margin-bottom: 12px;
+            }
+            
+            .subtitle {
+                font-size: 14px;
+                margin-bottom: 32px;
+            }
+            
+            .btn {
+                padding: 16px 24px;
+                font-size: 13px;
+            }
+            
+            /* Login modal */
+            .login-modal {
+                padding: 16px;
+            }
+            
+            .modal-header {
+                margin-bottom: 32px;
+            }
+            
+            .modal-header .logo {
+                height: 32px;
+            }
+            
+            .login-title {
+                font-size: 28px;
+            }
+            
+            .login-subtitle {
+                font-size: 14px;
+                margin-bottom: 32px;
+            }
+            
+            .form-group {
+                margin-bottom: 24px;
+            }
+            
+            .form-group input {
+                font-size: 16px;
+                padding: 14px 0;
+            }
+        }
+
+        /* Schermi medi */
+        @media (min-width: 381px) and (max-width: 414px) {
+            .logo {
+                height: 70px;
+            }
+            
+            .title {
+                font-size: 42px;
+            }
+        }
+
+        /* Landscape mode */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 12px;
+            }
+            
+            .logo {
+                height: 50px;
+            }
+            
+            .content {
+                padding: 16px 32px 24px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: flex-end;
+                gap: 24px;
+            }
+            
+            .content > * {
+                flex: none;
+            }
+            
+            .title {
+                font-size: 32px;
+            }
+            
+            .subtitle {
+                margin-bottom: 0;
+                max-width: 250px;
+            }
+            
+            .btn-group {
+                flex-direction: row;
+                margin-left: auto;
+            }
+            
+            .btn {
+                padding: 14px 24px;
+                font-size: 12px;
+            }
+            
+            .login-modal {
+                flex-direction: row;
+                gap: 40px;
+            }
+            
+            .modal-header {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 0;
+            }
+        }
+
+        /* Touch feedback */
+        @media (hover: none) {
+            .btn-primary:active {
+                transform: scale(0.97);
+            }
+            
+            .btn-secondary:active {
+                background: rgba(255,255,255,0.1);
+            }
+            
+            .back-btn:active {
+                background: #333;
+            }
+        }
+
+        /* Safe area for notch */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .header {
+                padding-top: calc(24px + env(safe-area-inset-top));
+            }
+            
+            .content {
+                padding-bottom: calc(48px + env(safe-area-inset-bottom));
+            }
+            
+            .login-modal {
+                padding-top: calc(24px + env(safe-area-inset-top));
+                padding-bottom: calc(24px + env(safe-area-inset-bottom));
+            }
+        }
     </style>
 </head>
 <body>
