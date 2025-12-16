@@ -1242,60 +1242,182 @@
             .nav-item.active::before { display: none; }
             .nav-spacer { display: none; }
             .main-container {
-                grid-template-columns: 1fr;
+                display: none;
+            }
+            .main-container.show-detail {
+                display: block !important;
                 margin-left: 0;
                 margin-bottom: 70px;
             }
-            .clients-panel {
+            .main-container.show-detail .clients-panel {
                 display: none;
             }
-            .clients-panel.mobile-show {
-                display: flex;
-                position: fixed;
-                inset: 0;
-                bottom: 70px;
+            .main-container.show-detail .detail-panel {
                 margin-left: 0;
-                z-index: 50;
-                background: var(--gray-900);
             }
-            .detail-panel {
-                padding: 16px;
+            .mobile-back-btn {
+                display: flex !important;
             }
-            .detail-header {
-                flex-direction: column;
-                text-align: center;
-                gap: 12px;
+            .mobile-clients-view {
+                display: block !important;
+                margin-bottom: 70px;
+                padding: 20px;
+                padding-top: 20px;
+                overflow-y: auto;
+                height: calc(100vh - 70px);
             }
-            .profile-avatar {
-                width: 80px;
-                height: 80px;
-                font-size: 28px;
-            }
-            .profile-name {
-                font-size: 22px;
-            }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-            .stat-card {
-                padding: 16px;
-            }
-            .tabs {
-                overflow-x: auto;
-                padding-bottom: 8px;
-            }
-            .tab {
-                padding: 12px 16px;
-                font-size: 12px;
-                white-space: nowrap;
-            }
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-            .chat-container {
-                height: calc(100vh - 200px);
-            }
+        }
+
+        /* MOBILE CLIENTS VIEW */
+        .mobile-clients-view {
+            display: none;
+        }
+        
+        .mobile-search {
+            background: var(--gray-800);
+            border-radius: 16px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .mobile-search i {
+            color: var(--gray-500);
+        }
+        
+        .mobile-search input {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 15px;
+            width: 100%;
+            outline: none;
+        }
+        
+        .mobile-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        
+        .sport-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        
+        .sport-card {
+            background: var(--gray-800);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .sport-card:hover, .sport-card.active {
+            border-color: var(--red);
+            background: var(--gray-700);
+        }
+        
+        .sport-card-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .sport-card-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .sport-card-count {
+            font-size: 12px;
+            color: var(--gray-400);
+        }
+        
+        .mobile-athletes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .mobile-athlete-card {
+            background: var(--gray-800);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mobile-athlete-card:hover {
+            background: var(--gray-700);
+        }
+        
+        .mobile-athlete-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            overflow: hidden;
+        }
+        
+        .mobile-athlete-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .mobile-athlete-info {
+            flex: 1;
+        }
+        
+        .mobile-athlete-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .mobile-athlete-meta {
+            font-size: 12px;
+            color: var(--gray-400);
+        }
+        
+        .mobile-athlete-arrow {
+            color: var(--gray-500);
+        }
+        
+        .mobile-back-btn {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 16px;
+            font-weight: 600;
+            padding: 16px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--gray-700);
+        }
+        
+        .mobile-back-btn i {
+            color: var(--red);
         }
 
         @media (max-width: 480px) {
@@ -1508,10 +1630,63 @@
 
         <!-- RIGHT: Client Detail -->
         <div class="detail-panel" id="detail-panel">
+            <button class="mobile-back-btn" onclick="backToMobileList()">
+                <i class="fas fa-arrow-left"></i> Torna alla lista
+            </button>
             <div class="detail-empty">
                 <i class="fas fa-user-circle"></i>
                 <p>Seleziona un cliente per iniziare</p>
             </div>
+        </div>
+    </div>
+
+    <!-- MOBILE CLIENTS VIEW -->
+    <div class="mobile-clients-view" id="mobile-clients-view">
+        <div class="mobile-search">
+            <i class="fas fa-search"></i>
+            <input type="text" id="mobile-search-input" placeholder="Cerca atleta...">
+        </div>
+        
+        <div class="mobile-section-title">Sport</div>
+        <div class="sport-cards" id="sport-cards">
+            <div class="sport-card" data-sport="calcio" onclick="filterBySport('calcio')">
+                <div class="sport-card-icon">⚽</div>
+                <div class="sport-card-name">Calcio</div>
+                <div class="sport-card-count" id="count-calcio">0 atleti</div>
+            </div>
+            <div class="sport-card" data-sport="basket" onclick="filterBySport('basket')">
+                <div class="sport-card-icon">🏀</div>
+                <div class="sport-card-name">Basket</div>
+                <div class="sport-card-count" id="count-basket">0 atleti</div>
+            </div>
+            <div class="sport-card" data-sport="boxe" onclick="filterBySport('boxe')">
+                <div class="sport-card-icon">🥊</div>
+                <div class="sport-card-name">Boxe</div>
+                <div class="sport-card-count" id="count-boxe">0 atleti</div>
+            </div>
+            <div class="sport-card" data-sport="palestra" onclick="filterBySport('palestra')">
+                <div class="sport-card-icon">💪</div>
+                <div class="sport-card-name">Palestra</div>
+                <div class="sport-card-count" id="count-palestra">0 atleti</div>
+            </div>
+            <div class="sport-card" data-sport="nuoto" onclick="filterBySport('nuoto')">
+                <div class="sport-card-icon">🏊</div>
+                <div class="sport-card-name">Nuoto</div>
+                <div class="sport-card-count" id="count-nuoto">0 atleti</div>
+            </div>
+            <div class="sport-card" data-sport="altro" onclick="filterBySport('altro')">
+                <div class="sport-card-icon">🏃</div>
+                <div class="sport-card-name">Altro</div>
+                <div class="sport-card-count" id="count-altro">0 atleti</div>
+            </div>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div class="mobile-section-title" style="margin-bottom: 0;" id="mobile-athletes-title">Tutti gli Atleti</div>
+            <button onclick="filterBySport('all')" style="background: none; border: none; color: var(--red); font-size: 12px; cursor: pointer;" id="show-all-btn">Mostra tutti</button>
+        </div>
+        <div class="mobile-athletes-list" id="mobile-athletes-list">
+            <!-- Loaded dynamically -->
         </div>
     </div>
 
@@ -1673,6 +1848,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await loadAthletes();
             setupSearch();
+            setupMobileSearch();
         });
 
         async function loadAthletes() {
@@ -1681,9 +1857,138 @@
                 document.getElementById('clients-count').textContent = allAthletes.length;
                 renderAthletes(allAthletes);
                 renderSportFilters();
+                // Mobile view updates
+                updateSportCounts();
+                renderMobileAthletes(allAthletes);
             } catch (error) {
                 console.error('Error loading athletes:', error);
             }
+        }
+
+        // Mobile view functions
+        let currentMobileSport = 'all';
+        
+        function updateSportCounts() {
+            const sportCounts = {
+                calcio: 0,
+                basket: 0,
+                boxe: 0,
+                palestra: 0,
+                nuoto: 0,
+                altro: 0
+            };
+            
+            allAthletes.forEach(a => {
+                const sport = a.sport?.toLowerCase() || 'altro';
+                if (sportCounts.hasOwnProperty(sport)) {
+                    sportCounts[sport]++;
+                } else {
+                    sportCounts.altro++;
+                }
+            });
+            
+            Object.keys(sportCounts).forEach(sport => {
+                const el = document.getElementById(`count-${sport}`);
+                if (el) {
+                    const count = sportCounts[sport];
+                    el.textContent = count === 1 ? '1 atleta' : `${count} atleti`;
+                }
+            });
+        }
+        
+        function renderMobileAthletes(athletes) {
+            const container = document.getElementById('mobile-athletes-list');
+            if (!container) return;
+            
+            if (athletes.length === 0) {
+                container.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:40px;">Nessun atleta trovato</p>';
+                return;
+            }
+            
+            container.innerHTML = athletes.map(a => {
+                const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+                return `
+                    <div class="mobile-athlete-card" onclick="selectMobileAthlete('${a.id}')">
+                        <div class="mobile-athlete-avatar">
+                            ${a.profile_photo ? `<img src="${a.profile_photo}" alt="">` : initials}
+                        </div>
+                        <div class="mobile-athlete-info">
+                            <div class="mobile-athlete-name">${a.first_name} ${a.last_name}</div>
+                            <div class="mobile-athlete-meta">${a.sport || 'Fitness'} • Lv. ${a.level || 1}</div>
+                        </div>
+                        <div class="mobile-athlete-arrow"><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function filterBySport(sport) {
+            currentMobileSport = sport;
+            
+            // Update card styles
+            document.querySelectorAll('.sport-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.sport === sport);
+            });
+            
+            // Filter athletes
+            let filtered;
+            if (sport === 'all') {
+                filtered = allAthletes;
+                document.getElementById('mobile-athletes-title').textContent = 'Tutti gli Atleti';
+            } else {
+                filtered = allAthletes.filter(a => {
+                    const athleteSport = a.sport?.toLowerCase() || 'altro';
+                    if (sport === 'altro') {
+                        return !['calcio', 'basket', 'boxe', 'palestra', 'nuoto'].includes(athleteSport);
+                    }
+                    return athleteSport === sport;
+                });
+                const sportNames = {calcio: 'Calcio', basket: 'Basket', boxe: 'Boxe', palestra: 'Palestra', nuoto: 'Nuoto', altro: 'Altro'};
+                document.getElementById('mobile-athletes-title').textContent = sportNames[sport] || sport;
+            }
+            
+            renderMobileAthletes(filtered);
+        }
+        
+        function setupMobileSearch() {
+            const input = document.getElementById('mobile-search-input');
+            if (!input) return;
+            
+            input.addEventListener('input', () => {
+                const search = input.value.toLowerCase();
+                let filtered = allAthletes.filter(a => 
+                    `${a.first_name} ${a.last_name}`.toLowerCase().includes(search)
+                );
+                
+                if (currentMobileSport !== 'all') {
+                    filtered = filtered.filter(a => {
+                        const athleteSport = a.sport?.toLowerCase() || 'altro';
+                        return athleteSport === currentMobileSport;
+                    });
+                }
+                
+                renderMobileAthletes(filtered);
+            });
+        }
+        
+        function selectMobileAthlete(id) {
+            // Navigate to athlete detail or show modal
+            selectedAthlete = allAthletes.find(a => a.id === id);
+            if (selectedAthlete) {
+                // Hide mobile view, show desktop view with detail
+                document.getElementById('mobile-clients-view').style.display = 'none';
+                const mainContainer = document.querySelector('.main-container');
+                mainContainer.classList.add('show-detail');
+                renderClientDetail();
+            }
+        }
+        
+        function backToMobileList() {
+            // Show mobile view, hide desktop view
+            const mainContainer = document.querySelector('.main-container');
+            mainContainer.classList.remove('show-detail');
+            document.getElementById('mobile-clients-view').style.display = '';
+            selectedAthlete = null;
         }
 
         function renderSportFilters() {
@@ -1770,6 +2075,9 @@
             const hasPhoto = a.profile_photo;
 
             document.getElementById('detail-panel').innerHTML = `
+                <button class="mobile-back-btn" onclick="backToMobileList()">
+                    <i class="fas fa-arrow-left"></i> Torna alla lista
+                </button>
                 <div class="client-header">
                     <div class="header-avatar">
                         ${hasPhoto ? `<img src="${a.profile_photo}" alt="">` : initials}
