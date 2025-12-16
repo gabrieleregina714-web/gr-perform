@@ -327,19 +327,21 @@
         .actions-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
         }
 
         .action-card {
             background: #111;
             border: 1px solid #222;
-            padding: 24px;
+            padding: 16px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             text-decoration: none;
             color: #fff;
             transition: all 0.2s;
+            min-width: 0; /* Permette shrink */
+            overflow: hidden;
         }
 
         .action-card:hover {
@@ -348,28 +350,40 @@
         }
 
         .action-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
             border-radius: 50%;
             background: #E63946;
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
+        }
+
+        .action-info {
+            min-width: 0;
+            overflow: hidden;
         }
 
         .action-info h4 {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .action-info p {
-            font-size: 11px;
+            font-size: 10px;
             color: rgba(255,255,255,0.4);
             margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* BOTTOM NAV */
@@ -421,15 +435,15 @@
         }
 
         /* MOBILE OPTIMIZATIONS */
-        @media (max-width: 380px) {
+        @media (max-width: 480px) {
             /* Hero più compatto su schermi piccoli */
             .hero {
-                height: 45vh;
-                min-height: 300px;
+                height: 40vh;
+                min-height: 280px;
             }
             
             .hero-content {
-                padding: 24px 16px;
+                padding: 20px 16px;
             }
             
             .user-name {
@@ -458,87 +472,125 @@
             
             /* Workout card */
             .workout-section {
-                padding: 0 16px;
+                padding: 0 12px;
+                margin-top: -16px;
             }
             
             .workout-card {
-                padding: 20px;
+                padding: 16px;
             }
             
             .workout-title {
-                font-size: 22px;
+                font-size: 20px;
+                margin-bottom: 6px;
+            }
+            
+            .workout-label {
+                font-size: 9px;
+                margin-bottom: 10px;
             }
             
             .workout-meta {
                 flex-wrap: wrap;
                 gap: 12px;
-                margin-bottom: 20px;
+                margin-bottom: 16px;
+            }
+            
+            .workout-meta-item {
+                font-size: 12px;
             }
             
             .workout-btn {
-                padding: 14px 24px;
-                font-size: 12px;
+                padding: 12px 20px;
+                font-size: 11px;
                 width: 100%;
                 justify-content: center;
             }
             
             /* Stats grid - 2 colonne su schermi piccoli */
             .stats-section {
-                padding: 24px 16px;
+                padding: 20px 12px;
+            }
+            
+            .section-title {
+                font-size: 9px;
+                margin-bottom: 12px;
             }
             
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1px;
             }
             
             .stat-card {
-                padding: 16px 10px;
+                padding: 12px 6px;
             }
             
             .stat-value {
-                font-size: 24px;
+                font-size: 20px;
+            }
+            
+            .stat-label {
+                font-size: 8px;
             }
             
             /* Level card */
             .level-section {
-                padding: 0 16px 24px;
+                padding: 0 12px 20px;
             }
             
             .level-card {
-                padding: 18px;
-                gap: 14px;
+                padding: 14px;
+                gap: 12px;
             }
             
             .level-badge {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
             }
             
-            /* Actions grid - full width */
+            .level-title {
+                font-size: 12px;
+            }
+            
+            .level-xp {
+                font-size: 10px;
+            }
+            
+            /* Actions grid */
             .actions-section {
-                padding: 0 16px 24px;
+                padding: 0 12px 20px;
             }
             
             .actions-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
             }
             
             .action-card {
-                padding: 18px;
-                gap: 14px;
+                padding: 12px;
+                gap: 10px;
             }
             
             .action-icon {
-                width: 42px;
-                height: 42px;
-                font-size: 16px;
+                width: 36px;
+                height: 36px;
+                min-width: 36px;
+                font-size: 14px;
+            }
+            
+            .action-info h4 {
+                font-size: 11px;
+            }
+            
+            .action-info p {
+                font-size: 9px;
             }
             
             /* Bottom nav */
             .nav-item {
-                padding: 4px 8px;
+                padding: 4px 6px;
             }
             
             .nav-item i {
@@ -548,40 +600,48 @@
             .nav-item span {
                 font-size: 8px;
             }
+            
+            body {
+                padding-bottom: 80px;
+            }
         }
-
-        /* Schermi medi (iPhone 6/7/8/X) */
-        @media (min-width: 381px) and (max-width: 414px) {
+        
+        /* Schermi molto piccoli (iPhone SE, ecc) */
+        @media (max-width: 350px) {
             .hero {
-                height: 48vh;
-                min-height: 340px;
+                height: 35vh;
+                min-height: 240px;
             }
             
             .user-name {
-                font-size: 32px;
+                font-size: 24px;
             }
             
             .workout-title {
-                font-size: 24px;
+                font-size: 18px;
             }
             
             .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
             
             .stat-value {
-                font-size: 24px;
-            }
-        }
-
-        /* Schermi più grandi (iPhone Plus/Max/Android) */
-        @media (min-width: 415px) and (max-width: 767px) {
-            .hero {
-                height: 50vh;
+                font-size: 22px;
             }
             
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
+            .action-icon {
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+                font-size: 12px;
+            }
+            
+            .action-info h4 {
+                font-size: 10px;
+            }
+            
+            .action-info p {
+                display: none;
             }
         }
 
