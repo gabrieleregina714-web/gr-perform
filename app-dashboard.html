@@ -841,7 +841,7 @@
             const athleteId = localStorage.getItem('gr_athlete_id');
             
             if (!athleteId) {
-                location.href = 'login.html';
+                window.location.replace('login.html');
                 return;
             }
 
@@ -851,7 +851,7 @@
                 const athlete = athletes[0];
                 
                 if (!athlete) {
-                    location.href = 'login.html';
+                    window.location.replace('login.html');
                     return;
                 }
 

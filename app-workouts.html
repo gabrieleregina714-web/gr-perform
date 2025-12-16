@@ -350,7 +350,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             if (!athleteId) {
-                location.href = 'login.html';
+                window.location.replace('login.html');
                 return;
             }
 
