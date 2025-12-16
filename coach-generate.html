@@ -1839,13 +1839,11 @@
                 return;
             }
 
+            // Minimal fields - only essentials
             const workout = {
                 athlete_id: selectedAthlete.id,
-                name: document.getElementById('workout-title').value,
-                type: 'ai_generated',
-                exercises: currentWorkout.exercises,
-                week: currentWeek,
-                status: 'assigned'
+                name: document.getElementById('workout-title').value || 'Workout AI',
+                exercises: currentWorkout.exercises
             };
 
             console.log('Saving workout:', workout);
