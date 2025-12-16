@@ -497,7 +497,7 @@
         <a href="coach-clients.html" class="nav-item"><i class="fas fa-users"></i></a>
         <a href="coach-generate.html" class="nav-item"><i class="fas fa-bolt"></i></a>
         <div class="nav-spacer"></div>
-        <a href="#" onclick="coachLogout()" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
+        <a href="#" onclick="coachLogout(event)" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
     </nav>
 
     <main class="main">
@@ -591,12 +591,14 @@
         }
 
         // Logout function
-        function coachLogout() {
+        function coachLogout(event) {
+            if (event) event.preventDefault();
             localStorage.removeItem('gr_coach_logged_in');
             localStorage.removeItem('gr_coach_email');
             localStorage.removeItem('gr_coach_name');
             localStorage.removeItem('gr_coach_last_active');
-            window.location.href = 'coach-login.html';
+            // Use replace to prevent back button issues
+            window.location.replace('coach-login.html');
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -639,14 +641,8 @@
                     document.getElementById('stat-workouts').textContent = '0';
                 }
                 
-                // Load pending feedback (with error handling)
-                try {
-                    const pending = await supabase.fetch('feedback', '?reviewed=eq.false&select=id');
-                    const pendingCount = pending?.length || 0;
-                    document.getElementById('stat-pending').textContent = pendingCount;
-                } catch(e) {
-                    document.getElementById('stat-pending').textContent = '0';
-                }
+                // Pending reviews - feedback table doesn't exist yet
+                document.getElementById('stat-pending').textContent = '0';
                 
                 // Render athletes (max 6)
                 const grid = document.getElementById('athletes-grid');
