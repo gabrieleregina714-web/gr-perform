@@ -39,7 +39,7 @@
         }
 
         .header-logo img {
-            height: 32px;
+            height: 44px;
         }
 
         .header-right {
@@ -51,9 +51,9 @@
             width: 42px;
             height: 42px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
+            background: rgba(230,57,70,0.2);
             border: none;
-            color: #fff;
+            color: #E63946;
             font-size: 16px;
             cursor: pointer;
             display: flex;
@@ -73,7 +73,31 @@
         .hero-bg {
             position: absolute;
             inset: 0;
-            background: url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800') center/cover;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Sport-specific hero backgrounds */
+        .hero-bg.boxing {
+            background-image: url('https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800');
+        }
+        .hero-bg.calcio, .hero-bg.football, .hero-bg.soccer {
+            background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800');
+        }
+        .hero-bg.basket, .hero-bg.basketball {
+            background-image: url('https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800');
+        }
+        .hero-bg.palestra, .hero-bg.fitness, .hero-bg.gym {
+            background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800');
+        }
+        .hero-bg.crossfit {
+            background-image: url('https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=800');
+        }
+        .hero-bg.running, .hero-bg.corsa {
+            background-image: url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800');
+        }
+        .hero-bg.default {
+            background-image: url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800');
         }
 
         .hero-overlay {
@@ -100,7 +124,7 @@
             font-weight: 700;
             letter-spacing: 3px;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.5);
+            color: #E63946;
             margin-bottom: 8px;
         }
 
@@ -122,7 +146,7 @@
 
         .workout-card {
             background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-            border: 1px solid #2a2a2a;
+            border: 1px solid #E63946;
             padding: 28px;
             position: relative;
             overflow: hidden;
@@ -135,7 +159,7 @@
             right: -20%;
             width: 200px;
             height: 200px;
-            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(230,57,70,0.15) 0%, transparent 70%);
         }
 
         .workout-label {
@@ -143,7 +167,7 @@
             font-weight: 700;
             letter-spacing: 2px;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.4);
+            color: #E63946;
             margin-bottom: 16px;
         }
 
@@ -177,8 +201,8 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            background: #fff;
-            color: #000;
+            background: #E63946;
+            color: #fff;
             padding: 16px 32px;
             border-radius: 30px;
             font-size: 13px;
@@ -191,7 +215,7 @@
 
         .workout-btn:hover {
             transform: scale(1.03);
-            box-shadow: 0 8px 32px rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(230,57,70,0.4);
         }
 
         /* STATS ROW */
@@ -254,8 +278,8 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: #fff;
-            color: #000;
+            background: #E63946;
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -284,7 +308,7 @@
 
         .level-progress-fill {
             height: 100%;
-            background: #fff;
+            background: #E63946;
             border-radius: 3px;
             transition: width 0.5s ease;
         }
@@ -327,8 +351,8 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: #fff;
-            color: #000;
+            background: #E63946;
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -383,7 +407,7 @@
 
         .nav-item.active,
         .nav-item:hover {
-            color: #fff;
+            color: #E63946;
         }
 
         /* Safe area iOS */
@@ -412,7 +436,7 @@
 
     <!-- HERO -->
     <section class="hero">
-        <div class="hero-bg"></div>
+        <div class="hero-bg" id="heroBg"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <p class="greeting">Bentornato</p>
@@ -560,6 +584,25 @@
 
                 // Update UI
                 document.getElementById('userName').textContent = athlete.first_name || 'Atleta';
+                
+                // Set hero background based on sport
+                const sport = (athlete.sport || 'fitness').toLowerCase();
+                const heroBg = document.getElementById('heroBg');
+                const sportClasses = ['boxing', 'boxe', 'calcio', 'football', 'soccer', 'basket', 'basketball', 'palestra', 'fitness', 'gym', 'crossfit', 'running', 'corsa'];
+                
+                // Find matching sport class
+                let sportClass = 'default';
+                for (const sc of sportClasses) {
+                    if (sport.includes(sc)) {
+                        sportClass = sc;
+                        break;
+                    }
+                }
+                // Map Italian to English for CSS classes
+                if (sportClass === 'boxe') sportClass = 'boxing';
+                if (sportClass === 'corsa') sportClass = 'running';
+                
+                heroBg.classList.add(sportClass);
                 
                 const level = athlete.level || 1;
                 const xp = athlete.xp || 0;
