@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GR Perform - Gestione Clienti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --red: #E63946;
+            --black: #000;
+            --gray-900: #0A0A0A;
+            --gray-800: #111;
+            --gray-700: #1A1A1A;
+            --gray-600: #222;
+            --gray-400: #888;
+            --gray-500: #666;
+            --white: #FFF;
+            --green: #00D26A;
+            --yellow: #FFB800;
+            --blue: #2196F3;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: 72px; height: 100vh;
+            background: var(--gray-900);
+            border-right: 1px solid var(--gray-600);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 100;
+        }
+
+        .logo {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            cursor: pointer;
+            text-decoration: none;
+            overflow: hidden;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .nav-item {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .nav-item:hover { background: var(--gray-700); color: var(--white); }
+        .nav-item.active { background: var(--gray-700); color: var(--white); }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            margin-left: 72px;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+        }
+
+        /* LEFT PANEL - CLIENT LIST */
+        .clients-panel {
+            background: var(--gray-900);
+            border-right: 1px solid var(--gray-700);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .search-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .search-title {
+            font-size: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            background: var(--gray-800);
+            border: 2px solid var(--gray-600);
+            border-radius: 12px;
+            color: var(--white);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 14px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            border-radius: 20px;
+            color: var(--gray-400);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--red);
+            border-color: var(--red);
+            color: var(--white);
+        }
+
+        .clients-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .client-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            background: var(--gray-800);
+            border: 2px solid transparent;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+        }
+
+        .client-card:hover {
+            border-color: var(--gray-500);
+        }
+
+        .client-card.active {
+            border-color: var(--red);
+            background: rgba(230, 57, 70, 0.1);
+        }
+
+        .client-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red), #FF6B6B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .client-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .client-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .client-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .client-meta {
+            font-size: 12px;
+            color: var(--gray-400);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .client-sport {
+            background: var(--gray-700);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .client-level {
+            color: var(--red);
+            font-weight: 700;
+        }
+
+        /* RIGHT PANEL - CLIENT DETAIL */
+        .detail-panel {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .detail-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+        }
+
+        .detail-empty i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .detail-empty p {
+            font-size: 16px;
+        }
+
+        /* CLIENT HEADER */
+        .client-header {
+            padding: 24px 32px;
+            background: var(--gray-900);
+            border-bottom: 1px solid var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red), #FF6B6B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 26px;
+            overflow: hidden;
+        }
+
+        .header-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .header-info {
+            flex: 1;
+        }
+
+        .header-name {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .header-details {
+            display: flex;
+            gap: 16px;
+            color: var(--gray-400);
+            font-size: 14px;
+        }
+
+        .header-details span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-btn {
+            padding: 10px 18px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            border-radius: 10px;
+            color: var(--white);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-btn:hover {
+            background: var(--gray-700);
+            border-color: var(--gray-500);
+        }
+
+        .header-btn.primary {
+            background: var(--red);
+            border-color: var(--red);
+        }
+
+        .header-btn.primary:hover {
+            background: #c9303b;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: var(--gray-900);
+            border-bottom: 1px solid var(--gray-700);
+            padding: 0 32px;
+        }
+
+        .tab {
+            padding: 16px 24px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-400);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tab:hover {
+            color: var(--white);
+        }
+
+        .tab.active {
+            color: var(--white);
+            border-bottom-color: var(--red);
+        }
+
+        /* TAB CONTENT */
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* PROFILE TAB */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--gray-800);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--red);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-section {
+            background: var(--gray-800);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .info-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            color: var(--gray-400);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        /* CHAT TAB */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 280px);
+        }
+
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .message.sent {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gray-700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            background: var(--gray-800);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message.sent .message-bubble {
+            background: var(--red);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-700);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 18px;
+            background: var(--gray-800);
+            border: 2px solid var(--gray-600);
+            border-radius: 14px;
+            color: var(--white);
+            font-size: 14px;
+            resize: none;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: var(--red);
+            border: none;
+            border-radius: 14px;
+            color: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* WORKOUT TAB */
+        .workout-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .workout-card {
+            background: var(--gray-800);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .workout-date {
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .workout-day {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .workout-month {
+            font-size: 11px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+        }
+
+        .workout-info {
+            flex: 1;
+        }
+
+        .workout-name {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .workout-meta {
+            font-size: 13px;
+            color: var(--gray-400);
+        }
+
+        .workout-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .workout-status.completed {
+            background: rgba(0, 210, 106, 0.2);
+            color: var(--green);
+        }
+
+        .workout-status.pending {
+            background: rgba(255, 184, 0, 0.2);
+            color: var(--yellow);
+        }
+
+        /* TEST TAB */
+        .test-category {
+            margin-bottom: 32px;
+        }
+
+        .test-category-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-category-title i {
+            color: var(--red);
+        }
+
+        .tests-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .test-card {
+            background: var(--gray-800);
+            border: 2px solid var(--gray-600);
+            border-radius: 14px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .test-card:hover {
+            border-color: var(--red);
+        }
+
+        .test-card.has-result {
+            border-color: var(--green);
+        }
+
+        .test-name {
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .test-desc {
+            font-size: 12px;
+            color: var(--gray-400);
+            margin-bottom: 12px;
+        }
+
+        .test-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .test-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--green);
+        }
+
+        .test-date {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        .add-test-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: transparent;
+            border: 2px dashed var(--gray-600);
+            border-radius: 14px;
+            color: var(--gray-400);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .add-test-btn:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gray-600); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gray-500); }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--gray-800);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-700);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gray-700);
+            border: none;
+            color: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: var(--gray-400);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--gray-700);
+            border: 2px solid var(--gray-600);
+            border-radius: 12px;
+            color: var(--white);
+            font-size: 15px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+
+        .form-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--red);
+            border: none;
+            border-radius: 12px;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <a href="coach-dashboard.html" class="logo">
+            <img src="https://i.imgur.com/8QKm5sE.png" alt="GR" onerror="this.parentElement.innerHTML='GR'">
+        </a>
+        <a href="coach-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i></a>
+        <a href="coach-clients.html" class="nav-item active"><i class="fas fa-users"></i></a>
+        <a href="coach-generate.html" class="nav-item"><i class="fas fa-bolt"></i></a>
+        <div class="nav-spacer"></div>
+        <a href="#" onclick="coachLogout()" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
+    </nav>
+
+    <div class="main-container">
+        <!-- LEFT: Client List -->
+        <div class="clients-panel">
+            <div class="search-header">
+                <h2 class="search-title">I Tuoi Clienti</h2>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Cerca cliente...">
+                </div>
+                <div class="filters" id="sport-filters">
+                    <button class="filter-btn active" data-sport="all">Tutti</button>
+                </div>
+            </div>
+            <div class="clients-list" id="clients-list">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- RIGHT: Client Detail -->
+        <div class="detail-panel" id="detail-panel">
+            <div class="detail-empty">
+                <i class="fas fa-user-circle"></i>
+                <p>Seleziona un cliente per iniziare</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Modal -->
+    <div class="modal-overlay" id="test-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-test-name">Registra Test</h3>
+                <button class="modal-close" onclick="closeTestModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Risultato</label>
+                    <input type="text" class="form-input" id="test-result-input" placeholder="Es: 12.5">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Note (opzionale)</label>
+                    <input type="text" class="form-input" id="test-notes-input" placeholder="Condizioni, osservazioni...">
+                </div>
+                <button class="form-btn" onclick="saveTestResult()">Salva Risultato</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase-client.js"></script>
+    <script>
+        // Auth check
+        if (localStorage.getItem('gr_coach_logged_in') !== 'true') {
+            window.location.href = 'coach-login.html';
+        }
+
+        function coachLogout() {
+            localStorage.removeItem('gr_coach_logged_in');
+            localStorage.removeItem('gr_coach_email');
+            localStorage.removeItem('gr_coach_name');
+            window.location.href = 'coach-login.html';
+        }
+
+        let allAthletes = [];
+        let selectedAthlete = null;
+        let currentTestId = null;
+
+        // Test database by sport
+        const TESTS_BY_SPORT = {
+            'calcio': {
+                'Velocità': [
+                    { id: 'sprint_10m', name: 'Sprint 10m', unit: 'sec', desc: 'Accelerazione esplosiva' },
+                    { id: 'sprint_30m', name: 'Sprint 30m', unit: 'sec', desc: 'Velocità massima' },
+                    { id: 'navetta', name: 'Navetta 5x10m', unit: 'sec', desc: 'Cambio di direzione' }
+                ],
+                'Resistenza': [
+                    { id: 'yo_yo', name: 'Yo-Yo Test IR1', unit: 'livello', desc: 'Capacità aerobica intermittente' },
+                    { id: 'cooper', name: 'Test Cooper', unit: 'm', desc: '12 minuti corsa' },
+                    { id: 'beep_test', name: 'Beep Test', unit: 'livello', desc: 'VO2max stimato' }
+                ],
+                'Forza': [
+                    { id: 'squat_jump', name: 'Squat Jump', unit: 'cm', desc: 'Potenza gambe' },
+                    { id: 'cmj', name: 'Counter Movement Jump', unit: 'cm', desc: 'Elasticità muscolare' },
+                    { id: 'hop_test', name: 'Single Leg Hop', unit: 'cm', desc: 'Asimmetria arti' }
+                ],
+                'Agilità': [
+                    { id: 'illinois', name: 'Illinois Test', unit: 'sec', desc: 'Agilità con palla' },
+                    { id: 't_test', name: 'T-Test', unit: 'sec', desc: 'Agilità multidirezionale' }
+                ]
+            },
+            'basket': {
+                'Velocità': [
+                    { id: 'sprint_20m', name: 'Sprint 20m', unit: 'sec', desc: 'Velocità in campo' },
+                    { id: 'suicide_drill', name: 'Suicide Drill', unit: 'sec', desc: 'Velocità navetta' }
+                ],
+                'Salto': [
+                    { id: 'vertical_jump', name: 'Vertical Jump', unit: 'cm', desc: 'Elevazione massima' },
+                    { id: 'approach_jump', name: 'Approach Jump', unit: 'cm', desc: 'Salto con rincorsa' },
+                    { id: 'standing_reach', name: 'Standing Reach', unit: 'cm', desc: 'Allungo da fermo' }
+                ],
+                'Resistenza': [
+                    { id: 'beep_test', name: 'Beep Test', unit: 'livello', desc: 'VO2max stimato' },
+                    { id: 'line_drill', name: 'Line Drill', unit: 'sec', desc: 'Resistenza specifica' }
+                ],
+                'Agilità': [
+                    { id: 'lane_agility', name: 'Lane Agility', unit: 'sec', desc: 'Movimenti difensivi' },
+                    { id: 't_test', name: 'T-Test', unit: 'sec', desc: 'Agilità laterale' }
+                ]
+            },
+            'boxe': {
+                'Potenza': [
+                    { id: 'punch_power', name: 'Punch Power Test', unit: 'kg', desc: 'Forza del pugno' },
+                    { id: 'medicine_ball', name: 'Medicine Ball Throw', unit: 'm', desc: 'Potenza esplosiva' }
+                ],
+                'Resistenza': [
+                    { id: 'round_simulation', name: 'Simulazione 3x3min', unit: 'colpi', desc: 'Volume mantenuto' },
+                    { id: 'cooper', name: 'Test Cooper', unit: 'm', desc: 'Base aerobica' },
+                    { id: 'burpee_test', name: 'Burpee 3min', unit: 'reps', desc: 'Resistenza muscolare' }
+                ],
+                'Velocità': [
+                    { id: 'combo_speed', name: 'Combo Speed', unit: 'sec', desc: 'Velocità combinazioni' },
+                    { id: 'reaction_test', name: 'Reaction Test', unit: 'ms', desc: 'Tempo di reazione' }
+                ],
+                'Forza': [
+                    { id: 'pull_ups', name: 'Trazioni', unit: 'reps', desc: 'Forza dorsale' },
+                    { id: 'plank', name: 'Plank Hold', unit: 'sec', desc: 'Core stability' }
+                ]
+            },
+            'nuoto': {
+                'Velocità': [
+                    { id: 'sprint_25m', name: 'Sprint 25m', unit: 'sec', desc: 'Velocità pura' },
+                    { id: 'sprint_50m', name: 'Sprint 50m', unit: 'sec', desc: 'Velocità resistente' }
+                ],
+                'Resistenza': [
+                    { id: 'test_400m', name: 'Test 400m', unit: 'min', desc: 'Soglia aerobica' },
+                    { id: 'css_test', name: 'CSS Test', unit: 'sec/100m', desc: 'Critical Swim Speed' }
+                ],
+                'Tecnica': [
+                    { id: 'stroke_count', name: 'Stroke Count 50m', unit: 'bracciate', desc: 'Efficienza' },
+                    { id: 'underwater', name: 'Underwater 15m', unit: 'sec', desc: 'Subacquea' }
+                ]
+            },
+            'tennis': {
+                'Velocità': [
+                    { id: 'spider_test', name: 'Spider Test', unit: 'sec', desc: 'Agilità in campo' },
+                    { id: 'sprint_20m', name: 'Sprint 20m', unit: 'sec', desc: 'Accelerazione' }
+                ],
+                'Resistenza': [
+                    { id: 'beep_test', name: 'Beep Test', unit: 'livello', desc: 'VO2max' },
+                    { id: 'hit_run', name: 'Hit & Run Test', unit: 'min', desc: 'Resistenza specifica' }
+                ],
+                'Forza': [
+                    { id: 'med_ball_throw', name: 'Med Ball Forehand', unit: 'm', desc: 'Potenza rotazionale' },
+                    { id: 'serve_speed', name: 'Serve Speed', unit: 'km/h', desc: 'Velocità servizio' }
+                ]
+            },
+            'default': {
+                'Velocità': [
+                    { id: 'sprint_30m', name: 'Sprint 30m', unit: 'sec', desc: 'Velocità massima' },
+                    { id: 'sprint_60m', name: 'Sprint 60m', unit: 'sec', desc: 'Velocità resistente' }
+                ],
+                'Resistenza': [
+                    { id: 'cooper', name: 'Test Cooper', unit: 'm', desc: '12 minuti corsa' },
+                    { id: 'beep_test', name: 'Beep Test', unit: 'livello', desc: 'VO2max stimato' }
+                ],
+                'Forza': [
+                    { id: 'squat_1rm', name: 'Squat 1RM', unit: 'kg', desc: 'Forza massima gambe' },
+                    { id: 'bench_1rm', name: 'Bench Press 1RM', unit: 'kg', desc: 'Forza massima petto' },
+                    { id: 'deadlift_1rm', name: 'Deadlift 1RM', unit: 'kg', desc: 'Forza massima' }
+                ],
+                'Flessibilità': [
+                    { id: 'sit_reach', name: 'Sit & Reach', unit: 'cm', desc: 'Flessibilità posteriore' }
+                ]
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadAthletes();
+            setupSearch();
+        });
+
+        async function loadAthletes() {
+            try {
+                allAthletes = await supabase.fetch('athletes', '?select=*&order=first_name.asc');
+                renderAthletes(allAthletes);
+                renderSportFilters();
+            } catch (error) {
+                console.error('Error loading athletes:', error);
+            }
+        }
+
+        function renderSportFilters() {
+            const sports = [...new Set(allAthletes.map(a => a.sport).filter(Boolean))];
+            const container = document.getElementById('sport-filters');
+            container.innerHTML = `<button class="filter-btn active" data-sport="all">Tutti</button>` +
+                sports.map(s => `<button class="filter-btn" data-sport="${s}">${s}</button>`).join('');
+            
+            container.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    filterAthletes();
+                });
+            });
+        }
+
+        function renderAthletes(athletes) {
+            const container = document.getElementById('clients-list');
+            container.innerHTML = athletes.map(a => {
+                const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+                const hasPhoto = a.profile_photo;
+                return `
+                    <div class="client-card" data-id="${a.id}" onclick="selectClient(${a.id})">
+                        <div class="client-avatar">
+                            ${hasPhoto ? `<img src="${a.profile_photo}" alt="">` : initials}
+                        </div>
+                        <div class="client-info">
+                            <div class="client-name">${a.first_name} ${a.last_name}</div>
+                            <div class="client-meta">
+                                <span class="client-sport">${a.sport || 'Fitness'}</span>
+                                <span class="client-level">Lv. ${a.level || 1}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setupSearch() {
+            document.getElementById('search-input').addEventListener('input', filterAthletes);
+        }
+
+        function filterAthletes() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const sport = document.querySelector('.filter-btn.active')?.dataset.sport || 'all';
+            
+            const filtered = allAthletes.filter(a => {
+                const matchesSearch = `${a.first_name} ${a.last_name}`.toLowerCase().includes(search);
+                const matchesSport = sport === 'all' || a.sport?.toLowerCase() === sport.toLowerCase();
+                return matchesSearch && matchesSport;
+            });
+            
+            renderAthletes(filtered);
+        }
+
+        async function selectClient(id) {
+            selectedAthlete = allAthletes.find(a => a.id === id);
+            if (!selectedAthlete) return;
+
+            // Update active state
+            document.querySelectorAll('.client-card').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.client-card[data-id="${id}"]`)?.classList.add('active');
+
+            // Render detail panel
+            await renderClientDetail();
+        }
+
+        async function renderClientDetail() {
+            const a = selectedAthlete;
+            const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+            const hasPhoto = a.profile_photo;
+
+            document.getElementById('detail-panel').innerHTML = `
+                <div class="client-header">
+                    <div class="header-avatar">
+                        ${hasPhoto ? `<img src="${a.profile_photo}" alt="">` : initials}
+                    </div>
+                    <div class="header-info">
+                        <h1 class="header-name">${a.first_name} ${a.last_name}</h1>
+                        <div class="header-details">
+                            <span><i class="fas fa-running"></i> ${a.sport || 'Fitness'}</span>
+                            <span><i class="fas fa-bullseye"></i> ${a.goal || 'Performance'}</span>
+                            <span><i class="fas fa-calendar"></i> ${a.training_days || 3}x/settimana</span>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <a href="coach-generate.html?athlete=${a.id}" class="header-btn primary">
+                            <i class="fas fa-bolt"></i> Genera Workout
+                        </a>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active" data-tab="profile">Profilo</div>
+                    <div class="tab" data-tab="chat">Chat</div>
+                    <div class="tab" data-tab="workouts">Workout</div>
+                    <div class="tab" data-tab="tests">Test Fisici</div>
+                </div>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-profile"></div>
+                    <div class="tab-pane" id="tab-chat"></div>
+                    <div class="tab-pane" id="tab-workouts"></div>
+                    <div class="tab-pane" id="tab-tests"></div>
+                </div>
+            `;
+
+            // Setup tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+                });
+            });
+
+            // Load all tabs content
+            await Promise.all([
+                loadProfileTab(),
+                loadChatTab(),
+                loadWorkoutsTab(),
+                loadTestsTab()
+            ]);
+        }
+
+        async function loadProfileTab() {
+            const a = selectedAthlete;
+            document.getElementById('tab-profile').innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${a.workouts_completed || 0}</div>
+                        <div class="stat-label">Workout</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${a.xp || 0}</div>
+                        <div class="stat-label">XP</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${a.level || 1}</div>
+                        <div class="stat-label">Livello</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${a.streak || 0}</div>
+                        <div class="stat-label">Streak</div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3 class="info-title">Dati Personali</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">${a.email || '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Data Nascita</span>
+                            <span class="info-value">${a.birth_date || '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Altezza</span>
+                            <span class="info-value">${a.height ? a.height + ' cm' : '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Peso</span>
+                            <span class="info-value">${a.weight ? a.weight + ' kg' : '-'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3 class="info-title">Programmazione</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Sport</span>
+                            <span class="info-value">${a.sport || 'Fitness'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Obiettivo</span>
+                            <span class="info-value">${a.goal || 'Performance'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Giorni/Settimana</span>
+                            <span class="info-value">${a.training_days || 3}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Attrezzatura</span>
+                            <span class="info-value">${a.equipment || 'Completa'}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadChatTab() {
+            const a = selectedAthlete;
+            let messages = [];
+            try {
+                messages = await supabase.fetch('chat_messages', `?athlete_id=eq.${a.id}&order=created_at.asc`);
+            } catch (e) {}
+
+            const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+            
+            document.getElementById('tab-chat').innerHTML = `
+                <div class="chat-container">
+                    <div class="messages-area" id="messages-area">
+                        ${messages.length === 0 ? '<p style="color:var(--gray-500);text-align:center;">Nessun messaggio</p>' : 
+                            messages.map(m => `
+                                <div class="message ${m.sender === 'coach' ? 'sent' : ''}">
+                                    <div class="message-avatar">
+                                        ${m.sender === 'coach' ? 'GR' : 
+                                            (a.profile_photo ? `<img src="${a.profile_photo}" alt="">` : initials)}
+                                    </div>
+                                    <div>
+                                        <div class="message-bubble">${m.message}</div>
+                                        <div class="message-time">${new Date(m.created_at).toLocaleString('it-IT', {hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'})}</div>
+                                    </div>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                    <div class="chat-input-area">
+                        <textarea class="chat-input" id="chat-message" placeholder="Scrivi un messaggio..." rows="1"></textarea>
+                        <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            `;
+
+            // Scroll to bottom
+            const area = document.getElementById('messages-area');
+            area.scrollTop = area.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-message');
+            const message = input.value.trim();
+            if (!message || !selectedAthlete) return;
+
+            try {
+                await supabase.insert('chat_messages', {
+                    athlete_id: selectedAthlete.id,
+                    sender: 'coach',
+                    message: message,
+                    read: false
+                });
+                input.value = '';
+                await loadChatTab();
+            } catch (e) {
+                console.error('Error sending message:', e);
+            }
+        }
+
+        async function loadWorkoutsTab() {
+            let workouts = [];
+            try {
+                workouts = await supabase.fetch('workouts', `?athlete_id=eq.${selectedAthlete.id}&order=created_at.desc&limit=20`);
+            } catch (e) {}
+
+            document.getElementById('tab-workouts').innerHTML = `
+                <div class="workout-list">
+                    ${workouts.length === 0 ? '<p style="color:var(--gray-500);">Nessun workout assegnato</p>' :
+                        workouts.map(w => {
+                            const date = new Date(w.created_at);
+                            return `
+                                <div class="workout-card">
+                                    <div class="workout-date">
+                                        <div class="workout-day">${date.getDate()}</div>
+                                        <div class="workout-month">${date.toLocaleString('it-IT', {month:'short'})}</div>
+                                    </div>
+                                    <div class="workout-info">
+                                        <div class="workout-name">${w.name || 'Workout'}</div>
+                                        <div class="workout-meta">${w.duration || 45} min • ${w.exercises?.length || 0} esercizi</div>
+                                    </div>
+                                    <span class="workout-status ${w.completed ? 'completed' : 'pending'}">
+                                        ${w.completed ? 'Completato' : 'Da fare'}
+                                    </span>
+                                </div>
+                            `;
+                        }).join('')
+                    }
+                </div>
+            `;
+        }
+
+        async function loadTestsTab() {
+            const sport = (selectedAthlete.sport || 'default').toLowerCase();
+            const tests = TESTS_BY_SPORT[sport] || TESTS_BY_SPORT['default'];
+            
+            // Load existing results
+            let results = [];
+            try {
+                results = await supabase.fetch('physical_tests', `?athlete_id=eq.${selectedAthlete.id}`);
+            } catch (e) {}
+            
+            const resultsMap = {};
+            results.forEach(r => {
+                if (!resultsMap[r.test_id] || new Date(r.created_at) > new Date(resultsMap[r.test_id].created_at)) {
+                    resultsMap[r.test_id] = r;
+                }
+            });
+
+            let html = '';
+            for (const category in tests) {
+                html += `
+                    <div class="test-category">
+                        <h3 class="test-category-title"><i class="fas fa-${getCategoryIcon(category)}"></i> ${category}</h3>
+                        <div class="tests-grid">
+                            ${tests[category].map(test => {
+                                const result = resultsMap[test.id];
+                                return `
+                                    <div class="test-card ${result ? 'has-result' : ''}" onclick="openTestModal('${test.id}', '${test.name}', '${test.unit}')">
+                                        <div class="test-name">${test.name}</div>
+                                        <div class="test-desc">${test.desc}</div>
+                                        <div class="test-result">
+                                            ${result ? `
+                                                <span class="test-value">${result.value} ${test.unit}</span>
+                                                <span class="test-date">${new Date(result.created_at).toLocaleDateString('it-IT')}</span>
+                                            ` : `
+                                                <span style="color:var(--gray-500);font-size:12px;">Nessun risultato</span>
+                                            `}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('tab-tests').innerHTML = html;
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                'Velocità': 'bolt',
+                'Resistenza': 'heart',
+                'Forza': 'dumbbell',
+                'Agilità': 'random',
+                'Salto': 'arrow-up',
+                'Potenza': 'fist-raised',
+                'Tecnica': 'bullseye',
+                'Flessibilità': 'child'
+            };
+            return icons[category] || 'clipboard-check';
+        }
+
+        function openTestModal(testId, testName, unit) {
+            currentTestId = testId;
+            document.getElementById('modal-test-name').textContent = testName;
+            document.getElementById('test-result-input').placeholder = `Es: 12.5 ${unit}`;
+            document.getElementById('test-result-input').value = '';
+            document.getElementById('test-notes-input').value = '';
+            document.getElementById('test-modal').classList.add('active');
+        }
+
+        function closeTestModal() {
+            document.getElementById('test-modal').classList.remove('active');
+            currentTestId = null;
+        }
+
+        async function saveTestResult() {
+            const value = document.getElementById('test-result-input').value.trim();
+            const notes = document.getElementById('test-notes-input').value.trim();
+            
+            if (!value || !currentTestId || !selectedAthlete) return;
+
+            try {
+                await supabase.insert('physical_tests', {
+                    athlete_id: selectedAthlete.id,
+                    test_id: currentTestId,
+                    value: value,
+                    notes: notes
+                });
+                closeTestModal();
+                await loadTestsTab();
+            } catch (e) {
+                console.error('Error saving test:', e);
+                alert('Errore nel salvataggio. Assicurati che la tabella physical_tests esista.');
+            }
+        }
+
+        // Close modal on overlay click
+        document.getElementById('test-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'test-modal') closeTestModal();
+        });
+    </script>
+</body>
+</html>
