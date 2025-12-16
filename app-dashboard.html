@@ -21,32 +21,80 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --red: #E63946;
-            --black: #000;
+            --black: #000000;
             --gray-900: #0A0A0A;
-            --gray-800: #111;
+            --gray-800: #111111;
             --gray-700: #1A1A1A;
-            --gray-600: #222;
-            --gray-400: #888;
-            --gray-500: #666;
-            --white: #FFF;
-            --green: #00D26A;
-            --yellow: #FFB800;
+            --gray-600: #222222;
+            --gray-500: #333333;
+            --gray-400: #666666;
+            --gray-300: #888888;
+            --white: #FFFFFF;
+            --accent: #FFFFFF;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--black);
             color: var(--white);
             min-height: 100vh;
             padding-bottom: 100px;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* HERO WITH IMAGE */
+        /* HEADER BAR - Nike Style */
+        .header-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: transparent;
+            transition: background 0.3s;
+        }
+
+        .header-bar.scrolled {
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-logo img {
+            height: 32px;
+            filter: invert(1);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* HERO WITH IMAGE - Nike Style */
         .hero {
             position: relative;
-            height: 50vh;
-            min-height: 380px;
+            height: 60vh;
+            min-height: 450px;
             overflow: hidden;
         }
 
@@ -55,15 +103,15 @@
             top: 0; left: 0;
             width: 100%; height: 100%;
             object-fit: cover;
-            opacity: 0.5;
+            opacity: 0.6;
         }
 
         .hero-overlay {
             position: absolute;
             inset: 0;
             background: linear-gradient(to bottom, 
-                rgba(0,0,0,0.2) 0%, 
-                rgba(0,0,0,0.7) 70%,
+                rgba(0,0,0,0.3) 0%, 
+                rgba(0,0,0,0.5) 50%,
                 rgba(0,0,0,1) 100%
             );
         }
@@ -75,45 +123,47 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 30px;
+            padding: 30px 24px;
         }
 
-        .hero-label {
-            font-size: 11px;
-            letter-spacing: 2px;
+        .hero-greeting {
+            font-size: 14px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            color: var(--red);
+            color: var(--gray-300);
             margin-bottom: 8px;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .hero-title {
-            font-size: 36px;
+            font-size: 42px;
             font-weight: 900;
-            letter-spacing: -1px;
-            line-height: 1.1;
-            margin-bottom: 8px;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 12px;
+            text-transform: uppercase;
         }
 
         .hero-subtitle {
             font-size: 14px;
             color: var(--gray-400);
+            font-weight: 500;
         }
 
-        /* LEVEL BAR */
+        /* LEVEL BAR - Minimal Nike Style */
         .level-bar {
             background: var(--gray-800);
-            padding: 20px 30px;
+            padding: 20px 24px;
             display: flex;
             align-items: center;
-            gap: 20px;
-            border-bottom: 1px solid var(--gray-700);
+            gap: 16px;
         }
 
         .level-badge {
-            width: 56px; height: 56px;
+            width: 52px; height: 52px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #E63946, #FF6B6B);
+            background: var(--white);
+            color: var(--black);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -122,32 +172,41 @@
         }
 
         .level-info { flex: 1; }
-        .level-text { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        
+        .level-text { 
+            font-size: 12px; 
+            font-weight: 700; 
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
         .level-progress {
-            height: 8px;
-            background: var(--gray-700);
-            border-radius: 4px;
+            height: 4px;
+            background: var(--gray-600);
+            border-radius: 2px;
             overflow: hidden;
         }
 
         .level-progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #E63946, #FF6B6B);
-            border-radius: 4px;
+            background: var(--white);
+            border-radius: 2px;
             transition: width 0.5s ease;
         }
 
         .level-xp {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--gray-400);
             text-align: right;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         /* CONTENT */
         .content { padding: 24px; }
 
-        .section { margin-bottom: 32px; }
+        .section { margin-bottom: 40px; }
 
         .section-header {
             display: flex;
@@ -157,69 +216,75 @@
         }
 
         .section-title {
-            font-size: 18px;
+            font-size: 13px;
             font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .section-link {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--gray-400);
             text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        /* TODAY WORKOUT CARD */
+        /* TODAY WORKOUT CARD - Nike Style */
         .workout-card {
-            background: linear-gradient(135deg, var(--gray-800), var(--gray-700));
-            border-radius: 20px;
-            padding: 24px;
+            background: var(--gray-800);
+            border-radius: 0;
+            padding: 28px;
             position: relative;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.3s;
+            border: 1px solid var(--gray-700);
         }
 
-        .workout-card:hover { transform: translateY(-4px); }
-
-        .workout-card::before {
-            content: '';
-            position: absolute;
-            top: 0; right: 0;
-            width: 50%; height: 100%;
-            background: radial-gradient(ellipse at top right, rgba(230,57,70,0.2), transparent);
+        .workout-card:hover { 
+            transform: translateY(-4px);
+            border-color: var(--gray-500);
         }
 
         .workout-label {
             font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--red);
-            font-weight: 600;
-            margin-bottom: 8px;
+            letter-spacing: 2px;
+            color: var(--gray-400);
+            font-weight: 700;
+            margin-bottom: 12px;
         }
 
         .workout-name {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 6px;
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
         }
 
         .workout-meta {
             font-size: 13px;
             color: var(--gray-400);
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            font-weight: 500;
         }
 
         .workout-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             background: var(--white);
             color: var(--black);
-            padding: 12px 24px;
-            border-radius: 50px;
+            padding: 14px 28px;
+            border-radius: 30px;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
             text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             transition: all 0.2s;
         }
 
@@ -228,34 +293,36 @@
             box-shadow: 0 10px 30px rgba(255,255,255,0.15);
         }
 
-        /* STATS GRID */
+        /* STATS GRID - Nike Style */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 2px;
+            background: var(--gray-700);
         }
 
         .stat-card {
             background: var(--gray-800);
-            border-radius: 16px;
-            padding: 20px;
+            padding: 24px;
             text-align: center;
         }
 
         .stat-value {
-            font-size: 28px;
-            font-weight: 800;
+            font-size: 36px;
+            font-weight: 900;
             margin-bottom: 4px;
+            letter-spacing: -1px;
         }
 
         .stat-label {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--gray-400);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1.5px;
+            font-weight: 600;
         }
 
-        /* QUICK ACTIONS */
+        /* QUICK ACTIONS - Nike Style */
         .actions-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -264,8 +331,9 @@
 
         .action-item {
             background: var(--gray-800);
-            border-radius: 16px;
-            padding: 20px 12px;
+            border: 1px solid var(--gray-700);
+            border-radius: 0;
+            padding: 20px 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
@@ -273,33 +341,39 @@
             color: var(--white);
         }
 
-        .action-item:hover { background: var(--gray-700); }
+        .action-item:hover { 
+            background: var(--gray-700);
+            border-color: var(--gray-500);
+        }
 
         .action-icon {
             width: 44px; height: 44px;
-            border-radius: 12px;
-            background: var(--gray-700);
+            border-radius: 50%;
+            background: var(--white);
+            color: var(--black);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            margin: 0 auto 10px;
+            font-size: 16px;
+            margin: 0 auto 12px;
         }
 
         .action-label {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        /* BOTTOM NAV */
+        /* BOTTOM NAV - Nike Style */
         .bottom-nav {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            background: var(--gray-900);
+            background: var(--black);
             border-top: 1px solid var(--gray-700);
             display: flex;
             justify-content: space-around;
-            padding: 12px 0 20px;
+            padding: 12px 0 24px;
             z-index: 100;
         }
 
@@ -310,23 +384,38 @@
             gap: 4px;
             color: var(--gray-500);
             text-decoration: none;
-            font-size: 10px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             transition: color 0.2s;
         }
 
         .nav-item i { font-size: 20px; }
-        .nav-item:hover, .nav-item.active { color: var(--red); }
+        .nav-item:hover, .nav-item.active { color: var(--white); }
     </style>
 </head>
 <body>
+    <!-- Header Bar -->
+    <header class="header-bar" id="header-bar">
+        <div class="header-logo">
+            <img src="https://cdn.shopify.com/s/files/1/0969/1801/2243/files/Black_White_Bold_Modern_Clothing_Brand_Logo_97389bbf-665b-4465-82ec-d71a0fa4b35e.png?v=1758700090" alt="GR Perform">
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" onclick="location.href='app-profile.html'">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+    </header>
+
     <!-- Hero -->
     <section class="hero">
-        <img src="assets/pexels-cottonbro-5741289.jpg" alt="" class="hero-bg">
+        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800" alt="" class="hero-bg">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <p class="hero-label">Bentornato</p>
+            <p class="hero-greeting">Bentornato</p>
             <h1 class="hero-title" id="user-name">Caricamento...</h1>
-            <p class="hero-subtitle" id="user-sport">Fitness</p>
+            <p class="hero-subtitle" id="user-sport">Pronto per allenarti?</p>
         </div>
     </section>
 
