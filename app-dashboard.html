@@ -728,10 +728,14 @@
                     <span id="workoutDuration">-</span>
                 </div>
             </div>
-            <a href="workout-session.html" class="workout-btn">
+            <a href="#" id="workoutBtn" class="workout-btn" style="display: none;">
                 <i class="fas fa-play"></i>
                 Inizia
             </a>
+            <div id="noWorkoutMsg" class="workout-btn" style="background: #333; cursor: default; display: none;">
+                <i class="fas fa-calendar-plus"></i>
+                Nessun workout assegnato
+            </div>
         </div>
     </section>
 
@@ -813,7 +817,7 @@
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="workout-session.html" class="nav-item">
+        <a href="app-workouts.html" class="nav-item">
             <i class="fas fa-dumbbell"></i>
             <span>Workout</span>
         </a>
@@ -897,12 +901,26 @@
                 if (workouts.length > 0) {
                     const w = workouts[0];
                     document.getElementById('workoutName').textContent = w.name || 'Workout del Giorno';
-                    document.getElementById('workoutExercises').textContent = `${w.exercises?.length || 0} esercizi`;
-                    document.getElementById('workoutDuration').textContent = '~45 min';
+                    
+                    // Count exercises properly
+                    let exerciseCount = 0;
+                    if (w.exercises?.main) {
+                        exerciseCount = w.exercises.main.length;
+                    } else if (Array.isArray(w.exercises)) {
+                        exerciseCount = w.exercises.length;
+                    }
+                    document.getElementById('workoutExercises').textContent = `${exerciseCount} esercizi`;
+                    document.getElementById('workoutDuration').textContent = `~${w.estimated_duration_minutes || 45} min`;
+                    
+                    // Set workout button with ID
+                    const workoutBtn = document.getElementById('workoutBtn');
+                    workoutBtn.href = `workout-session.html?id=${w.id}`;
+                    workoutBtn.style.display = 'inline-flex';
                 } else {
                     document.getElementById('workoutName').textContent = 'Nessun workout';
                     document.getElementById('workoutExercises').textContent = 'Contatta il coach';
                     document.getElementById('workoutDuration').textContent = '-';
+                    document.getElementById('noWorkoutMsg').style.display = 'inline-flex';
                 }
 
             } catch (error) {

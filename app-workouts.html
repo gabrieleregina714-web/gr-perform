@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>GR Perform - Workout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            padding-bottom: 90px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* HEADER */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #000;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .header-logo img {
+            height: 48px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(230,57,70,0.2);
+            border: none;
+            color: #E63946;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            padding: 24px 20px 16px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .page-subtitle {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            padding: 0 20px;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #E63946;
+            border-color: #E63946;
+            color: #fff;
+        }
+
+        /* WORKOUT LIST */
+        .workout-list {
+            padding: 0 16px;
+        }
+
+        .workout-item {
+            background: #111;
+            border: 1px solid #222;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: block;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.2s;
+        }
+
+        .workout-item:active {
+            transform: scale(0.98);
+            background: #1a1a1a;
+        }
+
+        .workout-item.completed {
+            opacity: 0.5;
+            border-color: #22C55E;
+        }
+
+        .workout-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .workout-date {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #E63946;
+        }
+
+        .workout-status {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .workout-status.pending {
+            background: rgba(230,57,70,0.2);
+            color: #E63946;
+        }
+
+        .workout-status.completed {
+            background: rgba(34,197,94,0.2);
+            color: #22C55E;
+        }
+
+        .workout-name {
+            font-size: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .workout-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .workout-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .workout-meta i {
+            color: #E63946;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            color: #333;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #000;
+            border-top: 1px solid #1a1a1a;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 24px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 8px;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+
+        .nav-item.active,
+        .nav-item:hover {
+            color: #E63946;
+        }
+
+        /* Safe area iOS */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .bottom-nav {
+                padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            }
+            body {
+                padding-bottom: calc(90px + env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .workout-name {
+                font-size: 18px;
+            }
+            
+            .workout-item {
+                padding: 16px;
+            }
+            
+            .header-logo img {
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <img src="https://cdn.shopify.com/s/files/1/0969/1801/2243/files/Black_White_Bold_Modern_Clothing_Brand_Logo_97389bbf-665b-4465-82ec-d71a0fa4b35e.png?v=1758700090" alt="GR Perform" class="header-logo">
+        <button class="header-btn" onclick="location.href='app-profile.html'">
+            <i class="fas fa-user"></i>
+        </button>
+    </header>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1 class="page-title">I tuoi Workout</h1>
+        <p class="page-subtitle">Scegli un allenamento da iniziare</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active" data-filter="all">Tutti</button>
+        <button class="tab" data-filter="pending">Da Fare</button>
+        <button class="tab" data-filter="completed">Completati</button>
+    </div>
+
+    <!-- WORKOUT LIST -->
+    <div class="workout-list" id="workoutList">
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-dumbbell"></i></div>
+            <h3 class="empty-title">Caricamento...</h3>
+            <p class="empty-text">Sto cercando i tuoi workout</p>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <a href="app-dashboard.html" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="app-workouts.html" class="nav-item active">
+            <i class="fas fa-dumbbell"></i>
+            <span>Workout</span>
+        </a>
+        <a href="app-progress.html" class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Progressi</span>
+        </a>
+        <a href="app-chat.html" class="nav-item">
+            <i class="fas fa-comment"></i>
+            <span>Chat</span>
+        </a>
+        <a href="app-profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profilo</span>
+        </a>
+    </nav>
+
+    <script src="js/supabase-client.js"></script>
+    <script>
+        const athleteId = localStorage.getItem('gr_athlete_id');
+        let allWorkouts = [];
+        let currentFilter = 'all';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!athleteId) {
+                location.href = 'login.html';
+                return;
+            }
+
+            await loadWorkouts();
+            setupTabs();
+        });
+
+        async function loadWorkouts() {
+            try {
+                const workouts = await supabase.fetch('workouts', 
+                    `?athlete_id=eq.${athleteId}&select=*&order=created_at.desc`
+                );
+                
+                allWorkouts = workouts;
+                renderWorkouts();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('workoutList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h3 class="empty-title">Errore</h3>
+                        <p class="empty-text">Impossibile caricare i workout</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderWorkouts() {
+            const list = document.getElementById('workoutList');
+            
+            let filtered = allWorkouts;
+            if (currentFilter === 'pending') {
+                filtered = allWorkouts.filter(w => w.status !== 'completed');
+            } else if (currentFilter === 'completed') {
+                filtered = allWorkouts.filter(w => w.status === 'completed');
+            }
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-calendar-times"></i></div>
+                        <h3 class="empty-title">Nessun Workout</h3>
+                        <p class="empty-text">${currentFilter === 'completed' ? 'Non hai ancora completato workout' : 'Il tuo coach non ti ha ancora assegnato workout'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = filtered.map(w => {
+                const isCompleted = w.status === 'completed';
+                const date = new Date(w.created_at);
+                const dateStr = date.toLocaleDateString('it-IT', { 
+                    weekday: 'short', 
+                    day: 'numeric', 
+                    month: 'short' 
+                }).toUpperCase();
+                
+                // Count exercises
+                let exerciseCount = 0;
+                if (w.exercises?.main) {
+                    exerciseCount = w.exercises.main.length;
+                } else if (Array.isArray(w.exercises)) {
+                    exerciseCount = w.exercises.length;
+                }
+                
+                return `
+                    <a href="workout-session.html?id=${w.id}" class="workout-item ${isCompleted ? 'completed' : ''}">
+                        <div class="workout-top">
+                            <span class="workout-date">${dateStr}</span>
+                            <span class="workout-status ${isCompleted ? 'completed' : 'pending'}">
+                                ${isCompleted ? '✓ Completato' : 'Da fare'}
+                            </span>
+                        </div>
+                        <h3 class="workout-name">${w.name || 'Workout'}</h3>
+                        <div class="workout-meta">
+                            <span><i class="fas fa-dumbbell"></i> ${exerciseCount} esercizi</span>
+                            <span><i class="fas fa-clock"></i> ~${w.estimated_duration_minutes || 45} min</span>
+                        </div>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.dataset.filter;
+                    renderWorkouts();
+                });
+            });
+        }
+    </script>
+</body>
+</html>
