@@ -510,7 +510,7 @@
         <a href="coach-tests.html" class="nav-item active"><i class="fas fa-clipboard-check"></i></a>
         <a href="coach-chat.html" class="nav-item"><i class="fas fa-comments"></i></a>
         <div class="nav-spacer"></div>
-        <a href="coach-login.html" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
+        <a href="#" onclick="coachLogout()" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
     </nav>
 
     <!-- MAIN -->
@@ -597,6 +597,19 @@
 
     <script src="js/supabase-client.js"></script>
     <script>
+        // Check if coach is logged in
+        if (localStorage.getItem('gr_coach_logged_in') !== 'true') {
+            window.location.href = 'coach-login.html';
+        }
+
+        // Logout function
+        function coachLogout() {
+            localStorage.removeItem('gr_coach_logged_in');
+            localStorage.removeItem('gr_coach_email');
+            localStorage.removeItem('gr_coach_name');
+            localStorage.removeItem('gr_coach_last_active');
+            window.location.href = 'coach-login.html';
+        }
         let athletes = [];
         let selectedAthlete = null;
         let selectedTests = {};
