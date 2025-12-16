@@ -162,7 +162,7 @@
         /* CHAT CONTAINER */
         .chat-container {
             flex: 1;
-            padding: 80px 16px 160px;
+            padding: 80px 16px 100px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -317,44 +317,6 @@
         @keyframes typingBounce {
             0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
             30% { transform: translateY(-6px); opacity: 1; }
-        }
-
-        /* QUICK REPLIES */
-        .quick-replies {
-            position: fixed;
-            bottom: 76px;
-            left: 0;
-            right: 0;
-            display: flex;
-            gap: 8px;
-            padding: 12px 16px;
-            overflow-x: auto;
-            background: linear-gradient(180deg, transparent 0%, var(--gray-900) 30%);
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .quick-replies::-webkit-scrollbar {
-            display: none;
-        }
-
-        .quick-reply {
-            padding: 10px 18px;
-            background: var(--gray-700);
-            border: 1px solid var(--gray-500);
-            border-radius: 20px;
-            color: var(--white);
-            font-size: 13px;
-            font-weight: 500;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .quick-reply:active {
-            background: var(--red);
-            border-color: var(--red);
-            transform: scale(0.95);
         }
 
         /* INPUT AREA */
@@ -681,14 +643,6 @@
         <div class="typing-dot"></div>
     </div>
 
-    <!-- QUICK REPLIES -->
-    <div class="quick-replies" id="quickReplies">
-        <button class="quick-reply" onclick="sendQuickReply('Ciao Coach! 👋')">Ciao Coach! 👋</button>
-        <button class="quick-reply" onclick="sendQuickReply('Ho una domanda sul workout')">Domanda workout</button>
-        <button class="quick-reply" onclick="sendQuickReply('Come posso migliorare?')">Come migliorare?</button>
-        <button class="quick-reply" onclick="sendQuickReply('Grazie mille! 💪')">Grazie! 💪</button>
-    </div>
-
     <!-- INPUT AREA -->
     <div class="input-area">
         <div class="input-actions">
@@ -742,14 +696,27 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const athleteId = localStorage.getItem('gr_athlete_id');
             const athleteName = localStorage.getItem('gr_athlete_name');
-            const athletePhoto = localStorage.getItem('gr_athlete_photo');
+            let athletePhoto = localStorage.getItem('gr_athlete_photo');
             
             if (!athleteId) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            // Build athlete object from localStorage
+            // Try to get fresh photo from Supabase
+            try {
+                const athletes = await supabase.fetch('athletes', `?id=eq.${athleteId}&select=profile_photo,first_name,last_name`);
+                if (athletes && athletes[0]) {
+                    if (athletes[0].profile_photo) {
+                        athletePhoto = athletes[0].profile_photo;
+                        localStorage.setItem('gr_athlete_photo', athletePhoto);
+                    }
+                }
+            } catch (e) {
+                console.log('Using cached photo');
+            }
+
+            // Build athlete object
             athlete = {
                 id: athleteId,
                 first_name: athleteName ? athleteName.split(' ')[0] : 'Atleta',
@@ -978,7 +945,6 @@
                 document.getElementById('attachmentName').textContent = file.name;
                 document.getElementById('attachmentSize').textContent = formatFileSize(file.size);
                 document.getElementById('attachmentPreview').classList.add('visible');
-                document.getElementById('quickReplies').style.display = 'none';
                 document.getElementById('sendBtn').disabled = false;
             };
             reader.readAsDataURL(file);
@@ -987,7 +953,6 @@
         function removeAttachment() {
             pendingAttachment = null;
             document.getElementById('attachmentPreview').classList.remove('visible');
-            document.getElementById('quickReplies').style.display = 'flex';
             document.getElementById('fileInput').value = '';
             
             const input = document.getElementById('messageInput');
