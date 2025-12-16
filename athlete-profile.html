@@ -166,6 +166,14 @@
             font-weight: 800;
             border: 4px solid var(--black);
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .profile-info {
@@ -850,7 +858,12 @@
         function populatePage() {
             const initials = (athlete.first_name?.[0] || '') + (athlete.last_name?.[0] || '');
             
-            document.getElementById('avatar').textContent = initials;
+            const avatarEl = document.getElementById('avatar');
+            if (athlete.profile_photo) {
+                avatarEl.innerHTML = `<img src="${athlete.profile_photo}" alt="">`;
+            } else {
+                avatarEl.textContent = initials;
+            }
             document.getElementById('name').textContent = `${athlete.first_name} ${athlete.last_name}`;
             document.getElementById('sport').textContent = athlete.sport || 'Fitness';
             document.getElementById('level').innerHTML = `<i class="fas fa-star"></i> Livello ${athlete.level || 1}`;

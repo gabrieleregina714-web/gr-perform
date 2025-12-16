@@ -248,6 +248,14 @@
             justify-content: center;
             font-weight: 700;
             font-size: 14px;
+            overflow: hidden;
+        }
+
+        .athlete-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .athlete-name { font-weight: 600; font-size: 14px; }
@@ -486,6 +494,7 @@
             
             list.innerHTML = athletes.map(a => {
                 const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+                const avatarHtml = a.profile_photo ? `<img src="${a.profile_photo}" alt="">` : initials;
                 const workouts = a.workouts_completed || 0;
                 const status = workouts > 10 ? 'green' : workouts > 0 ? 'yellow' : 'red';
                 const statusText = status === 'green' ? 'Attivo' : status === 'yellow' ? 'In Progress' : 'Nuovo';
@@ -493,7 +502,7 @@
                 return `
                     <div class="athlete-row" onclick="viewProfile('${a.id}')">
                         <div class="athlete-info">
-                            <div class="athlete-avatar">${initials}</div>
+                            <div class="athlete-avatar">${avatarHtml}</div>
                             <div>
                                 <div class="athlete-name">${a.first_name} ${a.last_name}</div>
                                 <div class="athlete-email">${a.email || 'Nessuna email'}</div>

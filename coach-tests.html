@@ -160,6 +160,14 @@
             justify-content: center;
             font-weight: 700;
             font-size: 18px;
+            overflow: hidden;
+        }
+
+        .athlete-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .athlete-info h4 {
@@ -698,10 +706,11 @@
             document.getElementById('athleteList').innerHTML = athletes.map(a => {
                 const initials = `${a.first_name?.[0] || ''}${a.last_name?.[0] || ''}`.toUpperCase();
                 const sportInfo = [a.sport, a.role, a.goal].filter(Boolean).join(' • ');
+                const avatarHtml = a.profile_photo ? `<img src="${a.profile_photo}" alt="">` : initials;
                 
                 return `
                     <div class="athlete-card" data-id="${a.id}" onclick="selectAthlete('${a.id}')">
-                        <div class="athlete-avatar">${initials}</div>
+                        <div class="athlete-avatar">${avatarHtml}</div>
                         <div class="athlete-info">
                             <h4>${a.first_name} ${a.last_name}</h4>
                             <p>${sportInfo || 'Nessuna info'}</p>

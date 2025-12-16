@@ -1493,7 +1493,12 @@
             
             // Update avatar
             const initials = (selectedAthlete.first_name?.[0] || '') + (selectedAthlete.last_name?.[0] || '');
-            document.getElementById('athlete-avatar').textContent = initials;
+            const avatarEl = document.getElementById('athlete-avatar');
+            if (selectedAthlete.profile_photo) {
+                avatarEl.innerHTML = `<img src="${selectedAthlete.profile_photo}" alt="">`;
+            } else {
+                avatarEl.textContent = initials;
+            }
 
             // Show context box
             document.getElementById('athlete-context').classList.add('show');

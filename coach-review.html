@@ -206,6 +206,14 @@
             justify-content: center;
             font-weight: 700;
             font-size: 14px;
+            overflow: hidden;
+        }
+
+        .feedback-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .feedback-name { font-weight: 700; font-size: 15px; }
@@ -418,7 +426,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             // Load athletes for lookup
-            const athleteList = await supabase.fetch('athletes', '?select=id,first_name,last_name,sport');
+            const athleteList = await supabase.fetch('athletes', '?select=id,first_name,last_name,sport,profile_photo');
             athleteList.forEach(a => athletes[a.id] = a);
 
             // Load feedback
@@ -466,6 +474,7 @@
             list.innerHTML = filtered.map(f => {
                 const athlete = athletes[f.athlete_id] || { first_name: 'Atleta', last_name: '', sport: 'Fitness' };
                 const initials = (athlete.first_name?.[0] || '') + (athlete.last_name?.[0] || '');
+                const avatarHtml = athlete.profile_photo ? `<img src="${athlete.profile_photo}" alt="">` : initials;
                 const date = new Date(f.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
                 
                 const rpeClass = f.rpe <= 6 ? 'good' : f.rpe <= 8 ? 'medium' : 'bad';
@@ -476,7 +485,7 @@
                     <div class="feedback-card">
                         <div class="feedback-header">
                             <div class="feedback-athlete">
-                                <div class="feedback-avatar">${initials}</div>
+                                <div class="feedback-avatar">${avatarHtml}</div>
                                 <div>
                                     <div class="feedback-name">${athlete.first_name} ${athlete.last_name}</div>
                                     <div class="feedback-workout">${f.workout_name || 'Workout'} • ${athlete.sport || 'Fitness'}</div>
