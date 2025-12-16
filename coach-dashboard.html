@@ -631,9 +631,11 @@
                 
                 // Load workouts
                 try {
-                    const workouts = await supabase.fetch('workouts', '?select=id');
-                    document.getElementById('stat-workouts').textContent = workouts?.length || 0;
+                    const workouts = await supabase.fetch('workouts', '?select=*');
+                    console.log('Dashboard - All workouts:', workouts);
+                    document.getElementById('stat-workouts').textContent = Array.isArray(workouts) ? workouts.length : 0;
                 } catch(e) {
+                    console.error('Error loading workouts count:', e);
                     document.getElementById('stat-workouts').textContent = '0';
                 }
                 
@@ -691,8 +693,9 @@
                 const workoutsList = document.getElementById('workouts-list');
                 try {
                     const recentWorkouts = await supabase.fetch('workouts', '?select=*&order=created_at.desc&limit=6');
+                    console.log('Recent workouts for grid:', recentWorkouts);
                     
-                    if (recentWorkouts && recentWorkouts.length > 0) {
+                    if (Array.isArray(recentWorkouts) && recentWorkouts.length > 0) {
                         // Get athlete names for workouts
                         const athleteIds = [...new Set(recentWorkouts.map(w => w.athlete_id).filter(Boolean))];
                         const athleteMap = {};

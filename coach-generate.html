@@ -1846,12 +1846,16 @@
                 exercises: currentWorkout.exercises,
                 duration: currentWorkout.exercises.length * 8,
                 week: currentWeek,
-                status: 'assigned'
+                status: 'assigned',
+                completed: false
             };
 
-            const result = await supabase.insert('workouts', workout);
+            console.log('Saving workout:', workout);
             
-            if (result && !result.error) {
+            const result = await supabase.insert('workouts', workout);
+            console.log('Save result:', result);
+            
+            if (result && !result.error && !result.message) {
                 addAIMessage('strength', `✅ Workout assegnato con successo a <strong>${selectedAthlete.first_name}</strong>!`, 'high');
                 
                 // Success animation
@@ -1864,7 +1868,8 @@
                     btn.style.background = '';
                 }, 2000);
             } else {
-                alert('Errore nel salvataggio');
+                console.error('Error saving workout:', result);
+                alert('Errore nel salvataggio: ' + (result.message || result.error || 'Errore sconosciuto'));
             }
         }
     </script>

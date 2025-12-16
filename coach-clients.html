@@ -2193,8 +2193,12 @@
         async function loadWorkoutsTab() {
             let workouts = [];
             try {
+                console.log('Loading workouts for athlete:', selectedAthlete.id);
                 workouts = await supabase.fetch('workouts', `?athlete_id=eq.${selectedAthlete.id}&order=created_at.desc&limit=20`);
-            } catch (e) {}
+                console.log('Loaded workouts:', workouts);
+            } catch (e) {
+                console.error('Error loading workouts:', e);
+            }
 
             document.getElementById('tab-workouts').innerHTML = `
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
