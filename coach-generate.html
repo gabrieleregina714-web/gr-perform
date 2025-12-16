@@ -64,8 +64,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            text-decoration: none;
-            color: var(--white);
         }
 
         .nav-item {
@@ -99,11 +97,10 @@
         /* MAIN */
         .main { margin-left: 72px; min-height: 100vh; }
 
-        /* HERO HEADER */
+        /* HERO HEADER - Nike Style */
         .hero-header {
-            background: linear-gradient(135deg, var(--gray-900) 0%, var(--black) 100%);
-            padding: 40px;
-            border-bottom: 1px solid var(--gray-700);
+            background: linear-gradient(180deg, var(--gray-900) 0%, var(--black) 100%);
+            padding: 40px 48px;
             position: relative;
             overflow: hidden;
         }
@@ -111,32 +108,44 @@
         .hero-header::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(230,57,70,0.1) 0%, transparent 70%);
+            top: -100px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(230,57,70,0.08) 0%, transparent 60%);
             pointer-events: none;
         }
 
-        .hero-content {
+        .hero-top {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            position: relative;
-            z-index: 1;
+            margin-bottom: 32px;
         }
 
-        .hero-left h1 {
-            font-size: 36px;
-            font-weight: 900;
-            letter-spacing: -1.5px;
-            display: flex;
+        .hero-badge {
+            display: inline-flex;
             align-items: center;
-            gap: 16px;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--red), #B71C1C);
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
         }
 
-        .hero-left h1 .gradient-text {
+        .hero-title {
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        .hero-title span {
             background: linear-gradient(135deg, var(--red), var(--orange));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -144,96 +153,129 @@
 
         .hero-subtitle {
             color: var(--gray-400);
-            font-size: 14px;
-            margin-top: 8px;
-            max-width: 400px;
+            font-size: 15px;
+            margin-top: 12px;
+            max-width: 500px;
         }
 
-        /* ATHLETE SELECTOR */
+        /* ATHLETE SELECTOR - Nike Style */
         .athlete-selector {
+            background: var(--gray-800);
+            border-radius: 20px;
+            padding: 20px 24px;
+            border: 1px solid var(--gray-700);
+            min-width: 320px;
+        }
+
+        .selector-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-400);
+            margin-bottom: 12px;
+        }
+
+        .selector-row {
             display: flex;
             align-items: center;
-            gap: 16px;
-            background: var(--gray-800);
-            padding: 12px 20px 12px 12px;
-            border-radius: 16px;
-            border: 1px solid var(--gray-600);
+            gap: 14px;
         }
 
         .athlete-avatar-lg {
-            width: 48px; height: 48px;
-            border-radius: 12px;
+            width: 52px; height: 52px;
+            border-radius: 14px;
             background: linear-gradient(135deg, var(--red), #FF6B6B);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 16px;
+            font-size: 18px;
+            overflow: hidden;
         }
 
-        .athlete-info h3 { font-size: 16px; font-weight: 700; }
-        .athlete-info p { font-size: 12px; color: var(--gray-400); }
+        .athlete-avatar-lg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
         .athlete-selector select {
+            flex: 1;
             background: var(--gray-700);
-            border: 1px solid var(--gray-600);
+            border: none;
             color: var(--white);
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             outline: none;
             cursor: pointer;
-            min-width: 200px;
-            padding: 10px 14px;
-            border-radius: 10px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 44px;
         }
 
         .athlete-selector select option { background: var(--gray-800); }
 
-        /* WORKFLOW STEPS */
-        .workflow-steps {
+        /* STEPS INDICATOR - Nike Style */
+        .steps-container {
             display: flex;
             gap: 0;
-            padding: 0 40px;
-            margin-top: -24px;
-            position: relative;
-            z-index: 2;
+            background: var(--gray-800);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--gray-700);
         }
 
-        .workflow-step {
+        .step-item {
             flex: 1;
-            background: var(--gray-800);
             padding: 20px 24px;
-            border: 1px solid var(--gray-700);
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
             cursor: pointer;
             transition: all 0.3s;
+            border-right: 1px solid var(--gray-700);
+            position: relative;
         }
 
-        .workflow-step:first-child { border-radius: 16px 0 0 16px; }
-        .workflow-step:last-child { border-radius: 0 16px 16px 0; }
+        .step-item:last-child { border-right: none; }
 
-        .workflow-step:hover { background: var(--gray-700); }
-        .workflow-step.active { background: var(--gray-700); border-color: var(--red); }
-        .workflow-step.completed { opacity: 0.6; }
+        .step-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--red);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
 
-        .step-number {
+        .step-item.active::after { transform: scaleX(1); }
+        .step-item.completed::after { background: var(--green); transform: scaleX(1); }
+
+        .step-num {
             width: 36px; height: 36px;
-            border-radius: 10px;
+            border-radius: 50%;
             background: var(--gray-700);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
             font-size: 14px;
+            transition: all 0.3s;
         }
 
-        .workflow-step.active .step-number { background: var(--red); }
-        .workflow-step.completed .step-number { background: var(--green); }
+        .step-item.active .step-num { background: var(--red); }
+        .step-item.completed .step-num { background: var(--green); }
 
-        .step-info h4 { font-size: 13px; font-weight: 700; }
-        .step-info p { font-size: 11px; color: var(--gray-400); }
+        .step-info h4 { font-size: 14px; font-weight: 700; }
+        .step-info p { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
 
         /* MAIN GRID */
         .main-grid {
@@ -753,41 +795,48 @@
     <main class="main">
         <!-- HERO HEADER -->
         <div class="hero-header">
-            <div class="hero-content">
+            <div class="hero-top">
                 <div class="hero-left">
-                    <h1>🧠 <span class="gradient-text">AI Workout Lab</span></h1>
-                    <p class="hero-subtitle">Il tuo team di 5 esperti AI analizza, discute e genera il workout perfetto per ogni atleta</p>
+                    <div class="hero-badge">
+                        <i class="fas fa-robot"></i>
+                        AI Powered
+                    </div>
+                    <h1 class="hero-title">WORKOUT<br><span>GENERATOR</span></h1>
+                    <p class="hero-subtitle">Il tuo team di 5 esperti AI analizza i dati, discute e genera il workout perfetto per ogni atleta</p>
                 </div>
                 <div class="athlete-selector">
-                    <div class="athlete-avatar-lg" id="athlete-avatar">--</div>
-                    <select id="athlete-select">
-                        <option value="">Seleziona atleta...</option>
-                    </select>
+                    <div class="selector-label">Seleziona Atleta</div>
+                    <div class="selector-row">
+                        <div class="athlete-avatar-lg" id="athlete-avatar">--</div>
+                        <select id="athlete-select">
+                            <option value="">Scegli un atleta...</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- WORKFLOW STEPS -->
-        <div class="workflow-steps">
-            <div class="workflow-step active" data-step="1">
-                <div class="step-number">1</div>
-                <div class="step-info">
-                    <h4>Analisi</h4>
-                    <p>Dati atleta e storico</p>
+            <!-- STEPS -->
+            <div class="steps-container">
+                <div class="step-item active" data-step="1">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                        <h4>Analisi Atleta</h4>
+                        <p>Dati e storico performance</p>
+                    </div>
                 </div>
-            </div>
-            <div class="workflow-step" data-step="2">
-                <div class="step-number">2</div>
-                <div class="step-info">
-                    <h4>Consulto AI</h4>
-                    <p>Discussione esperti</p>
+                <div class="step-item" data-step="2">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                        <h4>Consulto AI Team</h4>
+                        <p>Discussione tra esperti</p>
+                    </div>
                 </div>
-            </div>
-            <div class="workflow-step" data-step="3">
-                <div class="step-number">3</div>
-                <div class="step-info">
-                    <h4>Generazione</h4>
-                    <p>Workout finale</p>
+                <div class="step-item" data-step="3">
+                    <div class="step-num">3</div>
+                    <div class="step-info">
+                        <h4>Genera Workout</h4>
+                        <p>Scheda personalizzata</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1493,7 +1542,7 @@
         }
 
         function setWorkflowStep(step) {
-            document.querySelectorAll('.workflow-step').forEach((el, i) => {
+            document.querySelectorAll('.step-item').forEach((el, i) => {
                 el.classList.remove('active', 'completed');
                 if (i + 1 < step) el.classList.add('completed');
                 if (i + 1 === step) el.classList.add('active');

@@ -1099,6 +1099,94 @@
             <span class="chat-badge">2</span>
         </button>
     </div>
+
+    <script src="js/supabase-client.js"></script>
+    <script>
+        // Get athlete ID from localStorage or URL
+        const athleteId = localStorage.getItem('athlete_id') || new URLSearchParams(window.location.search).get('id');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!athleteId) {
+                console.log('No athlete ID found');
+                return;
+            }
+
+            try {
+                // Load athlete data
+                const athletes = await supabase.fetch('athletes', `?id=eq.${athleteId}`);
+                const athlete = athletes?.[0];
+                
+                if (athlete) {
+                    // Update profile info
+                    const profileName = document.querySelector('.profile-name');
+                    const profileTitle = document.querySelector('.profile-title');
+                    
+                    if (profileName) profileName.textContent = `${athlete.first_name} ${athlete.last_name}`;
+                    if (profileTitle) profileTitle.textContent = athlete.sport || 'Atleta GR Perform';
+                    
+                    // Update stats
+                    const workoutsValue = document.querySelector('.stat-card:nth-child(2) .stat-value');
+                    const xpValue = document.querySelector('.stat-card:nth-child(3) .stat-value');
+                    const levelValue = document.querySelector('.stat-card:nth-child(4) .stat-value');
+                    
+                    if (workoutsValue) workoutsValue.textContent = athlete.workouts_completed || 0;
+                    if (xpValue) xpValue.textContent = athlete.xp || 0;
+                    if (levelValue) levelValue.textContent = athlete.level || 1;
+                }
+
+                // Load today's workout
+                const workouts = await supabase.fetch('workouts', `?athlete_id=eq.${athleteId}&completed=eq.false&order=created_at.desc&limit=1`);
+                const todayWorkout = workouts?.[0];
+
+                if (todayWorkout) {
+                    const workoutCard = document.querySelector('.workout-today .card-body');
+                    if (workoutCard) {
+                        const exercises = todayWorkout.exercises || [];
+                        
+                        workoutCard.innerHTML = `
+                            <div class="workout-badge">
+                                <i class="fas fa-bolt"></i>
+                                Settimana ${todayWorkout.week || 1}
+                            </div>
+                            <h2 class="workout-title">${todayWorkout.name || 'Workout'}</h2>
+                            <div class="workout-meta">
+                                <span><i class="fas fa-clock"></i> ~${todayWorkout.duration || 45} min</span>
+                                <span><i class="fas fa-list"></i> ${exercises.length} esercizi</span>
+                            </div>
+                            <div class="workout-exercises">
+                                ${exercises.map((ex, i) => `
+                                    <div class="exercise-item">
+                                        <div class="exercise-number">${i + 1}</div>
+                                        <div class="exercise-info">
+                                            <div class="exercise-name">${ex.name}</div>
+                                            <div class="exercise-details">${ex.sets} × ${ex.reps} reps</div>
+                                        </div>
+                                        <div class="exercise-status pending">
+                                            <i class="fas fa-circle"></i>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                } else {
+                    // No workout assigned
+                    const workoutCard = document.querySelector('.workout-today .card-body');
+                    if (workoutCard) {
+                        workoutCard.innerHTML = `
+                            <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary);">
+                                <i class="fas fa-dumbbell" style="font-size: 48px; margin-bottom: 16px; opacity: 0.3;"></i>
+                                <p style="font-size: 16px; margin-bottom: 8px;">Nessun workout assegnato</p>
+                                <p style="font-size: 13px;">Il tuo coach ti assegnerà un workout presto!</p>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading athlete data:', error);
+            }
+        });
+    </script>
 </body>
 
 </html>

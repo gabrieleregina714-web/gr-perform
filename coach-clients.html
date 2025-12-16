@@ -967,21 +967,34 @@
 
         .workout-card {
             background: var(--gray-800);
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 20px;
             display: flex;
             align-items: center;
             gap: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .workout-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--red);
+            box-shadow: 0 8px 24px rgba(230,57,70,0.15);
         }
 
         .workout-date {
             text-align: center;
             min-width: 60px;
+            background: var(--gray-700);
+            border-radius: 12px;
+            padding: 12px 8px;
         }
 
         .workout-day {
             font-size: 24px;
             font-weight: 800;
+            color: var(--red);
         }
 
         .workout-month {
@@ -997,6 +1010,7 @@
         .workout-name {
             font-weight: 700;
             margin-bottom: 4px;
+            font-size: 15px;
         }
 
         .workout-meta {
@@ -1020,6 +1034,74 @@
         .workout-status.pending {
             background: rgba(255, 184, 0, 0.2);
             color: var(--yellow);
+        }
+
+        .workout-exercises-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .exercise-chip {
+            background: var(--gray-700);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--gray-300);
+        }
+
+        .workout-expand {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gray-700);
+            display: none;
+        }
+
+        .workout-card.expanded .workout-expand {
+            display: block;
+        }
+
+        .workout-exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .workout-exercise-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--gray-700);
+            border-radius: 10px;
+        }
+
+        .exercise-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .exercise-details {
+            flex: 1;
+        }
+
+        .exercise-detail-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .exercise-detail-params {
+            font-size: 12px;
+            color: var(--gray-400);
+            margin-top: 2px;
         }
 
         /* TEST TAB */
@@ -2115,19 +2197,52 @@
             } catch (e) {}
 
             document.getElementById('tab-workouts').innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                    <h3 style="font-size:16px;font-weight:700;">Workout Assegnati</h3>
+                    <a href="coach-generate.html?athlete=${selectedAthlete.id}" style="background:var(--red);color:white;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-plus"></i> Nuovo Workout
+                    </a>
+                </div>
                 <div class="workout-list">
-                    ${workouts.length === 0 ? '<p style="color:var(--gray-500);">Nessun workout assegnato</p>' :
-                        workouts.map(w => {
+                    ${workouts.length === 0 ? `
+                        <div style="text-align:center;padding:60px 20px;color:var(--gray-400);">
+                            <i class="fas fa-dumbbell" style="font-size:48px;margin-bottom:16px;opacity:0.3;display:block;"></i>
+                            <p style="font-size:16px;margin-bottom:8px;">Nessun workout assegnato</p>
+                            <p style="font-size:13px;">Crea il primo workout per questo atleta</p>
+                        </div>
+                    ` :
+                        workouts.map((w, idx) => {
                             const date = new Date(w.created_at);
+                            const exercises = w.exercises || [];
+                            const exercisePreview = exercises.slice(0, 3).map(e => e.name).join(', ');
                             return `
-                                <div class="workout-card">
+                                <div class="workout-card" onclick="toggleWorkoutExpand(this)">
                                     <div class="workout-date">
                                         <div class="workout-day">${date.getDate()}</div>
                                         <div class="workout-month">${date.toLocaleString('it-IT', {month:'short'})}</div>
                                     </div>
                                     <div class="workout-info">
                                         <div class="workout-name">${w.name || 'Workout'}</div>
-                                        <div class="workout-meta">${w.duration || 45} min • ${w.exercises?.length || 0} esercizi</div>
+                                        <div class="workout-meta">${w.duration || 45} min • ${exercises.length} esercizi • Sett. ${w.week || '-'}</div>
+                                        ${exercises.length > 0 ? `
+                                            <div class="workout-exercises-preview">
+                                                ${exercises.slice(0, 3).map(e => `<span class="exercise-chip">${e.name}</span>`).join('')}
+                                                ${exercises.length > 3 ? `<span class="exercise-chip">+${exercises.length - 3}</span>` : ''}
+                                            </div>
+                                        ` : ''}
+                                        <div class="workout-expand">
+                                            <div class="workout-exercise-list">
+                                                ${exercises.map((e, i) => `
+                                                    <div class="workout-exercise-item">
+                                                        <div class="exercise-num">${i + 1}</div>
+                                                        <div class="exercise-details">
+                                                            <div class="exercise-detail-name">${e.name}</div>
+                                                            <div class="exercise-detail-params">${e.sets} serie × ${e.reps} reps</div>
+                                                        </div>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
                                     </div>
                                     <span class="workout-status ${w.completed ? 'completed' : 'pending'}">
                                         ${w.completed ? 'Completato' : 'Da fare'}
@@ -2138,6 +2253,10 @@
                     }
                 </div>
             `;
+        }
+
+        function toggleWorkoutExpand(card) {
+            card.classList.toggle('expanded');
         }
 
         async function loadTestsTab() {

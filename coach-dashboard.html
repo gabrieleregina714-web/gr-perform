@@ -377,10 +377,79 @@
         .activity-text strong { font-weight: 600; }
         .activity-time { font-size: 11px; color: var(--gray-500); }
 
+        /* WORKOUTS LIST */
+        .workouts-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .workout-card-mini {
+            background: var(--gray-800);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .workout-card-mini:hover {
+            transform: translateY(-4px);
+            border-color: var(--red);
+        }
+
+        .workout-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .workout-athlete-name {
+            font-size: 12px;
+            color: var(--gray-400);
+            margin-bottom: 4px;
+        }
+
+        .workout-card-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .workout-card-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .workout-card-badge.pending {
+            background: rgba(255,184,0,0.2);
+            color: var(--yellow);
+        }
+
+        .workout-card-badge.completed {
+            background: rgba(0,210,106,0.2);
+            color: var(--green);
+        }
+
+        .workout-card-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--gray-400);
+        }
+
+        .workout-card-meta i {
+            margin-right: 6px;
+            color: var(--gray-500);
+        }
+
         /* RESPONSIVE */
         @media (max-width: 1200px) {
             .actions-grid { grid-template-columns: repeat(2, 1fr); }
             .action-card.featured { grid-column: span 2; }
+        }
         }
 
         @media (max-width: 768px) {
@@ -500,6 +569,17 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Recent Workouts -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Workout Recenti</h2>
+                    <a href="coach-generate.html" class="section-link">Crea nuovo <i class="fas fa-plus"></i></a>
+                </div>
+                <div class="workouts-list" id="workouts-list">
+                    <!-- Loaded from Supabase -->
+                </div>
+            </section>
         </div>
     </main>
 
@@ -605,6 +685,53 @@
                     }).join('');
                 } else {
                     grid.innerHTML = '<p style="color: var(--gray-400); padding: 20px; grid-column: span 3;">Nessun atleta trovato. Aggiungi atleti per iniziare.</p>';
+                }
+                
+                // Load recent workouts
+                const workoutsList = document.getElementById('workouts-list');
+                try {
+                    const recentWorkouts = await supabase.fetch('workouts', '?select=*&order=created_at.desc&limit=6');
+                    
+                    if (recentWorkouts && recentWorkouts.length > 0) {
+                        // Get athlete names for workouts
+                        const athleteIds = [...new Set(recentWorkouts.map(w => w.athlete_id).filter(Boolean))];
+                        const athleteMap = {};
+                        for (const id of athleteIds) {
+                            try {
+                                const athlete = await supabase.fetch('athletes', `?id=eq.${id}&select=first_name,last_name`);
+                                if (athlete && athlete[0]) {
+                                    athleteMap[id] = `${athlete[0].first_name} ${athlete[0].last_name}`;
+                                }
+                            } catch(e) {}
+                        }
+                        
+                        workoutsList.innerHTML = recentWorkouts.map(w => {
+                            const athleteName = athleteMap[w.athlete_id] || 'Atleta';
+                            const exercises = w.exercises || [];
+                            return `
+                                <div class="workout-card-mini" onclick="location.href='coach-clients.html'">
+                                    <div class="workout-card-header">
+                                        <div>
+                                            <div class="workout-athlete-name">${athleteName}</div>
+                                            <div class="workout-card-title">${w.name || 'Workout'}</div>
+                                        </div>
+                                        <span class="workout-card-badge ${w.completed ? 'completed' : 'pending'}">
+                                            ${w.completed ? 'Fatto' : 'Da fare'}
+                                        </span>
+                                    </div>
+                                    <div class="workout-card-meta">
+                                        <span><i class="fas fa-dumbbell"></i>${exercises.length} esercizi</span>
+                                        <span><i class="fas fa-clock"></i>${w.duration || 45} min</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    } else {
+                        workoutsList.innerHTML = '<p style="color: var(--gray-400); padding: 20px;">Nessun workout creato. <a href="coach-generate.html" style="color: var(--red);">Crea il primo!</a></p>';
+                    }
+                } catch (error) {
+                    console.log('Error loading workouts:', error);
+                    workoutsList.innerHTML = '<p style="color: var(--gray-400); padding: 20px;">Nessun workout creato</p>';
                 }
                 
                 // Load recent activity (messages + feedback)
