@@ -486,11 +486,49 @@
                 margin-bottom: 70px;
                 padding-bottom: 20px;
             }
-            .hero { height: 50vh; min-height: 320px; }
-            .hero-content { padding: 20px; }
-            .hero-title { font-size: 32px; }
-            .hero-stats { gap: 20px; flex-wrap: wrap; }
-            .hero-stat-value { font-size: 24px; }
+            .hero { 
+                height: auto; 
+                min-height: auto;
+                padding-bottom: 24px;
+            }
+            .hero-content { 
+                padding: 24px 20px;
+                display: flex;
+                flex-direction: column;
+            }
+            .hero-label {
+                font-size: 11px;
+                margin-bottom: 8px;
+            }
+            .hero-title { 
+                font-size: 28px;
+                margin-bottom: 8px;
+            }
+            .hero-title br { display: none; }
+            .hero-subtitle {
+                font-size: 13px;
+                margin-bottom: 20px;
+                opacity: 0.8;
+            }
+            .hero-stats { 
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                background: rgba(255,255,255,0.05);
+                border-radius: 16px;
+                padding: 16px;
+            }
+            .hero-stats > div {
+                text-align: center;
+            }
+            .hero-stat-value { 
+                font-size: 22px;
+                font-weight: 800;
+            }
+            .hero-stat-label {
+                font-size: 10px;
+                opacity: 0.7;
+            }
             .content { padding: 20px; }
             .actions-grid { grid-template-columns: 1fr; }
             .action-card.featured { grid-column: span 1; }
@@ -503,9 +541,9 @@
         }
 
         @media (max-width: 480px) {
-            .hero-stats { flex-direction: column; gap: 12px; text-align: center; }
-            .hero-title { font-size: 26px; }
-            .hero-subtitle { font-size: 13px; }
+            .hero-title { font-size: 24px; }
+            .hero-stat-value { font-size: 20px; }
+            .hero-stat-label { font-size: 9px; }
             .sidebar {
                 height: 65px;
             }
