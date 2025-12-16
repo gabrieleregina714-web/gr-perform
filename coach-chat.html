@@ -690,6 +690,27 @@
             cursor: pointer;
         }
 
+        /* Mobile back button in chat header */
+        .mobile-back-btn {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gray-700);
+            border: none;
+            color: var(--white);
+            font-size: 16px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 900px) {
+            .mobile-back-btn { display: flex; }
+        }
+
         /* RESPONSIVE */
         @media (max-width: 900px) {
             .chat-container { grid-template-columns: 1fr; }
@@ -852,11 +873,23 @@
         let unreadMap = {};
         let currentFilter = 'all';
         let pendingMedia = [];
+        let cameFromProfile = false;
         
         // Toggle contacts panel on mobile
         function toggleContacts() {
             const contacts = document.getElementById('contacts');
             contacts.classList.toggle('mobile-show');
+        }
+        
+        // Go back from chat on mobile
+        function goBackFromChat() {
+            if (cameFromProfile) {
+                // Go back to clients page if came from athlete profile
+                window.location.href = 'coach-clients.html';
+            } else {
+                // Show contacts list
+                toggleContacts();
+            }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -878,7 +911,13 @@
             // Check URL params for athlete
             const urlParams = new URLSearchParams(window.location.search);
             const athleteId = urlParams.get('athlete');
-            if (athleteId) selectAthlete(athleteId);
+            if (athleteId) {
+                cameFromProfile = true;
+                selectAthlete(parseInt(athleteId));
+                // Hide FAB on mobile when coming from profile
+                const fab = document.querySelector('.mobile-fab');
+                if (fab) fab.style.display = 'none';
+            }
         });
 
         async function loadUnreadCounts() {
@@ -972,6 +1011,7 @@
         }
 
         async function selectAthlete(id) {
+            id = parseInt(id); // Ensure ID is a number
             selectedAthleteId = id;
             const athlete = athletes.find(a => a.id === id);
             
@@ -997,13 +1037,14 @@
             
             document.getElementById('chat-area').innerHTML = `
                 <div class="chat-header">
+                    <button class="mobile-back-btn" onclick="goBackFromChat()"><i class="fas fa-arrow-left"></i></button>
                     <div class="chat-header-avatar">${initials}</div>
                     <div class="chat-header-info">
                         <h3>${athlete.first_name} ${athlete.last_name}</h3>
                         <p><i class="fas fa-circle"></i> Online ora</p>
                     </div>
                     <div class="chat-header-actions">
-                        <button class="header-action" onclick="location.href='athlete-profile.html?id=${id}'" title="Vedi Profilo"><i class="fas fa-user"></i></button>
+                        <button class="header-action" onclick="location.href='coach-clients.html'" title="Vedi Profilo"><i class="fas fa-user"></i></button>
                         <button class="header-action" onclick="callAthlete('${athlete.phone || ''}')" title="Chiama"><i class="fas fa-phone"></i></button>
                         <button class="header-action" onclick="location.href='coach-generate.html?athlete=${id}'" title="Genera Workout"><i class="fas fa-bolt"></i></button>
                         <button class="header-action" onclick="toggleChatMenu()" title="Altro"><i class="fas fa-ellipsis-v"></i></button>
