@@ -2401,13 +2401,13 @@
             const a = selectedAthlete;
             const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
             const hasPhoto = a.profile_photo;
-            const bgUrl = getSportBackgroundUrl(a.sport);
+            const bgImages = getSportBackgroundImages(a.sport);
             const metaFallback = `${formatSportLabel(a.sport)} • ${(a.package_type || 'Performance')}`;
 
             document.getElementById('detail-content').innerHTML = `
                 <!-- Hero Section -->
                 <div class="athlete-hero">
-                    <div class="athlete-hero-bg" style="background-image:url('${bgUrl}')"></div>
+                    <div class="athlete-hero-bg" style="background-image:${bgImages}"></div>
                     <div class="athlete-hero-avatar">
                         ${hasPhoto ? `<img src="${a.profile_photo}" alt="">` : initials}
                     </div>
@@ -2713,15 +2713,37 @@
                 .replace(/\b\w/g, m => m.toUpperCase());
         }
 
-        function getSportBackgroundUrl(sport) {
+        function getSportBackgroundImages(sport) {
             const s = normalizeSport(sport);
-            const map = {
+
+            // Primary = the specific photo you requested (if present in assets)
+            // Fallback = an existing local asset so the UI always has a background
+            const primaryBySport = {
+                // Mustafa Fatemi (Pexels id 29873486)
+                calcio: 'assets/pexels-mustafa-fatemi-383794430-29873486.jpg',
+
+                // Markus Spiske (Pexels id 1752757) -> add this file to assets if you want the exact image
+                basket: 'assets/pexels-markus-spiske-1752757.jpg',
+
+                // Dany Lovehill (Pexels id 10341870) -> add this file to assets if you want the exact image
+                boxe: 'assets/pexels-dany-lovehill-10341870.jpg',
+
+                // Victor Freitas (Pexels id 931321) -> add this file to assets if you want the exact image
+                palestra: 'assets/pexels-victor-freitas-931321.jpg'
+            };
+
+            const fallbackBySport = {
                 calcio: 'assets/pexels-chuck-2820899.jpg',
                 basket: 'assets/pexels-gasparzaldo-13464777.jpg',
-                boxe: 'assets/pexels-fari-9765649.jpg',
-                palestra: 'assets/pexels-cottonbro-5274989.jpg'
+                boxe: 'assets/pexels-dany-lovehill-141442867-10341872.jpg',
+                palestra: 'assets/pexels-victorfreitas-949132.jpg'
             };
-            return map[s] || 'assets/pexels-cottonbro-5274989.jpg';
+
+            const primary = primaryBySport[s] || 'assets/pexels-cottonbro-5274989.jpg';
+            const fallback = fallbackBySport[s] || 'assets/pexels-cottonbro-5274989.jpg';
+
+            // Multiple backgrounds: if primary 404s, fallback still renders.
+            return `url('${primary}'), url('${fallback}')`;
         }
 
         function getPrimaryGoalFromData(athlete, sportData, goalIds, goalsById) {
