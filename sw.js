@@ -1,7 +1,7 @@
 // GR Perform - Service Worker v1.4
-const CACHE_NAME = 'gr-perform-v9';
-const STATIC_CACHE = 'gr-perform-static-v9';
-const DYNAMIC_CACHE = 'gr-perform-dynamic-v9';
+const CACHE_NAME = 'gr-perform-v10';
+const STATIC_CACHE = 'gr-perform-static-v10';
+const DYNAMIC_CACHE = 'gr-perform-dynamic-v10';
 
 // Files to cache for offline use
 const STATIC_FILES = [
@@ -53,6 +53,11 @@ self.addEventListener('fetch', event => {
   
   // Skip non-GET requests
   if (event.request.method !== 'GET') return;
+
+  // Never intercept serverless API requests
+  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) {
+    return;
+  }
   
   // Skip Supabase API calls (always fetch fresh)
   if (url.hostname.includes('supabase')) {
