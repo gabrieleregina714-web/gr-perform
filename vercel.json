@@ -1,21 +1,30 @@
 {
   "version": 2,
   "name": "gr-perform",
-  "builds": [
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "headers": [
     {
-      "src": "**/*.html",
-      "use": "@vercel/static"
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
     },
     {
-      "src": "**/*.{js,css,json,svg,png,jpg,jpeg,gif,ico,woff,woff2}",
-      "use": "@vercel/static"
-    }
-  ],
-  
-  "rewrites": [
-    {
-      "source": "/((?!api/).*)",
-      "destination": "/$1"
+      "source": "/manifest.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
     }
   ]
 }
