@@ -1074,12 +1074,14 @@
                 // Show background with fade-in after correct class is set
                 setTimeout(() => heroBg.classList.add('loaded'), 50);
 
-                // Avatar
+                // Avatar - check Supabase first, then localStorage as fallback
                 const initials = (athlete.first_name?.[0] || '') + (athlete.last_name?.[0] || '');
                 const avatarEl = document.getElementById('avatar');
-                if (athlete.profile_photo) {
-                    avatarEl.innerHTML = `<img src="${athlete.profile_photo}" alt="Profile">`;
-                    localStorage.setItem('gr_athlete_photo', athlete.profile_photo);
+                const savedPhoto = athlete.profile_photo || localStorage.getItem('gr_athlete_photo');
+                
+                if (savedPhoto) {
+                    avatarEl.innerHTML = `<img src="${savedPhoto}" alt="Profile">`;
+                    localStorage.setItem('gr_athlete_photo', savedPhoto);
                 } else {
                     avatarEl.textContent = initials.toUpperCase();
                 }
@@ -1404,7 +1406,13 @@
                         profile_photo: resized
                     });
 
-                    console.log('Photo saved to Supabase:', result ? 'success' : 'failed');
+                    console.log('Photo save result:', result);
+                    
+                    // Check if save was successful
+                    if (result && result.error) {
+                        console.error('Supabase error:', result.error);
+                        // Still save to localStorage as fallback
+                    }
 
                     // Update local athlete object
                     athlete.profile_photo = resized;
@@ -1412,8 +1420,10 @@
                     // Update avatar
                     avatar.innerHTML = `<img src="${resized}" alt="Profile">`;
                     
-                    // Store in localStorage for chat use
+                    // ALWAYS store in localStorage (primary storage for now)
                     localStorage.setItem('gr_athlete_photo', resized);
+                    
+                    console.log('Photo saved successfully, length:', resized.length);
 
                 } catch (error) {
                     console.error('Upload error:', error);
