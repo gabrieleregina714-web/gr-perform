@@ -4,41 +4,88 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const supabase = {
     async fetch(table, query = '') {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${query}`, {
-            headers: {
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${query}`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                console.error(`Supabase fetch error for ${table}:`, data);
+                return [];
             }
-        });
-        return res.json();
+            return data;
+        } catch (e) {
+            console.error(`Supabase fetch exception for ${table}:`, e);
+            return [];
+        }
     },
     
     async insert(table, data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-            method: 'POST',
-            headers: {
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=representation'
-            },
-            body: JSON.stringify(data)
-        });
-        return res.json();
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (!res.ok) {
+                console.error(`Supabase insert error for ${table}:`, result);
+                return { error: true, message: result.message || result.error || 'Insert failed', details: result };
+            }
+            console.log(`Supabase insert success for ${table}:`, result);
+            return result;
+        } catch (e) {
+            console.error(`Supabase insert exception for ${table}:`, e);
+            return { error: true, message: e.message };
+        }
     },
     
     async update(table, id, data) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-            method: 'PATCH',
-            headers: {
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=representation'
-            },
-            body: JSON.stringify(data)
-        });
-        return res.json();
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (!res.ok) {
+                console.error(`Supabase update error for ${table}:`, result);
+                return { error: true, message: result.message || result.error || 'Update failed' };
+            }
+            return result;
+        } catch (e) {
+            console.error(`Supabase update exception for ${table}:`, e);
+            return { error: true, message: e.message };
+        }
+    },
+
+    async delete(table, query) {
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${query}`, {
+                method: 'DELETE',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            return res.ok;
+        } catch (e) {
+            console.error(`Supabase delete exception for ${table}:`, e);
+            return false;
+        }
     }
 };
 
