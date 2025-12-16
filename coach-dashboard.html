@@ -487,47 +487,32 @@
                 padding-bottom: 20px;
             }
             .hero { 
-                height: auto; 
-                min-height: auto;
-                padding-bottom: 24px;
+                height: 72vh;
+                min-height: 520px;
+                padding-bottom: 0;
             }
             .hero-content { 
-                padding: 24px 20px;
+                height: 100%;
+                padding: 44px 20px;
+                padding-bottom: calc(44px + env(safe-area-inset-bottom));
                 display: flex;
                 flex-direction: column;
+                justify-content: flex-end;
             }
             .hero-label {
                 font-size: 11px;
                 margin-bottom: 8px;
             }
             .hero-title { 
-                font-size: 28px;
-                margin-bottom: 8px;
+                font-size: 36px;
+                line-height: 1.08;
+                margin-bottom: 10px;
             }
             .hero-title br { display: none; }
             .hero-subtitle {
-                font-size: 13px;
-                margin-bottom: 20px;
-                opacity: 0.8;
-            }
-            .hero-stats { 
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 12px;
-                background: rgba(255,255,255,0.05);
-                border-radius: 16px;
-                padding: 16px;
-            }
-            .hero-stats > div {
-                text-align: center;
-            }
-            .hero-stat-value { 
-                font-size: 22px;
-                font-weight: 800;
-            }
-            .hero-stat-label {
-                font-size: 10px;
-                opacity: 0.7;
+                font-size: 15px;
+                max-width: 520px;
+                opacity: 0.85;
             }
             .content { padding: 20px; }
             .actions-grid { grid-template-columns: 1fr; }
@@ -541,9 +526,16 @@
         }
 
         @media (max-width: 480px) {
-            .hero-title { font-size: 24px; }
-            .hero-stat-value { font-size: 20px; }
-            .hero-stat-label { font-size: 9px; }
+            .hero { 
+                height: 70vh;
+                min-height: 500px;
+            }
+            .hero-content {
+                padding-top: 40px;
+                padding-bottom: calc(40px + env(safe-area-inset-bottom));
+            }
+            .hero-title { font-size: 32px; }
+            .hero-subtitle { font-size: 14px; }
             .sidebar {
                 height: 65px;
             }
