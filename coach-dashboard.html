@@ -296,7 +296,7 @@
             text-decoration: none;
             color: var(--white);
             overflow: hidden;
-            min-height: 170px;
+            aspect-ratio: 1 / 1;
             display: flex;
             align-items: flex-end;
         }
@@ -338,15 +338,6 @@
         .action-card:hover {
             transform: translateY(-4px);
             border-color: var(--gray-500);
-        }
-
-        .action-card.featured {
-            grid-column: span 2;
-        }
-
-        .action-card.featured:hover {
-            border-color: transparent;
-            box-shadow: 0 20px 40px rgba(230,57,70,0.3);
         }
 
         .action-icon {
@@ -490,7 +481,6 @@
         /* RESPONSIVE */
         @media (max-width: 1200px) {
             .actions-grid { grid-template-columns: repeat(2, 1fr); }
-            .action-card.featured { grid-column: span 2; }
         }
 
         @media (max-width: 768px) {
@@ -558,8 +548,7 @@
             }
             .content { padding: 20px; }
             .actions-grid { grid-template-columns: 1fr; }
-            .action-card.featured { grid-column: span 1; }
-            .action-card { min-height: 160px; }
+            .action-card { aspect-ratio: 1 / 1; }
             .athletes-grid { grid-template-columns: 1fr; gap: 12px; }
             .athlete-card { padding: 16px; }
             .athlete-avatar { width: 40px; height: 40px; font-size: 14px; }
@@ -620,7 +609,7 @@
                     <h2 class="section-title">Azioni Rapide</h2>
                 </div>
                 <div class="actions-grid">
-                    <a href="coach-clients.html" class="action-card featured">
+                    <a href="coach-clients.html" class="action-card">
                         <img class="action-bg" src="assets/sport-calcio.jpg" alt="" onerror="this.onerror=null; this.src='assets/pexels-gabin-cobret-430175667-32948745.jpg';">
                         <div class="action-overlay"></div>
                         <div class="action-content">
@@ -643,19 +632,6 @@
                             </div>
                             <div class="action-title">Genera Workout</div>
                             <div class="action-desc">Crea workout personalizzati</div>
-                        </div>
-                    </a>
-
-                    <a href="coach-chat.html" class="action-card">
-                        <img class="action-bg" src="assets/sport-boxe.jpg" alt="" onerror="this.onerror=null; this.src='assets/pexels-dany-lovehill-10341870.jpg';">
-                        <div class="action-overlay"></div>
-                        <div class="action-content">
-                            <div class="action-top-row">
-                                <div class="action-kicker">Chat</div>
-                                <div class="action-icon"><i class="fas fa-comment-dots"></i></div>
-                            </div>
-                            <div class="action-title">Apri Chat</div>
-                            <div class="action-desc">Messaggi e foto con i tuoi atleti</div>
                         </div>
                     </a>
                 </div>
