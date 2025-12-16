@@ -1624,6 +1624,10 @@
             gap: 8px;
             border-bottom: 1px solid var(--gray-800);
             overflow-x: auto;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: var(--black);
         }
         
         .athlete-tab {
@@ -2017,28 +2021,28 @@
         </div>
         <div class="sports-grid">
             <div class="sport-big-card" onclick="openSportView('calcio')">
-                <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80" alt="Calcio">
+                <img src="assets/pexels-gabin-cobret-430175667-32948745.jpg" alt="Calcio">
                 <div class="sport-card-content">
                     <div class="sport-card-title">Calcio</div>
                     <div class="sport-card-count"><span id="count-calcio">0</span> atleti</div>
                 </div>
             </div>
             <div class="sport-big-card" onclick="openSportView('basket')">
-                <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80" alt="Basket">
+                <img src="assets/pexels-gasparzaldo-13464777.jpg" alt="Basket">
                 <div class="sport-card-content">
                     <div class="sport-card-title">Basket</div>
                     <div class="sport-card-count"><span id="count-basket">0</span> atleti</div>
                 </div>
             </div>
             <div class="sport-big-card" onclick="openSportView('boxe')">
-                <img src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=600&q=80" alt="Boxe">
+                <img src="assets/pexels-dany-lovehill-10341870.jpg" alt="Boxe">
                 <div class="sport-card-content">
                     <div class="sport-card-title">Boxe</div>
                     <div class="sport-card-count"><span id="count-boxe">0</span> atleti</div>
                 </div>
             </div>
             <div class="sport-big-card" onclick="openSportView('palestra')">
-                <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80" alt="Palestra">
+                <img src="assets/pexels-cottonbro-5741289.jpg" alt="Palestra">
                 <div class="sport-card-content">
                     <div class="sport-card-title">Palestra</div>
                     <div class="sport-card-count"><span id="count-palestra">0</span> atleti</div>
@@ -2524,55 +2528,55 @@
             }
             
             // Prepara dati specifici sport
-            let sportSpecificHtml = '';
+            let sportSpecificProfileHtml = '';
             if (a.sport === 'calcio' || a.sport === 'basket') {
                 const prefix = a.sport === 'calcio' ? 'football' : 'basket';
-                sportSpecificHtml = `
-                    <div class="info-item">
-                        <span class="info-label">Ruolo</span>
-                        <span class="info-value">${sportData[prefix + '_role'] || '-'}</span>
+                sportSpecificProfileHtml = `
+                    <div class="profile-item">
+                        <span class="profile-item-label">Ruolo</span>
+                        <span class="profile-item-value">${formatReadableLabel(sportData[prefix + '_role'] || '-')}</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Squadra</span>
-                        <span class="info-value">${sportData[prefix + '_team_name'] || '-'}</span>
+                    <div class="profile-item">
+                        <span class="profile-item-label">Squadra</span>
+                        <span class="profile-item-value">${sportData[prefix + '_team_name'] || '-'}</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Livello Squadra</span>
-                        <span class="info-value">${sportData[prefix + '_team_level'] || '-'}</span>
+                    <div class="profile-item">
+                        <span class="profile-item-label">Livello squadra</span>
+                        <span class="profile-item-value">${formatReadableLabel(sportData[prefix + '_team_level'] || '-')}</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Giorno Partita</span>
-                        <span class="info-value">${sportData[prefix + '_match_day'] || '-'}</span>
+                    <div class="profile-item">
+                        <span class="profile-item-label">Giorno partita</span>
+                        <span class="profile-item-value">${formatReadableLabel(sportData[prefix + '_match_day'] || '-')}</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Allenamenti Squadra/Sett</span>
-                        <span class="info-value">${sportData[prefix + '_weekly_team_sessions'] || '-'}</span>
+                    <div class="profile-item">
+                        <span class="profile-item-label">Allenamenti squadra/sett</span>
+                        <span class="profile-item-value">${sportData[prefix + '_weekly_team_sessions'] ?? '-'}</span>
                     </div>
                 `;
             } else if (a.sport === 'boxe') {
-                sportSpecificHtml = `
-                    <div class="info-item">
-                        <span class="info-label">Categoria Peso</span>
-                        <span class="info-value">${sportData.boxing_weight_class || '-'}</span>
+                sportSpecificProfileHtml = `
+                    <div class="profile-item">
+                        <span class="profile-item-label">Categoria peso</span>
+                        <span class="profile-item-value">${formatReadableLabel(sportData.boxing_weight_class || '-')}</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Guardia</span>
-                        <span class="info-value">${sportData.boxing_stance || '-'}</span>
+                    <div class="profile-item">
+                        <span class="profile-item-label">Guardia</span>
+                        <span class="profile-item-value">${formatReadableLabel(sportData.boxing_stance || '-')}</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Stile</span>
-                        <span class="info-value">${sportData.boxing_style || '-'}</span>
+                    <div class="profile-item">
+                        <span class="profile-item-label">Stile</span>
+                        <span class="profile-item-value">${formatReadableLabel(sportData.boxing_style || '-')}</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Palestra</span>
-                        <span class="info-value">${sportData.boxing_gym_name || '-'}</span>
+                    <div class="profile-item">
+                        <span class="profile-item-label">Palestra</span>
+                        <span class="profile-item-value">${sportData.boxing_gym_name || '-'}</span>
                     </div>
                 `;
             } else if (a.sport === 'palestra') {
-                sportSpecificHtml = `
-                    <div class="info-item">
-                        <span class="info-label">Obiettivo Principale</span>
-                        <span class="info-value">${sportData.gym_primary_goal || '-'}</span>
+                sportSpecificProfileHtml = `
+                    <div class="profile-item">
+                        <span class="profile-item-label">Obiettivo principale</span>
+                        <span class="profile-item-value">${formatReadableLabel(sportData.gym_primary_goal || '-')}</span>
                     </div>
                 `;
             }
@@ -2617,6 +2621,10 @@
                             <span class="profile-item-value">${a.phone || '-'}</span>
                         </div>
                         <div class="profile-item">
+                            <span class="profile-item-label">Data di nascita</span>
+                            <span class="profile-item-value">${a.birth_date ? new Date(a.birth_date).toLocaleDateString('it-IT') : '-'}</span>
+                        </div>
+                        <div class="profile-item">
                             <span class="profile-item-label">Età</span>
                             <span class="profile-item-value">${age !== '-' ? age + ' anni' : '-'}</span>
                         </div>
@@ -2644,15 +2652,20 @@
                 </div>
 
                 <div class="profile-section">
-                    <h3 class="profile-section-title"><i class="fas fa-running"></i> Sport & Ruolo</h3>
+                    <h3 class="profile-section-title"><i class="fas fa-running"></i> Sport</h3>
                     <div class="profile-grid">
                         <div class="profile-item">
                             <span class="profile-item-label">Sport</span>
-                            <span class="profile-item-value">${a.sport || '-'}</span>
+                            <span class="profile-item-value">${formatSportLabel(a.sport)}</span>
                         </div>
                         <div class="profile-item">
                             <span class="profile-item-label">Livello</span>
-                            <span class="profile-item-value">${a.experience_level || '-'}</span>
+                            <span class="profile-item-value">${formatReadableLabel(a.experience_level || '-')}</span>
+                        </div>
+                        ${sportSpecificProfileHtml}
+                        <div class="profile-item" style="grid-column: span 2;">
+                            <span class="profile-item-label">Agenda</span>
+                            <div class="profile-item-value">${scheduleHtml || '-'}</div>
                         </div>
                     </div>
                 </div>
