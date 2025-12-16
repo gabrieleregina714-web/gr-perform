@@ -159,6 +159,14 @@
             justify-content: center;
             font-weight: 700;
             font-size: 16px;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
         .user-info {
@@ -822,9 +830,9 @@
         </nav>
 
         <div class="user-card">
-            <div class="user-avatar">MR</div>
+            <div class="user-avatar" id="sidebarAvatar">MR</div>
             <div class="user-info">
-                <div class="user-name">Marco Rossi</div>
+                <div class="user-name" id="sidebarName">Marco Rossi</div>
                 <div class="user-level">Livello 34 • Intermedio</div>
             </div>
             <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
@@ -835,7 +843,7 @@
     <main class="main-content">
         <header class="header">
             <div class="header-left">
-                <h1>Ciao Marco! 💪</h1>
+                <h1 id="greetingTitle">Ciao Marco! 💪</h1>
                 <p>Oggi è il giorno di <strong>SPINTA</strong> - Settimana 9 del tuo programma</p>
             </div>
             <div class="header-right">
@@ -1103,7 +1111,11 @@
     <script src="js/supabase-client.js"></script>
     <script>
         // Get athlete ID from localStorage or URL
-        const athleteId = localStorage.getItem('athlete_id') || new URLSearchParams(window.location.search).get('id');
+        const athleteId =
+            localStorage.getItem('gr_athlete_id') ||
+            localStorage.getItem('athlete_id') ||
+            new URLSearchParams(window.location.search).get('id') ||
+            new URLSearchParams(window.location.search).get('athlete');
 
         document.addEventListener('DOMContentLoaded', async () => {
             if (!athleteId) {
@@ -1117,6 +1129,26 @@
                 const athlete = athletes?.[0];
                 
                 if (athlete) {
+                    const firstName = (athlete.first_name || '').trim();
+                    const lastName = (athlete.last_name || '').trim();
+                    const fullName = `${firstName} ${lastName}`.trim() || 'Atleta';
+
+                    const sidebarName = document.getElementById('sidebarName');
+                    if (sidebarName) sidebarName.textContent = fullName;
+
+                    const greetingTitle = document.getElementById('greetingTitle');
+                    if (greetingTitle) greetingTitle.textContent = `Ciao ${firstName || fullName}! 💪`;
+
+                    const sidebarAvatar = document.getElementById('sidebarAvatar');
+                    if (sidebarAvatar) {
+                        if (athlete.profile_photo) {
+                            sidebarAvatar.innerHTML = `<img src="${athlete.profile_photo}" alt="Foto profilo" />`;
+                        } else {
+                            const initials = `${(firstName[0] || '')}${(lastName[0] || '')}`.toUpperCase() || 'GR';
+                            sidebarAvatar.textContent = initials;
+                        }
+                    }
+
                     // Update profile info
                     const profileName = document.querySelector('.profile-name');
                     const profileTitle = document.querySelector('.profile-title');
