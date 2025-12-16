@@ -845,8 +845,8 @@
 </head>
 <body>
     <nav class="sidebar">
-        <a href="coach-dashboard.html" class="logo">
-            <img src="https://i.imgur.com/8QKm5sE.png" alt="GR" onerror="this.parentElement.innerHTML='GR'">
+        <a href="coach-dashboard.html" class="logo" style="background:linear-gradient(135deg, #E63946, #FF6B6B);font-weight:900;font-size:16px;text-decoration:none;color:#fff;">
+            GR
         </a>
         <a href="coach-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i></a>
         <a href="coach-clients.html" class="nav-item active"><i class="fas fa-users"></i></a>
@@ -1066,7 +1066,7 @@
                 const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
                 const hasPhoto = a.profile_photo;
                 return `
-                    <div class="client-card" data-id="${a.id}" onclick="selectClient(${a.id})">
+                    <div class="client-card" data-id="${a.id}" onclick="selectClient('${a.id}')">
                         <div class="client-avatar">
                             ${hasPhoto ? `<img src="${a.profile_photo}" alt="">` : initials}
                         </div>
