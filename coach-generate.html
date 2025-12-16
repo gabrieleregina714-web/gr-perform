@@ -1412,22 +1412,20 @@
             setWorkflowStep(1);
 
             // Load athlete data
-            const workouts = await supabase.fetch('workouts', `?athlete_id=eq.${id}&select=*`);
-            const feedback = await supabase.fetch('feedback', `?athlete_id=eq.${id}&select=*&order=created_at.desc&limit=5`);
+            const workouts = await supabase.fetch('workouts', `?athlete_id=eq.${id}&select=*`) || [];
             
-            // Load wearable data
-            const wearableData = await loadWearableData(id);
+            // Wearable data not available yet
+            const wearableData = { hasData: false, status: 'none' };
+            updateWearableUI(null);
 
             // Calculate current week and phase
             currentWeek = Math.min(8, Math.max(1, Math.ceil((workouts.length + 1) / 3)));
             currentPhase = getPhase(currentWeek);
             
-            // Calculate stats
-            const avgRpe = feedback.length 
-                ? (feedback.reduce((s, f) => s + (f.rpe || 7), 0) / feedback.length).toFixed(1) 
-                : '7.0';
+            // Calculate stats (simplified without feedback table)
+            const avgRpe = '7.0';
             const compliance = workouts.length 
-                ? Math.round((workouts.filter(w => w.completed).length / workouts.length) * 100) 
+                ? Math.round((workouts.filter(w => w.status === 'completed').length / workouts.length) * 100) 
                 : 100;
 
             // Update UI
@@ -1839,11 +1837,12 @@
                 return;
             }
 
-            // Minimal fields - only essentials
+            // Fields matching workouts table schema
             const workout = {
                 athlete_id: selectedAthlete.id,
                 name: document.getElementById('workout-title').value || 'Workout AI',
-                exercises: currentWorkout.exercises
+                exercises: currentWorkout.exercises,
+                week_number: currentWeek
             };
 
             console.log('Saving workout:', workout);
