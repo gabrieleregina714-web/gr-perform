@@ -142,6 +142,11 @@
         .stat-icon {
             font-size: 24px;
             margin-bottom: 8px;
+            color: #E63946;
+        }
+        
+        .stat-card.highlight .stat-icon {
+            color: #fff;
         }
 
         .stat-value {
@@ -478,22 +483,22 @@
         <div class="section-label">Statistiche</div>
         <div class="stats-grid">
             <div class="stat-card highlight">
-                <div class="stat-icon">🏋️</div>
+                <div class="stat-icon"><i class="fas fa-dumbbell"></i></div>
                 <div class="stat-value" id="totalWorkouts">0</div>
                 <div class="stat-label">Workout</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">⏱️</div>
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
                 <div class="stat-value" id="totalMinutes">0</div>
                 <div class="stat-label">Minuti</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">🔥</div>
+                <div class="stat-icon"><i class="fas fa-fire"></i></div>
                 <div class="stat-value" id="currentStreak">0</div>
                 <div class="stat-label">Streak</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">⭐</div>
+                <div class="stat-icon"><i class="fas fa-star"></i></div>
                 <div class="stat-value" id="totalXP">0</div>
                 <div class="stat-label">XP</div>
             </div>
