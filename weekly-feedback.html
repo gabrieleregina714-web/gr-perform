@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Settimanale - GR Perform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --black: #0A0A0A; --dark: #1A1A1A; --medium: #2D2D2D; --white: #FFF; --red: #E63946; --green: #22C55E; --yellow: #F59E0B; --blue: #3B82F6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+        
+        .header { padding: 1.5rem; border-bottom: 1px solid var(--medium); }
+        .header h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+        .header p { color: #888; font-size: 0.9rem; }
+        
+        .main { padding: 1.5rem; max-width: 600px; margin: 0 auto; padding-bottom: 120px; }
+        
+        .week-summary { background: linear-gradient(135deg, var(--red), #B71C1C); border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; }
+        .week-summary h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+        .summary-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .summary-stat { text-align: center; }
+        .summary-stat .value { font-size: 1.75rem; font-weight: 800; }
+        .summary-stat .label { font-size: 0.75rem; opacity: 0.8; }
+        
+        .section { margin-bottom: 2rem; }
+        .section-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .section-title i { color: var(--red); }
+        
+        .question-card { background: var(--dark); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; }
+        .question-card label { display: block; font-weight: 500; margin-bottom: 1rem; }
+        
+        .slider-container { padding: 0 0.5rem; }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: #888; margin-bottom: 0.5rem; }
+        .slider { width: 100%; height: 8px; border-radius: 4px; background: var(--medium); appearance: none; cursor: pointer; }
+        .slider::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--red); cursor: pointer; }
+        .slider-value { text-align: center; font-size: 2rem; font-weight: 700; color: var(--red); margin-top: 0.5rem; }
+        
+        .emoji-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .emoji-opt { flex: 1; min-width: 60px; padding: 0.75rem 0.5rem; background: var(--medium); border: 2px solid transparent; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .emoji-opt:hover { border-color: var(--red); }
+        .emoji-opt.selected { border-color: var(--green); background: rgba(34, 197, 94, 0.15); }
+        .emoji-opt .icon { font-size: 1.5rem; }
+        .emoji-opt .text { font-size: 0.7rem; color: #888; margin-top: 0.25rem; }
+        
+        .body-map { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+        .body-part { padding: 0.75rem 0.5rem; background: var(--medium); border: 2px solid transparent; border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 0.85rem; }
+        .body-part:hover { border-color: var(--yellow); }
+        .body-part.selected { border-color: var(--yellow); background: rgba(245, 158, 11, 0.2); }
+        .body-part.selected.pain { border-color: var(--red); background: rgba(230, 57, 70, 0.2); }
+        
+        .textarea-field { width: 100%; background: var(--medium); border: none; border-radius: 12px; padding: 1rem; color: white; font-family: inherit; font-size: 0.9rem; min-height: 100px; resize: vertical; }
+        .textarea-field::placeholder { color: #666; }
+        
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--medium); }
+        .toggle-row:last-child { border-bottom: none; }
+        .toggle-label { font-size: 0.95rem; }
+        .toggle-label span { display: block; font-size: 0.8rem; color: #888; margin-top: 0.25rem; }
+        .toggle-switch { width: 50px; height: 28px; background: var(--medium); border-radius: 14px; position: relative; cursor: pointer; transition: all 0.2s; }
+        .toggle-switch.on { background: var(--green); }
+        .toggle-switch::after { content: ''; position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: all 0.2s; }
+        .toggle-switch.on::after { left: 25px; }
+        
+        .submit-section { position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem 1.5rem; background: var(--black); border-top: 1px solid var(--medium); }
+        .submit-btn { width: 100%; padding: 1rem; background: var(--green); border: none; border-radius: 12px; color: white; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .submit-btn:disabled { background: var(--medium); color: #666; }
+        
+        .skip-link { display: block; text-align: center; margin-top: 0.75rem; color: #888; font-size: 0.85rem; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>📊 Report Settimana <span id="weekNum">-</span></h1>
+        <p>Aiutaci a personalizzare il tuo prossimo allenamento</p>
+    </header>
+    
+    <main class="main">
+        <!-- Week Summary -->
+        <div class="week-summary">
+            <h2>Riepilogo Settimana</h2>
+            <div class="summary-stats">
+                <div class="summary-stat">
+                    <div class="value" id="completedCount">-</div>
+                    <div class="label">Allenamenti</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="value" id="totalMinutes">-</div>
+                    <div class="label">Minuti</div>
+                </div>
+                <div class="summary-stat">
+                    <div class="value" id="avgRPE">-</div>
+                    <div class="label">RPE Medio</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fatica Generale -->
+        <div class="section">
+            <div class="section-title"><i class="fas fa-battery-half"></i> Livello di Fatica</div>
+            <div class="question-card">
+                <label>Quanto ti senti affaticato complessivamente?</label>
+                <div class="slider-container">
+                    <div class="slider-labels">
+                        <span>Fresco</span>
+                        <span>Distrutto</span>
+                    </div>
+                    <input type="range" class="slider" id="fatigueSlider" min="1" max="10" value="5">
+                    <div class="slider-value" id="fatigueValue">5</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sonno e Recupero -->
+        <div class="section">
+            <div class="section-title"><i class="fas fa-moon"></i> Sonno e Recupero</div>
+            <div class="question-card">
+                <label>Qualità del sonno questa settimana?</label>
+                <div class="emoji-options" id="sleepQuality">
+                    <div class="emoji-opt" data-value="1" onclick="selectOption(this, 'sleep')">
+                        <div class="icon">😴</div>
+                        <div class="text">Pessimo</div>
+                    </div>
+                    <div class="emoji-opt" data-value="2" onclick="selectOption(this, 'sleep')">
+                        <div class="icon">😐</div>
+                        <div class="text">Scarso</div>
+                    </div>
+                    <div class="emoji-opt" data-value="3" onclick="selectOption(this, 'sleep')">
+                        <div class="icon">🙂</div>
+                        <div class="text">Normale</div>
+                    </div>
+                    <div class="emoji-opt" data-value="4" onclick="selectOption(this, 'sleep')">
+                        <div class="icon">😊</div>
+                        <div class="text">Buono</div>
+                    </div>
+                    <div class="emoji-opt" data-value="5" onclick="selectOption(this, 'sleep')">
+                        <div class="icon">🌟</div>
+                        <div class="text">Ottimo</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question-card">
+                <label>Ore medie di sonno per notte?</label>
+                <div class="emoji-options" id="sleepHours">
+                    <div class="emoji-opt" data-value="5" onclick="selectOption(this, 'hours')">
+                        <div class="icon">5h</div>
+                        <div class="text">o meno</div>
+                    </div>
+                    <div class="emoji-opt" data-value="6" onclick="selectOption(this, 'hours')">
+                        <div class="icon">6h</div>
+                    </div>
+                    <div class="emoji-opt" data-value="7" onclick="selectOption(this, 'hours')">
+                        <div class="icon">7h</div>
+                    </div>
+                    <div class="emoji-opt" data-value="8" onclick="selectOption(this, 'hours')">
+                        <div class="icon">8h</div>
+                    </div>
+                    <div class="emoji-opt" data-value="9" onclick="selectOption(this, 'hours')">
+                        <div class="icon">9h+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stress -->
+        <div class="section">
+            <div class="section-title"><i class="fas fa-brain"></i> Stress e Vita</div>
+            <div class="question-card">
+                <label>Livello di stress (lavoro, studio, vita)?</label>
+                <div class="slider-container">
+                    <div class="slider-labels">
+                        <span>Tranquillo</span>
+                        <span>Molto stressato</span>
+                    </div>
+                    <input type="range" class="slider" id="stressSlider" min="1" max="10" value="5">
+                    <div class="slider-value" id="stressValue">5</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dolori / Problemi -->
+        <div class="section">
+            <div class="section-title"><i class="fas fa-band-aid"></i> Dolori o Fastidi</div>
+            <div class="question-card">
+                <label>Seleziona le zone con dolore o fastidio</label>
+                <div class="body-map" id="bodyMap">
+                    <div class="body-part" data-part="spalla_sx" onclick="toggleBodyPart(this)">Spalla SX</div>
+                    <div class="body-part" data-part="spalla_dx" onclick="toggleBodyPart(this)">Spalla DX</div>
+                    <div class="body-part" data-part="collo" onclick="toggleBodyPart(this)">Collo</div>
+                    <div class="body-part" data-part="schiena_alta" onclick="toggleBodyPart(this)">Schiena Alta</div>
+                    <div class="body-part" data-part="gomito_sx" onclick="toggleBodyPart(this)">Gomito SX</div>
+                    <div class="body-part" data-part="gomito_dx" onclick="toggleBodyPart(this)">Gomito DX</div>
+                    <div class="body-part" data-part="schiena_bassa" onclick="toggleBodyPart(this)">Lombare</div>
+                    <div class="body-part" data-part="anca" onclick="toggleBodyPart(this)">Anca</div>
+                    <div class="body-part" data-part="polso_sx" onclick="toggleBodyPart(this)">Polso SX</div>
+                    <div class="body-part" data-part="polso_dx" onclick="toggleBodyPart(this)">Polso DX</div>
+                    <div class="body-part" data-part="ginocchio_sx" onclick="toggleBodyPart(this)">Ginocchio SX</div>
+                    <div class="body-part" data-part="ginocchio_dx" onclick="toggleBodyPart(this)">Ginocchio DX</div>
+                    <div class="body-part" data-part="quadricipite" onclick="toggleBodyPart(this)">Quadricipite</div>
+                    <div class="body-part" data-part="hamstring" onclick="toggleBodyPart(this)">Hamstring</div>
+                    <div class="body-part" data-part="caviglia_sx" onclick="toggleBodyPart(this)">Caviglia SX</div>
+                    <div class="body-part" data-part="caviglia_dx" onclick="toggleBodyPart(this)">Caviglia DX</div>
+                </div>
+            </div>
+            
+            <div class="question-card">
+                <label>Descrivi i fastidi (opzionale)</label>
+                <textarea class="textarea-field" id="painNotes" placeholder="Es: Leggero fastidio al ginocchio destro dopo gli squat, schiena rigida al mattino..."></textarea>
+            </div>
+        </div>
+        
+        <!-- Nutrizione -->
+        <div class="section">
+            <div class="section-title"><i class="fas fa-utensils"></i> Nutrizione</div>
+            <div class="question-card">
+                <label>Come hai mangiato questa settimana?</label>
+                <div class="emoji-options" id="nutrition">
+                    <div class="emoji-opt" data-value="1" onclick="selectOption(this, 'nutrition')">
+                        <div class="icon">🍕</div>
+                        <div class="text">Male</div>
+                    </div>
+                    <div class="emoji-opt" data-value="2" onclick="selectOption(this, 'nutrition')">
+                        <div class="icon">🍔</div>
+                        <div class="text">Così così</div>
+                    </div>
+                    <div class="emoji-opt" data-value="3" onclick="selectOption(this, 'nutrition')">
+                        <div class="icon">🥗</div>
+                        <div class="text">Bene</div>
+                    </div>
+                    <div class="emoji-opt" data-value="4" onclick="selectOption(this, 'nutrition')">
+                        <div class="icon">💪</div>
+                        <div class="text">Perfetta</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Motivazione -->
+        <div class="section">
+            <div class="section-title"><i class="fas fa-fire"></i> Motivazione</div>
+            <div class="question-card">
+                <label>Quanto sei motivato per la prossima settimana?</label>
+                <div class="slider-container">
+                    <div class="slider-labels">
+                        <span>Zero voglia</span>
+                        <span>Carichissimo</span>
+                    </div>
+                    <input type="range" class="slider" id="motivationSlider" min="1" max="10" value="7">
+                    <div class="slider-value" id="motivationValue">7</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preferenze Prossima Settimana -->
+        <div class="section">
+            <div class="section-title"><i class="fas fa-sliders-h"></i> Prossima Settimana</div>
+            <div class="question-card">
+                <div class="toggle-row">
+                    <div class="toggle-label">
+                        Settimana più leggera (deload)
+                        <span>Riduci volume/intensità per recuperare</span>
+                    </div>
+                    <div class="toggle-switch" id="deloadToggle" onclick="toggleSwitch(this)"></div>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-label">
+                        Focus mobilità
+                        <span>Più esercizi di mobilità e stretching</span>
+                    </div>
+                    <div class="toggle-switch" id="mobilityToggle" onclick="toggleSwitch(this)"></div>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-label">
+                        Aumenta intensità
+                        <span>Mi sento pronto per spingere di più</span>
+                    </div>
+                    <div class="toggle-switch" id="intensityToggle" onclick="toggleSwitch(this)"></div>
+                </div>
+            </div>
+            
+            <div class="question-card">
+                <label>Note aggiuntive per il coach</label>
+                <textarea class="textarea-field" id="coachNotes" placeholder="Es: La prossima settimana ho un esame importante, preferisco allenarmi al mattino, vorrei più lavoro sui glutei..."></textarea>
+            </div>
+        </div>
+    </main>
+    
+    <div class="submit-section">
+        <button class="submit-btn" onclick="submitReport()">
+            <i class="fas fa-paper-plane"></i> Invia Report
+        </button>
+        <a href="app-dashboard.html" class="skip-link">Salta per ora</a>
+    </div>
+    
+    <script src="js/supabase-client.js"></script>
+    <script>
+        const athleteId = localStorage.getItem('gr_athlete_id');
+        const weekNum = new URLSearchParams(window.location.search).get('week') || 1;
+        
+        // State
+        let selections = {
+            sleep: null,
+            hours: null,
+            nutrition: null
+        };
+        let painAreas = [];
+        
+        document.getElementById('weekNum').textContent = weekNum;
+        
+        // Slider updates
+        document.getElementById('fatigueSlider').addEventListener('input', (e) => {
+            document.getElementById('fatigueValue').textContent = e.target.value;
+        });
+        document.getElementById('stressSlider').addEventListener('input', (e) => {
+            document.getElementById('stressValue').textContent = e.target.value;
+        });
+        document.getElementById('motivationSlider').addEventListener('input', (e) => {
+            document.getElementById('motivationValue').textContent = e.target.value;
+        });
+        
+        function selectOption(el, type) {
+            const parent = el.parentElement;
+            parent.querySelectorAll('.emoji-opt').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            selections[type] = parseInt(el.dataset.value);
+        }
+        
+        function toggleBodyPart(el) {
+            el.classList.toggle('selected');
+            el.classList.toggle('pain');
+            const part = el.dataset.part;
+            if (painAreas.includes(part)) {
+                painAreas = painAreas.filter(p => p !== part);
+            } else {
+                painAreas.push(part);
+            }
+        }
+        
+        function toggleSwitch(el) {
+            el.classList.toggle('on');
+        }
+        
+        async function loadWeekStats() {
+            if (!athleteId) return;
+            
+            // Get this week's completed workouts
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            
+            const workouts = await supabase.fetch('workouts', 
+                `?athlete_id=eq.${athleteId}&status=eq.completed&completed_at=gte.${oneWeekAgo.toISOString()}`
+            );
+            
+            const completed = workouts.length;
+            let totalMins = 0;
+            let totalRPE = 0;
+            let rpeCount = 0;
+            
+            workouts.forEach(w => {
+                totalMins += w.actual_duration_minutes || w.estimated_duration_minutes || 60;
+                if (w.athlete_feedback?.rpe) {
+                    totalRPE += w.athlete_feedback.rpe;
+                    rpeCount++;
+                }
+            });
+            
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('totalMinutes').textContent = totalMins;
+            document.getElementById('avgRPE').textContent = rpeCount > 0 ? (totalRPE / rpeCount).toFixed(1) : '-';
+        }
+        
+        async function submitReport() {
+            const report = {
+                athlete_id: athleteId,
+                week_number: parseInt(weekNum),
+                submitted_at: new Date().toISOString(),
+                fatigue_level: parseInt(document.getElementById('fatigueSlider').value),
+                sleep_quality: selections.sleep,
+                sleep_hours: selections.hours,
+                stress_level: parseInt(document.getElementById('stressSlider').value),
+                nutrition_quality: selections.nutrition,
+                motivation_level: parseInt(document.getElementById('motivationSlider').value),
+                pain_areas: painAreas,
+                pain_notes: document.getElementById('painNotes').value,
+                preferences: {
+                    request_deload: document.getElementById('deloadToggle').classList.contains('on'),
+                    focus_mobility: document.getElementById('mobilityToggle').classList.contains('on'),
+                    increase_intensity: document.getElementById('intensityToggle').classList.contains('on')
+                },
+                coach_notes: document.getElementById('coachNotes').value
+            };
+            
+            // Calculate readiness score (1-10)
+            let readiness = 10;
+            readiness -= (report.fatigue_level - 5) * 0.5; // High fatigue reduces readiness
+            readiness -= (report.stress_level - 5) * 0.3; // High stress reduces readiness
+            readiness += (report.motivation_level - 5) * 0.3; // High motivation increases readiness
+            if (report.sleep_quality) readiness += (report.sleep_quality - 3) * 0.4;
+            if (painAreas.length > 0) readiness -= painAreas.length * 0.5;
+            report.readiness_score = Math.max(1, Math.min(10, Math.round(readiness)));
+            
+            try {
+                // Save to weekly_feedback table (or athlete's feedback history)
+                // For now, update athlete record with latest feedback
+                await supabase.update('athletes', athleteId, {
+                    latest_weekly_feedback: report,
+                    readiness_score: report.readiness_score
+                });
+                
+                alert(`✅ Report inviato!\n\nPunteggio Readiness: ${report.readiness_score}/10\n\nIl tuo prossimo allenamento sarà adattato in base a questi dati.`);
+                window.location.href = 'app-dashboard.html';
+                
+            } catch (error) {
+                console.error('Errore:', error);
+                alert('Errore durante l\'invio. Riprova.');
+            }
+        }
+        
+        loadWeekStats();
+    </script>
+</body>
+</html>

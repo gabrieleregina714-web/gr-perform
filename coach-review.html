@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GR Perform - Review Feedback</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --red: #E63946;
+            --black: #000;
+            --gray-900: #0A0A0A;
+            --gray-800: #111;
+            --gray-700: #1A1A1A;
+            --gray-600: #222;
+            --gray-400: #888;
+            --gray-500: #666;
+            --white: #FFF;
+            --green: #00D26A;
+            --yellow: #FFB800;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: 72px; height: 100vh;
+            background: var(--gray-900);
+            border-right: 1px solid var(--gray-600);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 100;
+        }
+
+        .logo {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #E63946, #FF6B6B);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            margin-bottom: 40px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .nav-item {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .nav-item:hover { background: var(--gray-700); color: var(--white); }
+        .nav-item.active { background: var(--gray-700); color: var(--white); }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        /* MAIN */
+        .main { margin-left: 72px; min-height: 100vh; }
+
+        /* HEADER */
+        .header {
+            padding: 40px 50px 30px;
+            border-bottom: 1px solid var(--gray-700);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .header-left p { color: var(--gray-400); font-size: 14px; }
+
+        /* STATS */
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: var(--gray-800);
+            border-radius: 12px;
+            padding: 16px 24px;
+            text-align: center;
+        }
+
+        .stat-box-value { font-size: 24px; font-weight: 800; }
+        .stat-box-label { font-size: 11px; color: var(--gray-400); text-transform: uppercase; margin-top: 4px; }
+
+        /* CONTENT */
+        .content { padding: 30px 50px; }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            color: var(--gray-400);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab:hover, .tab.active {
+            background: var(--white);
+            color: var(--black);
+            border-color: var(--white);
+        }
+
+        .tab .badge {
+            background: var(--red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        .tab.active .badge {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        /* FEEDBACK LIST */
+        .feedback-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .feedback-card {
+            background: var(--gray-800);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .feedback-card:hover {
+            border-color: var(--gray-600);
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .feedback-athlete {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feedback-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E63946, #FF6B6B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .feedback-name { font-weight: 700; font-size: 15px; }
+        .feedback-workout { font-size: 13px; color: var(--gray-400); margin-top: 2px; }
+
+        .feedback-date { font-size: 12px; color: var(--gray-500); }
+
+        /* RPE/FATIGUE */
+        .feedback-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .metric {
+            background: var(--gray-700);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .metric-value.good { color: var(--green); }
+        .metric-value.medium { color: var(--yellow); }
+        .metric-value.bad { color: var(--red); }
+
+        .metric-label {
+            font-size: 11px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        /* FEEDBACK TEXT */
+        .feedback-notes {
+            background: var(--gray-700);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .feedback-notes-label {
+            font-size: 11px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .feedback-notes-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--gray-400);
+        }
+
+        /* ACTIONS */
+        .feedback-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+        }
+
+        .btn-secondary {
+            background: var(--gray-700);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: rgba(230,57,70,0.15);
+            color: var(--red);
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--gray-500);
+        }
+
+        .empty-state i { font-size: 64px; margin-bottom: 20px; opacity: 0.3; }
+        .empty-state h3 { font-size: 20px; color: var(--gray-400); margin-bottom: 8px; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .feedback-metrics { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { 
+                width: 100%; height: 64px;
+                bottom: 0; top: auto;
+                flex-direction: row;
+                padding: 0 16px;
+                justify-content: space-around;
+            }
+            .logo { margin-bottom: 0; width: 36px; height: 36px; }
+            .nav-item { margin-bottom: 0; }
+            .nav-spacer { display: none; }
+            .main { margin-left: 0; margin-bottom: 64px; }
+            .header { padding: 24px; flex-direction: column; gap: 20px; align-items: flex-start; }
+            .content { padding: 20px; }
+            .feedback-metrics { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <a href="coach-dashboard.html" class="logo">GR</a>
+        <a href="coach-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i></a>
+        <a href="coach-team.html" class="nav-item"><i class="fas fa-users"></i></a>
+        <a href="coach-chat.html" class="nav-item"><i class="fas fa-comments"></i></a>
+        <a href="coach-generate.html" class="nav-item"><i class="fas fa-bolt"></i></a>
+        <a href="coach-review.html" class="nav-item active"><i class="fas fa-clipboard-check"></i></a>
+        <div class="nav-spacer"></div>
+        <a href="login.html" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
+    </nav>
+
+    <main class="main">
+        <div class="header">
+            <div class="header-left">
+                <h1>Review Feedback</h1>
+                <p>Analizza i feedback dei tuoi atleti</p>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-box">
+                    <div class="stat-box-value" id="pending-count">-</div>
+                    <div class="stat-box-label">Da Rivedere</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-box-value" id="reviewed-count">-</div>
+                    <div class="stat-box-label">Rivisti Oggi</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" data-filter="pending">Da Rivedere <span class="badge" id="pending-badge">0</span></button>
+                <button class="tab" data-filter="reviewed">Già Rivisti</button>
+                <button class="tab" data-filter="all">Tutti</button>
+            </div>
+
+            <div class="feedback-list" id="feedback-list">
+                <!-- Loaded from Supabase -->
+            </div>
+        </div>
+    </main>
+
+    <script src="js/supabase-client.js"></script>
+    <script>
+        let allFeedback = [];
+        let athletes = {};
+        let currentFilter = 'pending';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load athletes for lookup
+            const athleteList = await supabase.fetch('athletes', '?select=id,first_name,last_name,sport');
+            athleteList.forEach(a => athletes[a.id] = a);
+
+            // Load feedback
+            allFeedback = await supabase.fetch('feedback', '?select=*&order=created_at.desc');
+            
+            // Stats
+            const pending = allFeedback.filter(f => !f.reviewed).length;
+            const reviewed = allFeedback.filter(f => f.reviewed).length;
+            
+            document.getElementById('pending-count').textContent = pending;
+            document.getElementById('pending-badge').textContent = pending;
+            document.getElementById('reviewed-count').textContent = reviewed;
+
+            renderFeedback();
+
+            // Tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.dataset.filter;
+                    renderFeedback();
+                });
+            });
+        });
+
+        function renderFeedback() {
+            const list = document.getElementById('feedback-list');
+            
+            let filtered = allFeedback;
+            if (currentFilter === 'pending') filtered = allFeedback.filter(f => !f.reviewed);
+            if (currentFilter === 'reviewed') filtered = allFeedback.filter(f => f.reviewed);
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-check"></i>
+                        <h3>${currentFilter === 'pending' ? 'Nessun feedback da rivedere' : 'Nessun feedback'}</h3>
+                        <p>Ottimo lavoro! Sei in pari con i feedback</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = filtered.map(f => {
+                const athlete = athletes[f.athlete_id] || { first_name: 'Atleta', last_name: '', sport: 'Fitness' };
+                const initials = (athlete.first_name?.[0] || '') + (athlete.last_name?.[0] || '');
+                const date = new Date(f.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
+                
+                const rpeClass = f.rpe <= 6 ? 'good' : f.rpe <= 8 ? 'medium' : 'bad';
+                const fatigueClass = f.fatigue <= 4 ? 'good' : f.fatigue <= 7 ? 'medium' : 'bad';
+                const moodClass = f.mood >= 7 ? 'good' : f.mood >= 4 ? 'medium' : 'bad';
+
+                return `
+                    <div class="feedback-card">
+                        <div class="feedback-header">
+                            <div class="feedback-athlete">
+                                <div class="feedback-avatar">${initials}</div>
+                                <div>
+                                    <div class="feedback-name">${athlete.first_name} ${athlete.last_name}</div>
+                                    <div class="feedback-workout">${f.workout_name || 'Workout'} • ${athlete.sport || 'Fitness'}</div>
+                                </div>
+                            </div>
+                            <div class="feedback-date">${date}</div>
+                        </div>
+                        
+                        <div class="feedback-metrics">
+                            <div class="metric">
+                                <div class="metric-value ${rpeClass}">${f.rpe || '-'}</div>
+                                <div class="metric-label">RPE</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value ${fatigueClass}">${f.fatigue || '-'}</div>
+                                <div class="metric-label">Fatica</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value ${moodClass}">${f.mood || '-'}</div>
+                                <div class="metric-label">Umore</div>
+                            </div>
+                        </div>
+
+                        ${f.notes ? `
+                            <div class="feedback-notes">
+                                <div class="feedback-notes-label">Note dell'atleta</div>
+                                <div class="feedback-notes-text">${f.notes}</div>
+                            </div>
+                        ` : ''}
+
+                        <div class="feedback-actions">
+                            ${!f.reviewed ? `
+                                <button class="btn btn-primary" onclick="markReviewed(${f.id})">
+                                    <i class="fas fa-check"></i> Segna come Rivisto
+                                </button>
+                            ` : `
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="fas fa-check"></i> Rivisto
+                                </button>
+                            `}
+                            <button class="btn btn-secondary" onclick="location.href='coach-chat.html'">
+                                <i class="fas fa-comment"></i> Rispondi
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function markReviewed(id) {
+            await supabase.update('feedback', id, { reviewed: true });
+            
+            // Update local data
+            const feedback = allFeedback.find(f => f.id === id);
+            if (feedback) feedback.reviewed = true;
+            
+            // Update stats
+            const pending = allFeedback.filter(f => !f.reviewed).length;
+            const reviewed = allFeedback.filter(f => f.reviewed).length;
+            document.getElementById('pending-count').textContent = pending;
+            document.getElementById('pending-badge').textContent = pending;
+            document.getElementById('reviewed-count').textContent = reviewed;
+
+            renderFeedback();
+        }
+    </script>
+</body>
+</html>

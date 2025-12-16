@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genera Scheda - GR Perform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2D2D2D;
+            --white: #FFFFFF;
+            --primary-red: #E63946;
+            --success: #22C55E;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; padding: 2rem; }
+        
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .logo img { height: 36px; }
+        
+        h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+        .subtitle { color: #888; margin-bottom: 2rem; }
+        
+        .athlete-card {
+            background: var(--dark-gray);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .athlete-avatar {
+            width: 60px; height: 60px;
+            background: var(--primary-red);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 700;
+        }
+        .athlete-info h3 { margin-bottom: 0.25rem; }
+        .athlete-info p { color: #888; font-size: 0.9rem; }
+        .athlete-tags { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .tag {
+            background: var(--medium-gray);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: var(--primary-red);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+        }
+        .generate-btn:hover { background: #d32f3f; transform: translateY(-2px); }
+        .generate-btn:disabled { background: #444; cursor: not-allowed; transform: none; }
+        .generate-btn .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .program-output { display: none; }
+        .program-output.visible { display: block; }
+        
+        .program-header {
+            background: linear-gradient(135deg, var(--primary-red), #B91C1C);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .program-header h2 { margin-bottom: 0.5rem; }
+        .program-header p { opacity: 0.9; }
+        .phase-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        .workout-card {
+            background: var(--dark-gray);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .workout-header {
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        .workout-header:hover { background: var(--medium-gray); }
+        .workout-day { font-weight: 700; }
+        .workout-name { color: #888; font-size: 0.9rem; }
+        .workout-meta { display: flex; gap: 1rem; font-size: 0.85rem; color: #888; }
+        
+        .exercises-list { padding: 1rem; display: none; }
+        .exercises-list.open { display: block; }
+        
+        .exercise-item {
+            background: var(--medium-gray);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .exercise-item:last-child { margin-bottom: 0; }
+        .exercise-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .exercise-name { font-weight: 600; }
+        .exercise-sets { color: var(--primary-red); font-weight: 600; }
+        .exercise-details { display: flex; gap: 1rem; font-size: 0.85rem; color: #888; margin-bottom: 0.5rem; }
+        .exercise-notes { font-size: 0.85rem; color: #aaa; padding: 0.5rem; background: rgba(0,0,0,0.2); border-radius: 8px; margin-top: 0.5rem; }
+        .exercise-why { font-size: 0.8rem; color: var(--success); margin-top: 0.5rem; font-style: italic; }
+        .exercise-progression { font-size: 0.8rem; color: #f59e0b; margin-top: 0.5rem; }
+        .exercise-load { font-size: 0.8rem; color: #f59e0b; margin-top: 0.5rem; }
+        .exercise-alt { font-size: 0.75rem; color: #888; margin-top: 0.5rem; }
+        
+        .macro-overview { background: var(--dark-gray); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .macro-overview h3 { margin-bottom: 1rem; }
+        .phases-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .phase-card { background: var(--medium-gray); padding: 1rem; border-radius: 12px; text-align: center; }
+        .phase-card .phase-weeks { font-size: 0.75rem; color: var(--primary-red); }
+        .phase-card h4 { margin: 0.5rem 0 0.25rem; }
+        .phase-card p { font-size: 0.8rem; color: #888; }
+        
+        .coach-tip { background: rgba(34, 197, 94, 0.1); border-left: 3px solid var(--success); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+        .weekly-tips { background: var(--dark-gray); padding: 1rem; border-radius: 12px; margin-top: 1.5rem; }
+        
+        .warmup-section, .cooldown-section { background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem; }
+        .warmup-section p, .cooldown-section p { font-size: 0.85rem; color: #aaa; margin-top: 0.25rem; }
+        
+        .phase-section { margin-bottom: 2rem; }
+        .phase-title { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; font-size: 1.1rem; }
+        .workout-focus { font-size: 0.8rem; color: #888; margin-top: 0.25rem; }
+        
+        .actions { display: flex; gap: 1rem; margin-top: 2rem; }
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        .btn-primary { background: var(--primary-red); color: white; border: none; }
+        .btn-secondary { background: transparent; color: white; border: 1px solid #444; }
+        .btn:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="https://cdn.shopify.com/s/files/1/0917/4204/3027/files/Frame_6.png?v=1733431122" alt="GR Perform">
+            </div>
+        </header>
+        
+        <h1>🤖 Genera Scheda AI</h1>
+        <p class="subtitle">Crea un programma personalizzato basato sui dati dell'atleta</p>
+        
+        <div class="athlete-card" id="athleteCard">
+            <div class="athlete-avatar" id="athleteAvatar">?</div>
+            <div class="athlete-info">
+                <h3 id="athleteName">Caricamento...</h3>
+                <p id="athleteDetails">-</p>
+                <div class="athlete-tags" id="athleteTags"></div>
+            </div>
+        </div>
+        
+        <button class="generate-btn" id="generateBtn">
+            <i class="fas fa-magic"></i>
+            Genera Programma con AI
+        </button>
+        
+        <div class="program-output" id="programOutput">
+            <div class="program-header">
+                <h2 id="programName">-</h2>
+                <p id="programDesc">-</p>
+                <span class="phase-badge" id="programPhase">-</span>
+            </div>
+            
+            <div id="workoutsList"></div>
+            
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="regenerate()">
+                    <i class="fas fa-redo"></i> Rigenera
+                </button>
+                <button class="btn btn-primary" onclick="saveProgram()">
+                    <i class="fas fa-save"></i> Salva Programma
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/supabase-client.js"></script>
+    <script src="js/ai-generator.js"></script>
+    <script src="js/ai-elite.js"></script>
+    <script>
+        let currentAthlete = null;
+        let currentSportData = null;
+        let currentSchedule = null;
+        let currentGoals = [];
+        let generatedProgram = null;
+        
+        const athleteId = new URLSearchParams(window.location.search).get('id');
+        
+        async function init() {
+            if (!athleteId) {
+                alert('ID atleta mancante');
+                return;
+            }
+            
+            // Load athlete data
+            const athletes = await supabase.fetch('athletes', `?id=eq.${athleteId}`);
+            currentAthlete = athletes[0];
+            
+            if (!currentAthlete) {
+                alert('Atleta non trovato');
+                return;
+            }
+            
+            // Load related data
+            const sportData = await supabase.fetch('sport_specific_data', `?athlete_id=eq.${athleteId}`);
+            currentSportData = sportData[0] || {};
+            
+            const schedules = await supabase.fetch('weekly_schedule', `?athlete_id=eq.${athleteId}`);
+            currentSchedule = schedules[0] || {};
+            
+            const athleteGoals = await supabase.fetch('athlete_goals', `?athlete_id=eq.${athleteId}`);
+            if (athleteGoals.length > 0) {
+                const goalIds = athleteGoals.map(g => g.goal_id).join(',');
+                currentGoals = await supabase.fetch('role_specific_goals', `?id=in.(${goalIds})`);
+            }
+            
+            updateUI();
+        }
+        
+        function updateUI() {
+            const a = currentAthlete;
+            document.getElementById('athleteAvatar').textContent = a.first_name[0] + a.last_name[0];
+            document.getElementById('athleteName').textContent = `${a.first_name} ${a.last_name}`;
+            document.getElementById('athleteDetails').textContent = `${a.sport} • ${a.experience_level} • ${a.height_cm}cm / ${a.weight_kg}kg`;
+            
+            const tagsHtml = `
+                <span class="tag">${a.package_type}</span>
+                <span class="tag">${currentSportData.football_role || currentSportData.basket_role || currentSportData.boxing_weight_class || currentSportData.gym_primary_goal || '-'}</span>
+            `;
+            document.getElementById('athleteTags').innerHTML = tagsHtml;
+        }
+        
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner spinner"></i> Creo macro-piano...';
+            
+            try {
+                // Usa il sistema Elite
+                btn.innerHTML = '<i class="fas fa-spinner spinner"></i> Step 1/2: Macro-plan...';
+                const result = await GREliteAI.onboardAthlete(athleteId);
+                
+                btn.innerHTML = '<i class="fas fa-spinner spinner"></i> Step 2/2: Settimana 1...';
+                
+                // Mostra risultato
+                displayEliteProgram(result);
+                
+            } catch (error) {
+                console.error('Errore:', error);
+                alert('Errore: ' + error.message);
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-magic"></i> Genera Programma con AI';
+        });
+        
+        function displayEliteProgram(result) {
+            const { macroPlan, week1 } = result;
+            
+            document.getElementById('programName').textContent = macroPlan.plan_name;
+            document.getElementById('programDesc').textContent = macroPlan.overview;
+            document.getElementById('programPhase').textContent = `${macroPlan.total_weeks} settimane`;
+            
+            const dayNames = {
+                monday: 'Lunedì', tuesday: 'Martedì', wednesday: 'Mercoledì',
+                thursday: 'Giovedì', friday: 'Venerdì', saturday: 'Sabato', sunday: 'Domenica'
+            };
+            
+            let html = '';
+            
+            // Mostra fasi del macro-plan
+            html += '<div class="macro-overview"><h3>📊 Periodizzazione</h3><div class="phases-grid">';
+            macroPlan.phases?.forEach(phase => {
+                html += `
+                    <div class="phase-card">
+                        <span class="phase-weeks">Sett. ${phase.weeks?.join('-') || phase.week_range}</span>
+                        <h4>${phase.name}</h4>
+                        <p>${phase.focus}</p>
+                    </div>
+                `;
+            });
+            html += '</div></div>';
+            
+            // Mostra settimana 1
+            html += `<h3 style="margin: 2rem 0 1rem;">📅 Settimana 1 - ${week1.phase}</h3>`;
+            if (week1.coach_notes) {
+                html += `<div class="coach-tip">💡 ${week1.coach_notes}</div>`;
+            }
+            
+            week1.workouts?.forEach((workout, wi) => {
+                html += `
+                    <div class="workout-card">
+                        <div class="workout-header" onclick="toggleExercises('w1-${wi}')">
+                            <div>
+                                <div class="workout-day">${dayNames[workout.day] || workout.day}</div>
+                                <div class="workout-name">${workout.name}</div>
+                            </div>
+                            <div class="workout-meta">
+                                <span><i class="fas fa-clock"></i> ${workout.duration_minutes}min</span>
+                                <span><i class="fas fa-dumbbell"></i> ${workout.main_workout?.length || 0} esercizi</span>
+                            </div>
+                        </div>
+                        <div class="exercises-list" id="exercises-w1-${wi}">
+                            ${workout.warmup ? `<div class="warmup-section"><strong>🔥 Warm-up (${workout.warmup.duration}min)</strong><p>${workout.warmup.exercises?.join(' → ')}</p></div>` : ''}
+                            ${(workout.main_workout || []).map(ex => `
+                                <div class="exercise-item">
+                                    <div class="exercise-header">
+                                        <span class="exercise-name">${ex.order}. ${ex.name}</span>
+                                        <span class="exercise-sets">${ex.sets}x${ex.reps}</span>
+                                    </div>
+                                    <div class="exercise-details">
+                                        <span><i class="fas fa-stopwatch"></i> ${ex.tempo}</span>
+                                        <span><i class="fas fa-hourglass"></i> ${ex.rest_seconds}s</span>
+                                        <span><i class="fas fa-fire"></i> RPE ${ex.RPE_target || '-'}</span>
+                                    </div>
+                                    ${ex.load_suggestion ? `<div class="exercise-load">💪 ${ex.load_suggestion}</div>` : ''}
+                                    ${ex.technique_cues ? `<div class="exercise-notes">💡 ${ex.technique_cues.join(' • ')}</div>` : ''}
+                                    ${ex.why ? `<div class="exercise-why">🎯 ${ex.why}</div>` : ''}
+                                    ${ex.alternatives ? `<div class="exercise-alt">↔️ Alternative: ${ex.alternatives.join(', ')}</div>` : ''}
+                                </div>
+                            `).join('')}
+                            ${workout.cooldown ? `<div class="cooldown-section"><strong>❄️ Cool-down (${workout.cooldown.duration}min)</strong><p>${workout.cooldown.exercises?.join(' → ')}</p></div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if (week1.weekly_tips) {
+                html += `<div class="weekly-tips">📌 ${week1.weekly_tips}</div>`;
+            }
+            
+            document.getElementById('workoutsList').innerHTML = html;
+            document.getElementById('programOutput').classList.add('visible');
+            
+            generatedProgram = { macroPlan, week1 };
+        }
+        
+        function displayProgram(program) {
+            document.getElementById('programName').textContent = program.program_name;
+            document.getElementById('programDesc').textContent = program.description;
+            document.getElementById('programPhase').textContent = `${program.total_weeks || 8} settimane`;
+            
+            const dayNames = {
+                monday: 'Lunedì', tuesday: 'Martedì', wednesday: 'Mercoledì',
+                thursday: 'Giovedì', friday: 'Venerdì', saturday: 'Sabato', sunday: 'Domenica'
+            };
+            
+            let html = '';
+            
+            // Check if new format (weekly_templates) or old format (workouts)
+            if (program.weekly_templates) {
+                program.weekly_templates.forEach((template, ti) => {
+                    html += `
+                        <div class="phase-section">
+                            <h3 class="phase-title">
+                                <span class="phase-badge">${template.phase}</span>
+                                Settimane ${template.week_range}
+                            </h3>
+                    `;
+                    
+                    template.workouts.forEach((workout, wi) => {
+                        html += renderWorkoutCard(workout, `${ti}-${wi}`, dayNames);
+                    });
+                    
+                    html += '</div>';
+                });
+            } else if (program.workouts) {
+                // Old format fallback
+                program.workouts.forEach((workout, wi) => {
+                    html += renderWorkoutCard(workout, wi, dayNames);
+                });
+            }
+            
+            document.getElementById('workoutsList').innerHTML = html;
+            document.getElementById('programOutput').classList.add('visible');
+        }
+        
+        function renderWorkoutCard(workout, index, dayNames) {
+            if (!workout.exercises || workout.exercises.length === 0) {
+                return '';
+            }
+            
+            return `
+                <div class="workout-card">
+                    <div class="workout-header" onclick="toggleExercises('${index}')">
+                        <div>
+                            <div class="workout-day">${dayNames[workout.day] || workout.day}</div>
+                            <div class="workout-name">${workout.name}</div>
+                            ${workout.focus ? `<div class="workout-focus">${workout.focus}</div>` : ''}
+                        </div>
+                        <div class="workout-meta">
+                            <span><i class="fas fa-clock"></i> ${workout.duration_minutes}min</span>
+                            <span><i class="fas fa-dumbbell"></i> ${workout.exercises.length} esercizi</span>
+                        </div>
+                    </div>
+                    <div class="exercises-list" id="exercises-${index}">
+                        ${workout.exercises.map(ex => `
+                            <div class="exercise-item">
+                                <div class="exercise-header">
+                                    <span class="exercise-name">${ex.order ? ex.order + '. ' : ''}${ex.name}</span>
+                                    <span class="exercise-sets">${ex.sets}x${ex.reps}</span>
+                                </div>
+                                <div class="exercise-details">
+                                    <span><i class="fas fa-stopwatch"></i> Tempo: ${ex.tempo}</span>
+                                    <span><i class="fas fa-hourglass"></i> Rest: ${ex.rest_seconds}s</span>
+                                </div>
+                                ${ex.load_progression ? `<div class="exercise-progression">📈 ${ex.load_progression}</div>` : ''}
+                                ${ex.notes ? `<div class="exercise-notes">💡 ${ex.notes}</div>` : ''}
+                                ${ex.why ? `<div class="exercise-why">🎯 ${ex.why}</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function toggleExercises(index) {
+            document.getElementById(`exercises-${index}`).classList.toggle('open');
+        }
+        
+        function regenerate() {
+            document.getElementById('generateBtn').click();
+        }
+        
+        async function saveProgram() {
+            if (!generatedProgram) return;
+            
+            try {
+                // Save program
+                const [program] = await supabase.insert('programs', {
+                    athlete_id: athleteId,
+                    name: generatedProgram.program_name,
+                    description: generatedProgram.description,
+                    program_type: currentAthlete.package_type,
+                    total_weeks: 4,
+                    phase: generatedProgram.phase,
+                    status: 'active',
+                    start_date: new Date().toISOString().split('T')[0]
+                });
+                
+                // Save workouts
+                for (let workout of generatedProgram.workouts) {
+                    await supabase.insert('workouts', {
+                        program_id: program.id,
+                        athlete_id: athleteId,
+                        week_number: 1,
+                        day_of_week: workout.day,
+                        name: workout.name,
+                        workout_type: workout.type,
+                        exercises: workout.exercises,
+                        ai_generated: true,
+                        estimated_duration_minutes: workout.duration_minutes,
+                        status: 'pending'
+                    });
+                }
+                
+                alert('✅ Programma salvato!');
+                window.location.href = `athlete-dashboard.html?id=${athleteId}`;
+                
+            } catch (error) {
+                alert('Errore nel salvataggio');
+                console.error(error);
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>

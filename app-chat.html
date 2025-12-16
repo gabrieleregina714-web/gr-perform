@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#E63946">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    <title>Chat con Coach | GR Perform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --light-gray: #3A3A3A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #888888;
+            --red: #E63946;
+            --red-dark: #C62B38;
+            --success: #00C853;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--black);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .chat-header {
+            background: var(--dark-gray);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--medium-gray);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--medium-gray);
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--light-gray);
+        }
+
+        .coach-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .coach-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background: var(--success);
+            border-radius: 50%;
+            border: 2px solid var(--dark-gray);
+        }
+
+        .coach-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .coach-details span {
+            font-size: 12px;
+            color: var(--success);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--medium-gray);
+            border: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--light-gray);
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            padding: 80px 16px 100px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Date Separator */
+        .date-separator {
+            text-align: center;
+            margin: 16px 0;
+        }
+
+        .date-separator span {
+            background: var(--medium-gray);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Messages */
+        .message {
+            display: flex;
+            gap: 10px;
+            max-width: 85%;
+            animation: messageIn 0.3s ease;
+        }
+
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.received {
+            align-self: flex-start;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--medium-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .message.sent .message-avatar {
+            background: var(--red);
+        }
+
+        .message-content {
+            background: var(--medium-gray);
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .message.sent .message-content {
+            background: var(--red);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received .message-content {
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-text {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .message.sent .message-time {
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            padding: 12px 16px;
+            background: var(--medium-gray);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-indicator.visible {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+        }
+
+        /* Quick Replies */
+        .quick-replies {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            overflow-x: auto;
+            background: var(--dark-gray);
+            border-top: 1px solid var(--medium-gray);
+        }
+
+        .quick-reply {
+            padding: 8px 16px;
+            background: var(--medium-gray);
+            border: 1px solid var(--light-gray);
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-size: 13px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-reply:hover {
+            background: var(--red);
+            border-color: var(--red);
+        }
+
+        /* Input Area */
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--dark-gray);
+            border-top: 1px solid var(--medium-gray);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .attachment-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .attachment-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .message-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--medium-gray);
+            border: 1px solid var(--light-gray);
+            border-radius: 24px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            resize: none;
+            max-height: 100px;
+        }
+
+        .message-input:focus {
+            border-color: var(--red);
+        }
+
+        .message-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--red);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            background: var(--red-dark);
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            background: var(--medium-gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Empty State */
+        .empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--medium-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Attachment Preview */
+        .attachment-preview {
+            display: none;
+            padding: 12px 16px;
+            background: var(--dark-gray);
+            border-top: 1px solid var(--medium-gray);
+        }
+
+        .attachment-preview.visible {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .attachment-preview img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .attachment-info {
+            flex: 1;
+        }
+
+        .attachment-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .attachment-size {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .remove-attachment {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--medium-gray);
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="chat-header">
+        <button class="back-btn" onclick="window.location.href='app-dashboard.html'">←</button>
+        <div class="coach-info">
+            <div class="coach-avatar">
+                GR
+                <span class="online-indicator"></span>
+            </div>
+            <div class="coach-details">
+                <h3 id="coachName">Coach GR Perform</h3>
+                <span id="coachStatus">Online</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="action-btn" title="Chiama">📞</button>
+            <button class="action-btn" title="Opzioni">⋮</button>
+        </div>
+    </header>
+
+    <!-- Chat Messages -->
+    <div class="chat-container" id="chatContainer">
+        <!-- Messages will be loaded here -->
+        <div class="date-separator">
+            <span>Oggi</span>
+        </div>
+    </div>
+
+    <!-- Typing Indicator -->
+    <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+    </div>
+
+    <!-- Quick Replies -->
+    <div class="quick-replies" id="quickReplies">
+        <button class="quick-reply" onclick="sendQuickReply('Ciao Coach! 👋')">Ciao Coach! 👋</button>
+        <button class="quick-reply" onclick="sendQuickReply('Ho una domanda sul workout')">Domanda workout</button>
+        <button class="quick-reply" onclick="sendQuickReply('Come posso migliorare?')">Come migliorare?</button>
+        <button class="quick-reply" onclick="sendQuickReply('Grazie!')">Grazie!</button>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+        <button class="attachment-btn" onclick="attachFile()">📎</button>
+        <div class="message-input-wrapper">
+            <textarea 
+                class="message-input" 
+                id="messageInput" 
+                placeholder="Scrivi un messaggio..." 
+                rows="1"
+                onkeydown="handleKeyDown(event)"
+                oninput="autoResize(this)"
+            ></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>➤</button>
+    </div>
+
+    <input type="file" id="fileInput" style="display: none" accept="image/*" onchange="handleFileSelect(event)">
+
+    <script>
+        // Config
+        const SUPABASE_URL = 'https://unkzjnlrorluzfahmize.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVua3pqbmxyb3JsdXpmYWhtaXplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU3OTQ3MTIsImV4cCI6MjA4MTM3MDcxMn0.c1utLN0YO2k6K-8cFokp7LaTD2ND6Mb0l2BxeFW4oxM';
+
+        let athlete = null;
+        let messages = [];
+        let pollingInterval = null;
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            const athleteId = localStorage.getItem('gr_athlete_id');
+            const athleteName = localStorage.getItem('gr_athlete_name');
+            
+            if (!athleteId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Build athlete object from localStorage
+            athlete = {
+                id: athleteId,
+                first_name: athleteName ? athleteName.split(' ')[0] : 'Atleta',
+                last_name: athleteName ? athleteName.split(' ').slice(1).join(' ') : ''
+            };
+            
+            await loadMessages();
+            startPolling();
+            setupInputListener();
+        });
+
+        // Setup input listener
+        function setupInputListener() {
+            const input = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+
+            input.addEventListener('input', () => {
+                sendBtn.disabled = !input.value.trim();
+            });
+        }
+
+        // Load messages
+        async function loadMessages() {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/chat_messages?athlete_id=eq.${athlete.id}&order=created_at.asc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+                if (response.ok) {
+                    messages = await response.json();
+                    renderMessages();
+                } else {
+                    // Table might not exist yet, show welcome message
+                    showWelcomeMessage();
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                showWelcomeMessage();
+            }
+        }
+
+        // Show welcome message
+        function showWelcomeMessage() {
+            const container = document.getElementById('chatContainer');
+            const welcomeMsg = {
+                id: 'welcome',
+                sender: 'coach',
+                message: `Ciao ${athlete.first_name}! 👋 Sono il tuo coach personale GR Perform. Come posso aiutarti oggi? Puoi chiedermi qualsiasi cosa riguardo al tuo programma di allenamento, nutrizione, recupero o obiettivi.`,
+                created_at: new Date().toISOString()
+            };
+            messages = [welcomeMsg];
+            renderMessages();
+        }
+
+        // Render messages
+        function renderMessages() {
+            const container = document.getElementById('chatContainer');
+            let html = '<div class="date-separator"><span>Oggi</span></div>';
+
+            messages.forEach(msg => {
+                const isSent = msg.sender === 'athlete';
+                const time = new Date(msg.created_at).toLocaleTimeString('it-IT', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                const initials = isSent ? 
+                    (athlete.first_name[0] + (athlete.last_name?.[0] || '')).toUpperCase() :
+                    'GR';
+
+                html += `
+                    <div class="message ${isSent ? 'sent' : 'received'}">
+                        <div class="message-avatar">${initials}</div>
+                        <div class="message-content">
+                            <div class="message-text">${msg.message}</div>
+                            <div class="message-time">${time}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            scrollToBottom();
+        }
+
+        // Scroll to bottom
+        function scrollToBottom() {
+            const container = document.getElementById('chatContainer');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            // Add to local messages immediately
+            const newMessage = {
+                id: Date.now(),
+                athlete_id: athlete.id,
+                sender: 'athlete',
+                message: text,
+                created_at: new Date().toISOString()
+            };
+
+            messages.push(newMessage);
+            renderMessages();
+            input.value = '';
+            document.getElementById('sendBtn').disabled = true;
+            autoResize(input);
+
+            // Save to database
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/chat_messages`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        athlete_id: athlete.id,
+                        sender: 'athlete',
+                        message: text
+                    })
+                });
+            } catch (error) {
+                console.error('Error saving message:', error);
+            }
+
+            // No auto-response - coach will respond from dashboard
+        }
+
+        // Send quick reply
+        function sendQuickReply(text) {
+            document.getElementById('messageInput').value = text;
+            document.getElementById('sendBtn').disabled = false;
+            sendMessage();
+        }
+
+        // Typing indicator
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').classList.add('visible');
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').classList.remove('visible');
+        }
+
+        // Polling for new messages
+        function startPolling() {
+            pollingInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/chat_messages?athlete_id=eq.${athlete.id}&order=created_at.desc&limit=1`,
+                        {
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                            }
+                        }
+                    );
+
+                    if (response.ok) {
+                        const latest = await response.json();
+                        if (latest.length > 0 && latest[0].id !== messages[messages.length - 1]?.id) {
+                            // New message, reload
+                            await loadMessages();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }, 5000);
+        }
+
+        // Handle key down
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                if (!document.getElementById('sendBtn').disabled) {
+                    sendMessage();
+                }
+            }
+        }
+
+        // Auto resize textarea
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+        }
+
+        // Attachment functions
+        function attachFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                alert('📎 Funzione in arrivo! Presto potrai inviare anche immagini e file.');
+            }
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
+        });
+    </script>
+</body>
+</html>

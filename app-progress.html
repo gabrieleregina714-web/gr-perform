@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progressi - GR Perform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --black: #0A0A0A; --dark: #1A1A1A; --medium: #2D2D2D; --light: #4A4A4A; --white: #FFF; --red: #E63946; --green: #22C55E; --yellow: #F59E0B; --blue: #3B82F6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; padding-bottom: 100px; }
+        
+        .header { padding: 1.5rem; border-bottom: 1px solid var(--medium); }
+        .header h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+        .header p { color: #888; font-size: 0.9rem; }
+        
+        .main { padding: 1.5rem; max-width: 600px; margin: 0 auto; }
+        
+        /* Period Selector */
+        .period-selector { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
+        .period-btn { padding: 0.5rem 1rem; background: var(--dark); border: none; border-radius: 20px; color: #888; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .period-btn.active { background: var(--red); color: white; }
+        
+        /* Summary Cards */
+        .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+        .summary-card { background: var(--dark); border-radius: 16px; padding: 1.25rem; }
+        .summary-card.highlight { background: linear-gradient(135deg, var(--red), #B71C1C); }
+        .summary-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .summary-value { font-size: 2rem; font-weight: 800; }
+        .summary-label { font-size: 0.8rem; color: #888; }
+        .summary-card.highlight .summary-label { color: rgba(255,255,255,0.8); }
+        .summary-change { font-size: 0.75rem; margin-top: 0.25rem; }
+        .summary-change.positive { color: var(--green); }
+        .summary-change.negative { color: var(--red); }
+        
+        /* Chart Section */
+        .chart-section { background: var(--dark); border-radius: 16px; padding: 1.25rem; margin-bottom: 1.5rem; }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .chart-title { font-weight: 600; }
+        .chart-legend { display: flex; gap: 1rem; font-size: 0.75rem; color: #888; }
+        .chart-legend span { display: flex; align-items: center; gap: 0.25rem; }
+        .chart-legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+        
+        .chart-container { height: 200px; display: flex; align-items: flex-end; gap: 0.5rem; padding: 0 0.5rem; }
+        .chart-bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; }
+        .chart-bars { display: flex; gap: 2px; align-items: flex-end; height: 160px; }
+        .chart-bar { width: 12px; border-radius: 4px 4px 0 0; transition: height 0.5s ease; }
+        .chart-bar.volume { background: var(--blue); }
+        .chart-bar.intensity { background: var(--red); }
+        .chart-label { font-size: 0.7rem; color: #888; margin-top: 0.5rem; }
+        
+        /* Progress Rings */
+        .rings-section { margin-bottom: 1.5rem; }
+        .section-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+        .rings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+        .ring-card { background: var(--dark); border-radius: 16px; padding: 1rem; text-align: center; }
+        .ring-container { position: relative; width: 80px; height: 80px; margin: 0 auto 0.5rem; }
+        .ring-svg { transform: rotate(-90deg); }
+        .ring-bg { fill: none; stroke: var(--medium); stroke-width: 8; }
+        .ring-progress { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+        .ring-progress.green { stroke: var(--green); }
+        .ring-progress.red { stroke: var(--red); }
+        .ring-progress.blue { stroke: var(--blue); }
+        .ring-value { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 700; font-size: 1.1rem; }
+        .ring-label { font-size: 0.75rem; color: #888; }
+        
+        /* Records Section */
+        .records-section { margin-bottom: 1.5rem; }
+        .record-card { background: var(--dark); border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; }
+        .record-icon { width: 48px; height: 48px; background: linear-gradient(135deg, var(--yellow), #D97706); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .record-info { flex: 1; }
+        .record-name { font-weight: 600; margin-bottom: 0.1rem; }
+        .record-meta { font-size: 0.8rem; color: #888; }
+        .record-value { text-align: right; }
+        .record-value .num { font-size: 1.25rem; font-weight: 700; color: var(--green); }
+        .record-value .unit { font-size: 0.75rem; color: #888; }
+        
+        /* History Section */
+        .history-section { margin-bottom: 1.5rem; }
+        .history-item { background: var(--dark); border-radius: 12px; padding: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 1rem; }
+        .history-date { width: 50px; text-align: center; }
+        .history-date .day { font-size: 1.25rem; font-weight: 700; }
+        .history-date .month { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+        .history-info { flex: 1; }
+        .history-name { font-weight: 500; margin-bottom: 0.1rem; }
+        .history-stats { font-size: 0.8rem; color: #888; }
+        .history-badge { padding: 0.25rem 0.5rem; background: rgba(34, 197, 94, 0.2); color: var(--green); border-radius: 8px; font-size: 0.75rem; font-weight: 600; }
+        
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark); border-top: 1px solid var(--medium); display: flex; justify-content: space-around; padding: 0.75rem 0; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; color: #666; font-size: 0.7rem; cursor: pointer; padding: 0.5rem 1rem; text-decoration: none; }
+        .nav-btn i { font-size: 1.25rem; }
+        .nav-btn.active { color: var(--red); }
+        
+        /* Empty State */
+        .empty-state { text-align: center; padding: 3rem 1rem; color: #888; }
+        .empty-state i { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>📈 I Tuoi Progressi</h1>
+        <p>Monitora la tua crescita atletica</p>
+    </header>
+    
+    <main class="main">
+        <!-- Period Selector -->
+        <div class="period-selector">
+            <button class="period-btn active" data-period="week">Questa Settimana</button>
+            <button class="period-btn" data-period="month">Ultimo Mese</button>
+            <button class="period-btn" data-period="3months">3 Mesi</button>
+            <button class="period-btn" data-period="all">Tutto</button>
+        </div>
+        
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card highlight">
+                <div class="summary-icon">🏋️</div>
+                <div class="summary-value" id="totalWorkouts">0</div>
+                <div class="summary-label">Allenamenti</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">⏱️</div>
+                <div class="summary-value" id="totalMinutes">0</div>
+                <div class="summary-label">Minuti totali</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">🔥</div>
+                <div class="summary-value" id="avgRPE">-</div>
+                <div class="summary-label">RPE Medio</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-icon">⭐</div>
+                <div class="summary-value" id="totalXP">0</div>
+                <div class="summary-label">XP Guadagnati</div>
+            </div>
+        </div>
+        
+        <!-- Weekly Chart -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <span class="chart-title">Volume Settimanale</span>
+                <div class="chart-legend">
+                    <span><div class="dot" style="background: var(--blue);"></div> Volume</span>
+                    <span><div class="dot" style="background: var(--red);"></div> Intensità</span>
+                </div>
+            </div>
+            <div class="chart-container" id="weeklyChart">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+        
+        <!-- Progress Rings -->
+        <div class="rings-section">
+            <div class="section-title">Obiettivi Settimanali</div>
+            <div class="rings-grid">
+                <div class="ring-card">
+                    <div class="ring-container">
+                        <svg class="ring-svg" viewBox="0 0 80 80" width="80" height="80">
+                            <circle class="ring-bg" cx="40" cy="40" r="32"></circle>
+                            <circle class="ring-progress green" cx="40" cy="40" r="32" 
+                                stroke-dasharray="201" stroke-dashoffset="201" id="ringWorkouts"></circle>
+                        </svg>
+                        <span class="ring-value" id="ringWorkoutsValue">0/3</span>
+                    </div>
+                    <div class="ring-label">Allenamenti</div>
+                </div>
+                <div class="ring-card">
+                    <div class="ring-container">
+                        <svg class="ring-svg" viewBox="0 0 80 80" width="80" height="80">
+                            <circle class="ring-bg" cx="40" cy="40" r="32"></circle>
+                            <circle class="ring-progress red" cx="40" cy="40" r="32" 
+                                stroke-dasharray="201" stroke-dashoffset="201" id="ringMinutes"></circle>
+                        </svg>
+                        <span class="ring-value" id="ringMinutesValue">0</span>
+                    </div>
+                    <div class="ring-label">Minuti</div>
+                </div>
+                <div class="ring-card">
+                    <div class="ring-container">
+                        <svg class="ring-svg" viewBox="0 0 80 80" width="80" height="80">
+                            <circle class="ring-bg" cx="40" cy="40" r="32"></circle>
+                            <circle class="ring-progress blue" cx="40" cy="40" r="32" 
+                                stroke-dasharray="201" stroke-dashoffset="201" id="ringStreak"></circle>
+                        </svg>
+                        <span class="ring-value" id="ringStreakValue">0</span>
+                    </div>
+                    <div class="ring-label">🔥 Streak</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Personal Records -->
+        <div class="records-section">
+            <div class="section-title">🏆 Record Personali</div>
+            <div id="recordsList">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+        
+        <!-- Workout History -->
+        <div class="history-section">
+            <div class="section-title">Storico Allenamenti</div>
+            <div id="historyList">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </main>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="app-dashboard.html" class="nav-btn"><i class="fas fa-home"></i> Home</a>
+        <a href="app-challenges.html" class="nav-btn"><i class="fas fa-trophy"></i> Sfide</a>
+        <a href="app-chat.html" class="nav-btn"><i class="fas fa-comments"></i> Coach</a>
+        <a href="app-progress.html" class="nav-btn active"><i class="fas fa-chart-line"></i> Progressi</a>
+        <a href="app-profile.html" class="nav-btn"><i class="fas fa-user"></i> Profilo</a>
+    </nav>
+    
+    <script src="js/supabase-client.js"></script>
+    <script>
+        const athleteId = localStorage.getItem('gr_athlete_id');
+        
+        if (!athleteId) {
+            window.location.href = 'login.html';
+        }
+        
+        let allWorkouts = [];
+        let currentPeriod = 'week';
+        
+        // Period selector
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPeriod = btn.dataset.period;
+                updateStats();
+            });
+        });
+        
+        async function loadProgress() {
+            // Load athlete data
+            const athletes = await supabase.fetch('athletes', `?id=eq.${athleteId}`);
+            const athlete = athletes[0];
+            
+            // Load all completed workouts
+            allWorkouts = await supabase.fetch('workouts', 
+                `?athlete_id=eq.${athleteId}&status=eq.completed&order=completed_at.desc`
+            );
+            
+            document.getElementById('totalXP').textContent = athlete?.total_xp || 0;
+            
+            updateStats();
+            renderChart();
+            renderRecords();
+            renderHistory();
+        }
+        
+        function updateStats() {
+            const filtered = filterByPeriod(allWorkouts);
+            
+            // Total workouts
+            document.getElementById('totalWorkouts').textContent = filtered.length;
+            
+            // Total minutes
+            const totalMins = filtered.reduce((sum, w) => 
+                sum + (w.actual_duration_minutes || w.estimated_duration_minutes || 60), 0
+            );
+            document.getElementById('totalMinutes').textContent = totalMins;
+            
+            // Average RPE
+            let rpeSum = 0, rpeCount = 0;
+            filtered.forEach(w => {
+                if (w.athlete_feedback?.rpe) {
+                    rpeSum += w.athlete_feedback.rpe;
+                    rpeCount++;
+                }
+            });
+            document.getElementById('avgRPE').textContent = rpeCount > 0 
+                ? (rpeSum / rpeCount).toFixed(1) 
+                : '-';
+            
+            // Update rings
+            updateRings(filtered, totalMins);
+        }
+        
+        function filterByPeriod(workouts) {
+            const now = new Date();
+            let startDate;
+            
+            switch (currentPeriod) {
+                case 'week':
+                    startDate = new Date(now);
+                    startDate.setDate(now.getDate() - 7);
+                    break;
+                case 'month':
+                    startDate = new Date(now);
+                    startDate.setMonth(now.getMonth() - 1);
+                    break;
+                case '3months':
+                    startDate = new Date(now);
+                    startDate.setMonth(now.getMonth() - 3);
+                    break;
+                default:
+                    return workouts;
+            }
+            
+            return workouts.filter(w => new Date(w.completed_at) >= startDate);
+        }
+        
+        function updateRings(workouts, totalMins) {
+            const workoutGoal = 3;
+            const minuteGoal = 180;
+            const streakGoal = 7;
+            
+            const workoutProgress = Math.min(workouts.length / workoutGoal, 1);
+            const minuteProgress = Math.min(totalMins / minuteGoal, 1);
+            const streak = Math.min(workouts.length, streakGoal);
+            const streakProgress = streak / streakGoal;
+            
+            // Circumference = 2 * PI * r = 2 * 3.14159 * 32 = 201
+            const circumference = 201;
+            
+            document.getElementById('ringWorkouts').style.strokeDashoffset = 
+                circumference * (1 - workoutProgress);
+            document.getElementById('ringWorkoutsValue').textContent = 
+                `${workouts.length}/${workoutGoal}`;
+            
+            document.getElementById('ringMinutes').style.strokeDashoffset = 
+                circumference * (1 - minuteProgress);
+            document.getElementById('ringMinutesValue').textContent = totalMins;
+            
+            document.getElementById('ringStreak').style.strokeDashoffset = 
+                circumference * (1 - streakProgress);
+            document.getElementById('ringStreakValue').textContent = streak;
+        }
+        
+        function renderChart() {
+            const days = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
+            const dayData = days.map(() => ({ volume: 0, intensity: 0 }));
+            
+            // Get this week's workouts
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            
+            allWorkouts.forEach(w => {
+                if (new Date(w.completed_at) >= weekAgo) {
+                    const dayIndex = (new Date(w.completed_at).getDay() + 6) % 7;
+                    dayData[dayIndex].volume = w.actual_duration_minutes || 60;
+                    dayData[dayIndex].intensity = (w.athlete_feedback?.rpe || 7) * 10;
+                }
+            });
+            
+            const maxValue = 100;
+            
+            let html = '';
+            days.forEach((day, i) => {
+                const volumeHeight = (dayData[i].volume / maxValue) * 160;
+                const intensityHeight = (dayData[i].intensity / maxValue) * 160;
+                
+                html += `
+                    <div class="chart-bar-group">
+                        <div class="chart-bars">
+                            <div class="chart-bar volume" style="height: ${volumeHeight}px;"></div>
+                            <div class="chart-bar intensity" style="height: ${intensityHeight}px;"></div>
+                        </div>
+                        <div class="chart-label">${day}</div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('weeklyChart').innerHTML = html;
+        }
+        
+        function renderRecords() {
+            // Simulated records - in real app would track actual PRs
+            const records = [
+                { name: 'Squat', value: '80', unit: 'kg', date: '10 Dic 2025', icon: '🏋️' },
+                { name: 'Sessione più lunga', value: '95', unit: 'min', date: '12 Dic 2025', icon: '⏱️' },
+                { name: 'Streak massimo', value: '5', unit: 'giorni', date: 'Attivo', icon: '🔥' }
+            ];
+            
+            let html = '';
+            records.forEach(r => {
+                html += `
+                    <div class="record-card">
+                        <div class="record-icon">${r.icon}</div>
+                        <div class="record-info">
+                            <div class="record-name">${r.name}</div>
+                            <div class="record-meta">${r.date}</div>
+                        </div>
+                        <div class="record-value">
+                            <div class="num">${r.value}</div>
+                            <div class="unit">${r.unit}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('recordsList').innerHTML = html;
+        }
+        
+        function renderHistory() {
+            if (allWorkouts.length === 0) {
+                document.getElementById('historyList').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-dumbbell"></i>
+                        <p>Nessun allenamento completato</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const months = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+            
+            let html = '';
+            allWorkouts.slice(0, 10).forEach(w => {
+                const date = new Date(w.completed_at);
+                const duration = w.actual_duration_minutes || w.estimated_duration_minutes || 60;
+                const rpe = w.athlete_feedback?.rpe || '-';
+                
+                html += `
+                    <div class="history-item">
+                        <div class="history-date">
+                            <div class="day">${date.getDate()}</div>
+                            <div class="month">${months[date.getMonth()]}</div>
+                        </div>
+                        <div class="history-info">
+                            <div class="history-name">${w.name}</div>
+                            <div class="history-stats">${duration} min • RPE ${rpe}</div>
+                        </div>
+                        <span class="history-badge">+100 XP</span>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('historyList').innerHTML = html;
+        }
+        
+        loadProgress();
+    </script>
+</body>
+</html>

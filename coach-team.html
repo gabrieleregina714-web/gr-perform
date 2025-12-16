@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GR Perform - Team</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --red: #E63946;
+            --black: #000;
+            --gray-900: #0A0A0A;
+            --gray-800: #111;
+            --gray-700: #1A1A1A;
+            --gray-600: #222;
+            --gray-400: #888;
+            --gray-500: #666;
+            --white: #FFF;
+            --green: #00D26A;
+            --yellow: #FFB800;
+            --blue: #2196F3;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--black);
+            color: var(--white);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: 72px; height: 100vh;
+            background: var(--gray-900);
+            border-right: 1px solid var(--gray-600);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 100;
+        }
+
+        .logo {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #E63946, #FF6B6B);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            margin-bottom: 40px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .nav-item {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .nav-item:hover { background: var(--gray-700); color: var(--white); }
+        .nav-item.active { background: var(--gray-700); color: var(--white); }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        /* MAIN */
+        .main { margin-left: 72px; min-height: 100vh; }
+
+        /* HEADER */
+        .header {
+            padding: 40px 50px 30px;
+            border-bottom: 1px solid var(--gray-700);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .header-left p {
+            color: var(--gray-400);
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--white);
+            color: var(--black);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+        }
+
+        .btn-secondary {
+            background: var(--gray-700);
+            color: var(--white);
+        }
+
+        /* STATS BAR */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--gray-700);
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .stat-item {
+            background: var(--gray-900);
+            padding: 24px 30px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* CONTENT */
+        .content { padding: 30px 50px; }
+
+        /* FILTERS */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            color: var(--gray-400);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--white);
+            color: var(--black);
+            border-color: var(--white);
+        }
+
+        /* ATHLETES TABLE */
+        .athletes-table {
+            background: var(--gray-800);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 100px;
+            padding: 16px 24px;
+            background: var(--gray-700);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-400);
+        }
+
+        .athlete-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 100px;
+            padding: 20px 24px;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-700);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .athlete-row:hover { background: var(--gray-700); }
+        .athlete-row:last-child { border-bottom: none; }
+
+        .athlete-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .athlete-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E63946, #FF6B6B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .athlete-name { font-weight: 600; font-size: 14px; }
+        .athlete-email { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+
+        .cell { font-size: 14px; }
+        .cell-muted { color: var(--gray-400); }
+
+        .tag {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tag.green { background: rgba(0,210,106,0.15); color: var(--green); }
+        .tag.yellow { background: rgba(255,184,0,0.15); color: var(--yellow); }
+        .tag.red { background: rgba(230,57,70,0.15); color: var(--red); }
+
+        .row-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .row-action {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: var(--gray-700);
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .row-action:hover {
+            background: var(--red);
+            color: var(--white);
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray-400);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .table-header, .athlete-row { 
+                grid-template-columns: 2fr 1fr 1fr 80px; 
+            }
+            .table-header > *:nth-child(3),
+            .table-header > *:nth-child(4),
+            .athlete-row > *:nth-child(3),
+            .athlete-row > *:nth-child(4) { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { 
+                width: 100%; height: 64px;
+                bottom: 0; top: auto;
+                flex-direction: row;
+                padding: 0 16px;
+                justify-content: space-around;
+            }
+            .logo { margin-bottom: 0; width: 36px; height: 36px; }
+            .nav-item { margin-bottom: 0; }
+            .nav-spacer { display: none; }
+            .main { margin-left: 0; margin-bottom: 64px; }
+            .header { padding: 24px; flex-direction: column; gap: 16px; align-items: flex-start; }
+            .content { padding: 16px; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <a href="coach-dashboard.html" class="logo">GR</a>
+        <a href="coach-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i></a>
+        <a href="coach-team.html" class="nav-item active"><i class="fas fa-users"></i></a>
+        <a href="coach-chat.html" class="nav-item"><i class="fas fa-comments"></i></a>
+        <a href="coach-generate.html" class="nav-item"><i class="fas fa-bolt"></i></a>
+        <a href="coach-review.html" class="nav-item"><i class="fas fa-clipboard-check"></i></a>
+        <div class="nav-spacer"></div>
+        <a href="login.html" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
+    </nav>
+
+    <main class="main">
+        <div class="header">
+            <div class="header-left">
+                <h1>Il Tuo Team</h1>
+                <p>Gestisci e monitora tutti i tuoi atleti</p>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-secondary"><i class="fas fa-download"></i> Esporta</button>
+                <button class="btn btn-primary" onclick="alert('Coming soon: Invita atleta')"><i class="fas fa-plus"></i> Aggiungi Atleta</button>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="total-athletes">-</div>
+                <div class="stat-label">Atleti Totali</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="active-athletes">-</div>
+                <div class="stat-label">Attivi Questa Settimana</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="total-workouts">-</div>
+                <div class="stat-label">Workout Completati</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="avg-level">-</div>
+                <div class="stat-label">Livello Medio</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Tutti</button>
+                <button class="filter-btn" data-filter="active">Attivi</button>
+                <button class="filter-btn" data-filter="new">Nuovi</button>
+            </div>
+
+            <div class="athletes-table">
+                <div class="table-header">
+                    <div>Atleta</div>
+                    <div>Sport</div>
+                    <div>Workout</div>
+                    <div>XP</div>
+                    <div>Stato</div>
+                    <div>Azioni</div>
+                </div>
+                <div id="athletes-list">
+                    <!-- Loaded from Supabase -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/supabase-client.js"></script>
+    <script>
+        let allAthletes = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Load athletes
+                allAthletes = await supabase.fetch('athletes', '?select=*&order=created_at.desc');
+                
+                // Stats
+                document.getElementById('total-athletes').textContent = allAthletes.length;
+                
+                const activeCount = allAthletes.filter(a => (a.workouts_completed || 0) > 0).length;
+                document.getElementById('active-athletes').textContent = activeCount;
+                
+                const totalWorkouts = allAthletes.reduce((sum, a) => sum + (a.workouts_completed || 0), 0);
+                document.getElementById('total-workouts').textContent = totalWorkouts;
+                
+                const avgLevel = allAthletes.length > 0 
+                    ? (allAthletes.reduce((sum, a) => sum + (a.level || 1), 0) / allAthletes.length).toFixed(1)
+                    : 0;
+                document.getElementById('avg-level').textContent = avgLevel;
+                
+                // Render athletes
+                renderAthletes(allAthletes);
+                
+                // Filters
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        
+                        const filter = btn.dataset.filter;
+                        let filtered = allAthletes;
+                        if (filter === 'active') filtered = allAthletes.filter(a => (a.workouts_completed || 0) > 5);
+                        if (filter === 'new') filtered = allAthletes.filter(a => (a.workouts_completed || 0) <= 5);
+                        
+                        renderAthletes(filtered);
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        function renderAthletes(athletes) {
+            const list = document.getElementById('athletes-list');
+            
+            if (athletes.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>Nessun atleta trovato</p></div>';
+                return;
+            }
+            
+            list.innerHTML = athletes.map(a => {
+                const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+                const workouts = a.workouts_completed || 0;
+                const status = workouts > 10 ? 'green' : workouts > 0 ? 'yellow' : 'red';
+                const statusText = status === 'green' ? 'Attivo' : status === 'yellow' ? 'In Progress' : 'Nuovo';
+                
+                return `
+                    <div class="athlete-row" onclick="viewProfile('${a.id}')">
+                        <div class="athlete-info">
+                            <div class="athlete-avatar">${initials}</div>
+                            <div>
+                                <div class="athlete-name">${a.first_name} ${a.last_name}</div>
+                                <div class="athlete-email">${a.email || 'Nessuna email'}</div>
+                            </div>
+                        </div>
+                        <div class="cell">${a.sport || 'Fitness'}</div>
+                        <div class="cell">${workouts}</div>
+                        <div class="cell">${a.xp || 0} XP</div>
+                        <div><span class="tag ${status}">${statusText}</span></div>
+                        <div class="row-actions">
+                            <button class="row-action" title="Chat" onclick="event.stopPropagation(); location.href='coach-chat.html?athlete=${a.id}'"><i class="fas fa-comment"></i></button>
+                            <button class="row-action" title="Profilo" onclick="event.stopPropagation(); viewProfile('${a.id}')"><i class="fas fa-user"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function viewProfile(id) {
+            location.href = 'athlete-profile.html?id=' + id;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#E63946">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GR Perform">
+    <meta name="description" content="App di coaching fitness per atleti e coach professionisti">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-72.png">
+    
+    <title>GR Perform - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --red: #E63946;
+            --black: #000;
+            --gray-900: #0A0A0A;
+            --gray-800: #111;
+            --gray-700: #1A1A1A;
+            --gray-600: #222;
+            --gray-400: #888;
+            --gray-500: #666;
+            --white: #FFF;
+            --green: #00D26A;
+            --yellow: #FFB800;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        /* HERO WITH IMAGE */
+        .hero {
+            position: relative;
+            height: 50vh;
+            min-height: 380px;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.2) 0%, 
+                rgba(0,0,0,0.7) 70%,
+                rgba(0,0,0,1) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+        }
+
+        .hero-label {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .hero-title {
+            font-size: 36px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            color: var(--gray-400);
+        }
+
+        /* LEVEL BAR */
+        .level-bar {
+            background: var(--gray-800);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .level-badge {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E63946, #FF6B6B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        .level-info { flex: 1; }
+        .level-text { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+
+        .level-progress {
+            height: 8px;
+            background: var(--gray-700);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .level-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E63946, #FF6B6B);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .level-xp {
+            font-size: 12px;
+            color: var(--gray-400);
+            text-align: right;
+        }
+
+        /* CONTENT */
+        .content { padding: 24px; }
+
+        .section { margin-bottom: 32px; }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .section-link {
+            font-size: 12px;
+            color: var(--gray-400);
+            text-decoration: none;
+        }
+
+        /* TODAY WORKOUT CARD */
+        .workout-card {
+            background: linear-gradient(135deg, var(--gray-800), var(--gray-700));
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .workout-card:hover { transform: translateY(-4px); }
+
+        .workout-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 50%; height: 100%;
+            background: radial-gradient(ellipse at top right, rgba(230,57,70,0.2), transparent);
+        }
+
+        .workout-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--red);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .workout-name {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .workout-meta {
+            font-size: 13px;
+            color: var(--gray-400);
+            margin-bottom: 20px;
+        }
+
+        .workout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white);
+            color: var(--black);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .workout-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.15);
+        }
+
+        /* STATS GRID */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: var(--gray-800);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* QUICK ACTIONS */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .action-item {
+            background: var(--gray-800);
+            border-radius: 16px;
+            padding: 20px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .action-item:hover { background: var(--gray-700); }
+
+        .action-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: var(--gray-700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin: 0 auto 10px;
+        }
+
+        .action-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--gray-900);
+            border-top: 1px solid var(--gray-700);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 20px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--gray-500);
+            text-decoration: none;
+            font-size: 10px;
+            transition: color 0.2s;
+        }
+
+        .nav-item i { font-size: 20px; }
+        .nav-item:hover, .nav-item.active { color: var(--red); }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <section class="hero">
+        <img src="assets/pexels-cottonbro-5741289.jpg" alt="" class="hero-bg">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="hero-label">Bentornato</p>
+            <h1 class="hero-title" id="user-name">Caricamento...</h1>
+            <p class="hero-subtitle" id="user-sport">Fitness</p>
+        </div>
+    </section>
+
+    <!-- Level Bar -->
+    <div class="level-bar">
+        <div class="level-badge" id="level-badge">1</div>
+        <div class="level-info">
+            <div class="level-text">Livello <span id="level-num">1</span></div>
+            <div class="level-progress">
+                <div class="level-progress-fill" id="level-progress" style="width: 0%"></div>
+            </div>
+        </div>
+        <div class="level-xp">
+            <div id="xp-text">0 / 500 XP</div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Today Workout -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Workout di Oggi</h2>
+            </div>
+            <div class="workout-card" id="workout-card" onclick="location.href='workout-session.html'">
+                <div class="workout-label">In Programma</div>
+                <div class="workout-name" id="workout-name">Caricamento...</div>
+                <div class="workout-meta" id="workout-meta">-</div>
+                <a href="workout-session.html" class="workout-btn">
+                    <i class="fas fa-play"></i>
+                    Inizia Workout
+                </a>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Le Tue Stats</h2>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-workouts">0</div>
+                    <div class="stat-label">Workout</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-streak">0</div>
+                    <div class="stat-label">Streak 🔥</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-xp">0</div>
+                    <div class="stat-label">XP Totali</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-week">0</div>
+                    <div class="stat-label">Questa Settimana</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Azioni Rapide</h2>
+            </div>
+            <div class="actions-grid">
+                <a href="app-progress.html" class="action-item">
+                    <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="action-label">Progressi</div>
+                </a>
+                <a href="app-chat.html" class="action-item">
+                    <div class="action-icon"><i class="fas fa-comment"></i></div>
+                    <div class="action-label">Chat</div>
+                </a>
+                <a href="app-challenges.html" class="action-item">
+                    <div class="action-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="action-label">Sfide</div>
+                </a>
+                <a href="app-profile.html" class="action-item">
+                    <div class="action-icon"><i class="fas fa-user"></i></div>
+                    <div class="action-label">Profilo</div>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="app-dashboard.html" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="workout-session.html" class="nav-item">
+            <i class="fas fa-dumbbell"></i>
+            <span>Workout</span>
+        </a>
+        <a href="app-progress.html" class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Progressi</span>
+        </a>
+        <a href="app-chat.html" class="nav-item">
+            <i class="fas fa-comment"></i>
+            <span>Chat</span>
+        </a>
+        <a href="app-profile.html" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profilo</span>
+        </a>
+    </nav>
+
+    <script src="js/supabase-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const athleteId = localStorage.getItem('gr_athlete_id');
+            
+            if (!athleteId) {
+                location.href = 'login.html';
+                return;
+            }
+
+            try {
+                // Load athlete data
+                const athletes = await supabase.fetch('athletes', `?id=eq.${athleteId}&select=*`);
+                const athlete = athletes[0];
+                
+                if (!athlete) {
+                    location.href = 'login.html';
+                    return;
+                }
+
+                // Update UI
+                document.getElementById('user-name').textContent = `${athlete.first_name} ${athlete.last_name}`;
+                document.getElementById('user-sport').textContent = athlete.sport || 'Fitness';
+                
+                const level = athlete.level || 1;
+                const xp = athlete.xp || 0;
+                const xpForLevel = 500;
+                const xpInLevel = xp % xpForLevel;
+                const progress = (xpInLevel / xpForLevel) * 100;
+
+                document.getElementById('level-badge').textContent = level;
+                document.getElementById('level-num').textContent = level;
+                document.getElementById('level-progress').style.width = progress + '%';
+                document.getElementById('xp-text').textContent = `${xpInLevel} / ${xpForLevel} XP`;
+                
+                document.getElementById('stat-workouts').textContent = athlete.workouts_completed || 0;
+                document.getElementById('stat-xp').textContent = xp;
+                document.getElementById('stat-streak').textContent = athlete.streak || 0;
+                document.getElementById('stat-week').textContent = Math.min(athlete.workouts_completed || 0, 5);
+
+                // Load today's workout
+                const workouts = await supabase.fetch('workouts', 
+                    `?athlete_id=eq.${athleteId}&select=*&order=created_at.desc&limit=1`
+                );
+                
+                if (workouts.length > 0) {
+                    const w = workouts[0];
+                    document.getElementById('workout-name').textContent = w.name || 'Workout del Giorno';
+                    document.getElementById('workout-meta').textContent = `${w.exercises?.length || 0} esercizi • ~45 min`;
+                } else {
+                    document.getElementById('workout-name').textContent = 'Nessun workout';
+                    document.getElementById('workout-meta').textContent = 'Contatta il coach';
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('SW registered:', reg.scope))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>

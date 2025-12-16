@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro Assistenza - GR Perform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --black: #0A0A0A; --dark: #1A1A1A; --medium: #2D2D2D; --light: #4A4A4A; --white: #FFF; --red: #E63946; --green: #22C55E; --yellow: #F59E0B; --blue: #3B82F6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+        
+        .header { padding: 1.5rem; border-bottom: 1px solid var(--medium); display: flex; align-items: center; gap: 1rem; }
+        .back-btn { background: none; border: none; color: white; font-size: 1.25rem; cursor: pointer; }
+        .header h1 { font-size: 1.25rem; }
+        
+        .main { padding: 1.5rem; max-width: 600px; margin: 0 auto; }
+        
+        /* Search */
+        .search-box { display: flex; align-items: center; gap: 0.75rem; background: var(--dark); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+        .search-box i { color: #888; }
+        .search-box input { flex: 1; background: none; border: none; color: white; font-size: 1rem; outline: none; }
+        .search-box input::placeholder { color: #666; }
+        
+        /* Quick Actions */
+        .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
+        .quick-action { background: var(--dark); border-radius: 16px; padding: 1.25rem; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .quick-action:hover { background: var(--medium); transform: translateY(-2px); }
+        .quick-action i { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .quick-action.red i { color: var(--red); }
+        .quick-action.green i { color: var(--green); }
+        .quick-action.blue i { color: var(--blue); }
+        .quick-action.yellow i { color: var(--yellow); }
+        .quick-action h4 { font-size: 0.9rem; margin-bottom: 0.25rem; }
+        .quick-action p { font-size: 0.75rem; color: #888; }
+        
+        /* FAQ Section */
+        .section { margin-bottom: 2rem; }
+        .section-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        
+        .faq-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .faq-item { background: var(--dark); border-radius: 12px; overflow: hidden; }
+        .faq-question { padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .faq-question h4 { font-size: 0.95rem; font-weight: 500; }
+        .faq-question i { color: #888; transition: transform 0.2s; }
+        .faq-item.open .faq-question i { transform: rotate(180deg); }
+        .faq-answer { padding: 0 1.25rem; max-height: 0; overflow: hidden; transition: all 0.3s; }
+        .faq-item.open .faq-answer { padding: 0 1.25rem 1rem; max-height: 300px; }
+        .faq-answer p { color: #aaa; font-size: 0.9rem; line-height: 1.6; }
+        
+        /* Contact Section */
+        .contact-card { background: linear-gradient(135deg, var(--red), #B71C1C); border-radius: 16px; padding: 1.5rem; text-align: center; margin-bottom: 1.5rem; }
+        .contact-card h3 { margin-bottom: 0.5rem; }
+        .contact-card p { opacity: 0.9; margin-bottom: 1rem; font-size: 0.9rem; }
+        .contact-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 2rem; background: white; color: var(--black); border: none; border-radius: 10px; font-weight: 600; cursor: pointer; text-decoration: none; }
+        
+        /* Contact Options */
+        .contact-options { display: flex; flex-direction: column; gap: 0.75rem; }
+        .contact-option { background: var(--dark); border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s; text-decoration: none; color: white; }
+        .contact-option:hover { background: var(--medium); }
+        .contact-option i { width: 40px; height: 40px; background: var(--medium); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .contact-option .info { flex: 1; }
+        .contact-option .info h4 { font-size: 0.95rem; margin-bottom: 0.1rem; }
+        .contact-option .info p { font-size: 0.8rem; color: #888; }
+        .contact-option .arrow { color: #666; }
+        
+        /* Status Banner */
+        .status-banner { background: rgba(34, 197, 94, 0.15); border: 1px solid var(--green); border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .status-banner .dot { width: 10px; height: 10px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .status-banner .text { flex: 1; }
+        .status-banner .text h4 { font-size: 0.9rem; color: var(--green); }
+        .status-banner .text p { font-size: 0.8rem; color: #888; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+        <h1>Centro Assistenza</h1>
+    </header>
+    
+    <main class="main">
+        <!-- Status Banner -->
+        <div class="status-banner">
+            <div class="dot"></div>
+            <div class="text">
+                <h4>Tutti i sistemi operativi</h4>
+                <p>Tempo risposta medio: < 2 ore</p>
+            </div>
+        </div>
+        
+        <!-- Search -->
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Cerca nelle FAQ..." oninput="searchFAQ(this.value)">
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="quick-action red" onclick="location.href='app-chat.html'">
+                <i class="fas fa-comments"></i>
+                <h4>Chat Coach</h4>
+                <p>Parla con il tuo coach</p>
+            </div>
+            <div class="quick-action green" onclick="location.href='mailto:help@grperform.it'">
+                <i class="fas fa-envelope"></i>
+                <h4>Email</h4>
+                <p>Supporto tecnico</p>
+            </div>
+            <div class="quick-action blue" onclick="showTutorial()">
+                <i class="fas fa-play-circle"></i>
+                <h4>Tutorial</h4>
+                <p>Video guida</p>
+            </div>
+            <div class="quick-action yellow" onclick="reportBug()">
+                <i class="fas fa-bug"></i>
+                <h4>Segnala Bug</h4>
+                <p>Aiutaci a migliorare</p>
+            </div>
+        </div>
+        
+        <!-- FAQ Section -->
+        <div class="section">
+            <div class="section-title"><i class="fas fa-question-circle"></i> Domande Frequenti</div>
+            <div class="faq-list" id="faqList">
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <h4>Come funziona la generazione AI degli allenamenti?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Il nostro sistema AI analizza i tuoi dati (sport, obiettivi, disponibilità, feedback settimanale) e crea programmi personalizzati. Ogni settimana l'AI adatta l'allenamento in base ai tuoi progressi e al tuo stato di recupero.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <h4>Come collego il mio smartwatch?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Vai su Profilo → Wearables e seleziona il tuo dispositivo (Apple Watch, Garmin, Fitbit, WHOOP). Segui le istruzioni per autorizzare la connessione. I dati verranno sincronizzati automaticamente.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <h4>Posso modificare un allenamento?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Gli allenamenti sono creati dal coach in base alle tue esigenze. Se hai bisogno di modifiche, usa la chat per comunicare con il coach che potrà adattare il programma.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <h4>Come funziona il sistema XP e livelli?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Guadagni XP completando allenamenti (+100 XP), sfide e mantenendo streak. Ogni 1000 XP sali di livello. I livelli sbloccano badge e ti permettono di scalare le classifiche.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <h4>Cosa significa "Readiness Score"?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Il Readiness Score indica quanto sei pronto per allenarti (1-10 o 1-100 con wearable). Viene calcolato da: HRV, qualità del sonno, stress, fatica percepita. Un punteggio alto significa che puoi spingere, uno basso suggerisce recupero.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <h4>Come annullo l'abbonamento?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Vai su Profilo → Abbonamento → Gestisci. Puoi annullare in qualsiasi momento. L'accesso rimarrà attivo fino alla fine del periodo pagato.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        <h4>Posso usare GR Perform offline?</h4>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Sì! Gli allenamenti vengono salvati localmente. Puoi allenarti offline e i dati verranno sincronizzati quando torni online.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contact -->
+        <div class="contact-card">
+            <h3>Non trovi quello che cerchi?</h3>
+            <p>Il nostro team è qui per aiutarti</p>
+            <a href="app-chat.html" class="contact-btn">
+                <i class="fas fa-comments"></i> Chatta con noi
+            </a>
+        </div>
+        
+        <div class="contact-options">
+            <a href="mailto:help@grperform.it" class="contact-option">
+                <i class="fas fa-envelope"></i>
+                <div class="info">
+                    <h4>Email</h4>
+                    <p>help@grperform.it</p>
+                </div>
+                <i class="fas fa-chevron-right arrow"></i>
+            </a>
+            <a href="https://instagram.com/grperform" target="_blank" class="contact-option">
+                <i class="fab fa-instagram"></i>
+                <div class="info">
+                    <h4>Instagram</h4>
+                    <p>@grperform</p>
+                </div>
+                <i class="fas fa-chevron-right arrow"></i>
+            </a>
+            <a href="https://wa.me/393331234567" target="_blank" class="contact-option">
+                <i class="fab fa-whatsapp"></i>
+                <div class="info">
+                    <h4>WhatsApp</h4>
+                    <p>+39 333 123 4567</p>
+                </div>
+                <i class="fas fa-chevron-right arrow"></i>
+            </a>
+        </div>
+        
+        <p style="text-align: center; color: #666; font-size: 0.75rem; margin-top: 2rem; padding-bottom: 2rem;">
+            GR Perform v1.0.0<br>
+            © 2025 GR Perform. Tutti i diritti riservati.
+        </p>
+    </main>
+    
+    <script>
+        function toggleFAQ(item) {
+            // Close all others
+            document.querySelectorAll('.faq-item').forEach(i => {
+                if (i !== item) i.classList.remove('open');
+            });
+            // Toggle this one
+            item.classList.toggle('open');
+        }
+        
+        function searchFAQ(query) {
+            const items = document.querySelectorAll('.faq-item');
+            const q = query.toLowerCase();
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(q) ? 'block' : 'none';
+            });
+        }
+        
+        function showTutorial() {
+            alert('🎬 Video tutorial in arrivo!\n\nStiamo preparando guide video per aiutarti a sfruttare al massimo GR Perform.');
+        }
+        
+        function reportBug() {
+            const bug = prompt('Descrivi il problema che hai riscontrato:');
+            if (bug) {
+                alert('🐛 Grazie per la segnalazione!\n\nIl nostro team analizzerà il problema e lo risolverà al più presto.');
+                // In production: would send to backend
+            }
+        }
+    </script>
+</body>
+</html>

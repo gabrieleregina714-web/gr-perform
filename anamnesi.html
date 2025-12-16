@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anamnesi - GR Perform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/anamnesi.css">
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-steps">
+            <div class="step active" data-step="1"><span>1</span><p>Sport</p></div>
+            <div class="step" data-step="2"><span>2</span><p>Dati</p></div>
+            <div class="step" data-step="3"><span>3</span><p>Ruolo</p></div>
+            <div class="step" data-step="4"><span>4</span><p>Obiettivi</p></div>
+            <div class="step" data-step="5"><span>5</span><p>Agenda</p></div>
+            <div class="step" data-step="6"><span>6</span><p>Fine</p></div>
+        </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <div class="logo-header">
+            <img src="https://cdn.shopify.com/s/files/1/0917/4204/3027/files/Frame_6.png?v=1733431122" alt="GR Perform">
+        </div>
+
+        <!-- Step 1: Sport Selection -->
+        <div class="form-step active" id="step1">
+            <h2>Che sport pratichi?</h2>
+            <p class="subtitle">Seleziona il tuo sport principale</p>
+            
+            <div class="sport-grid">
+                <div class="sport-card" data-sport="calcio">
+                    <i class="fas fa-futbol"></i>
+                    <span>Calcio</span>
+                </div>
+                <div class="sport-card" data-sport="basket">
+                    <i class="fas fa-basketball-ball"></i>
+                    <span>Basket</span>
+                </div>
+                <div class="sport-card" data-sport="boxe">
+                    <i class="fas fa-hand-fist"></i>
+                    <span>Boxe</span>
+                </div>
+                <div class="sport-card" data-sport="palestra">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Palestra</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Personal Data -->
+        <div class="form-step" id="step2">
+            <h2>I tuoi dati</h2>
+            <p class="subtitle">Informazioni base per personalizzare il programma</p>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nome *</label>
+                    <input type="text" id="firstName" placeholder="Mario" required>
+                </div>
+                <div class="form-group">
+                    <label>Cognome *</label>
+                    <input type="text" id="lastName" placeholder="Rossi" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="email" placeholder="mario@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefono</label>
+                    <input type="tel" id="phone" placeholder="+39 333 1234567">
+                </div>
+                <div class="form-group">
+                    <label>Data di nascita *</label>
+                    <input type="date" id="birthDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Sesso *</label>
+                    <select id="gender" required>
+                        <option value="">Seleziona</option>
+                        <option value="maschio">Maschio</option>
+                        <option value="femmina">Femmina</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Altezza (cm) *</label>
+                    <input type="number" id="height" placeholder="175" min="100" max="250" required>
+                </div>
+                <div class="form-group">
+                    <label>Peso (kg) *</label>
+                    <input type="number" id="weight" placeholder="70" min="30" max="200" step="0.1" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>Anni di allenamento</label>
+                    <select id="experience">
+                        <option value="principiante">Meno di 1 anno</option>
+                        <option value="intermedio">1-3 anni</option>
+                        <option value="avanzato">3-5 anni</option>
+                        <option value="esperto">5+ anni</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Role Specific (Dynamic) -->
+        <div class="form-step" id="step3">
+            <h2 id="step3Title">Il tuo ruolo</h2>
+            <p class="subtitle" id="step3Subtitle">Dettagli specifici del tuo sport</p>
+            
+            <div id="roleContent">
+                <!-- Content loaded dynamically based on sport -->
+            </div>
+        </div>
+
+        <!-- Step 4: Goals -->
+        <div class="form-step" id="step4">
+            <h2>I tuoi obiettivi</h2>
+            <p class="subtitle">Seleziona fino a 3 obiettivi prioritari</p>
+            
+            <div class="goals-container" id="goalsContainer">
+                <!-- Goals loaded from database based on sport/role -->
+            </div>
+            
+            <div class="package-selection">
+                <h3>Pacchetto scelto</h3>
+                <div class="package-grid">
+                    <div class="package-card" data-package="tecnica">
+                        <i class="fas fa-bullseye"></i>
+                        <h4>Tecnica</h4>
+                        <p>Focus su abilità sport-specifiche</p>
+                    </div>
+                    <div class="package-card" data-package="performance">
+                        <i class="fas fa-bolt"></i>
+                        <h4>Performance</h4>
+                        <p>Forza, velocità, resistenza</p>
+                    </div>
+                    <div class="package-card selected" data-package="completo">
+                        <i class="fas fa-trophy"></i>
+                        <h4>Completo</h4>
+                        <p>Tecnica + Performance</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Weekly Schedule -->
+        <div class="form-step" id="step5">
+            <h2>La tua settimana</h2>
+            <p class="subtitle">Quando ti alleni con la squadra e quando sei disponibile per GR?</p>
+            
+            <div class="schedule-grid">
+                <div class="day-row">
+                    <span class="day-name">Lunedì</span>
+                    <select class="day-activity" data-day="monday">
+                        <option value="rest">Riposo</option>
+                        <option value="team_training">Allenamento squadra</option>
+                        <option value="match">Partita</option>
+                        <option value="gr_available">Disponibile GR</option>
+                    </select>
+                </div>
+                <div class="day-row">
+                    <span class="day-name">Martedì</span>
+                    <select class="day-activity" data-day="tuesday">
+                        <option value="rest">Riposo</option>
+                        <option value="team_training">Allenamento squadra</option>
+                        <option value="match">Partita</option>
+                        <option value="gr_available">Disponibile GR</option>
+                    </select>
+                </div>
+                <div class="day-row">
+                    <span class="day-name">Mercoledì</span>
+                    <select class="day-activity" data-day="wednesday">
+                        <option value="rest">Riposo</option>
+                        <option value="team_training">Allenamento squadra</option>
+                        <option value="match">Partita</option>
+                        <option value="gr_available">Disponibile GR</option>
+                    </select>
+                </div>
+                <div class="day-row">
+                    <span class="day-name">Giovedì</span>
+                    <select class="day-activity" data-day="thursday">
+                        <option value="rest">Riposo</option>
+                        <option value="team_training">Allenamento squadra</option>
+                        <option value="match">Partita</option>
+                        <option value="gr_available">Disponibile GR</option>
+                    </select>
+                </div>
+                <div class="day-row">
+                    <span class="day-name">Venerdì</span>
+                    <select class="day-activity" data-day="friday">
+                        <option value="rest">Riposo</option>
+                        <option value="team_training">Allenamento squadra</option>
+                        <option value="match">Partita</option>
+                        <option value="gr_available">Disponibile GR</option>
+                    </select>
+                </div>
+                <div class="day-row">
+                    <span class="day-name">Sabato</span>
+                    <select class="day-activity" data-day="saturday">
+                        <option value="rest">Riposo</option>
+                        <option value="team_training">Allenamento squadra</option>
+                        <option value="match">Partita</option>
+                        <option value="gr_available">Disponibile GR</option>
+                    </select>
+                </div>
+                <div class="day-row">
+                    <span class="day-name">Domenica</span>
+                    <select class="day-activity" data-day="sunday">
+                        <option value="rest">Riposo</option>
+                        <option value="team_training">Allenamento squadra</option>
+                        <option value="match">Partita</option>
+                        <option value="gr_available">Disponibile GR</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-top: 2rem;">
+                <label>Sessioni GR massime a settimana</label>
+                <select id="maxSessions">
+                    <option value="2">2 sessioni</option>
+                    <option value="3" selected>3 sessioni</option>
+                    <option value="4">4 sessioni</option>
+                    <option value="5">5 sessioni</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Durata del programma</label>
+                <select id="programDuration">
+                    <option value="4">4 settimane (1 mese)</option>
+                    <option value="8" selected>8 settimane (2 mesi)</option>
+                    <option value="12">12 settimane (3 mesi)</option>
+                    <option value="16">16 settimane (4 mesi)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Durata sessione preferita</label>
+                <select id="sessionDuration">
+                    <option value="45">45 minuti</option>
+                    <option value="60" selected>60 minuti</option>
+                    <option value="75">75 minuti</option>
+                    <option value="90">90 minuti</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Step 6: Injuries & Summary -->
+        <div class="form-step" id="step6">
+            <h2>Quasi fatto!</h2>
+            <p class="subtitle">Infortuni passati e note finali</p>
+            
+            <div class="form-group full-width">
+                <label>Hai infortuni o condizioni di cui dovremmo sapere?</label>
+                <textarea id="injuries" rows="3" placeholder="Es: Distorsione caviglia sinistra 6 mesi fa, dolore occasionale al ginocchio destro..."></textarea>
+            </div>
+            
+            <div class="form-group full-width">
+                <label>Note aggiuntive</label>
+                <textarea id="notes" rows="3" placeholder="Qualsiasi altra informazione utile..."></textarea>
+            </div>
+            
+            <div class="summary-card">
+                <h3><i class="fas fa-check-circle"></i> Riepilogo</h3>
+                <div id="summaryContent">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="form-navigation">
+            <button class="btn-secondary" id="prevBtn" style="display:none;">
+                <i class="fas fa-arrow-left"></i> Indietro
+            </button>
+            <button class="btn-primary" id="nextBtn">
+                Avanti <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="js/supabase-client.js"></script>
+    <script src="js/anamnesi.js"></script>
+</body>
+</html>

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allenamento - GR Perform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --black: #0A0A0A; --dark: #1A1A1A; --medium: #2D2D2D; --white: #FFF; --red: #E63946; --green: #22C55E; --yellow: #F59E0B; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+        
+        .header { padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--medium); position: sticky; top: 0; background: var(--black); z-index: 100; }
+        .back-btn { background: none; border: none; color: white; font-size: 1.25rem; cursor: pointer; padding: 0.5rem; }
+        .header-title { font-weight: 600; }
+        .timer { font-family: monospace; font-size: 1.1rem; color: var(--red); }
+        
+        .main { padding: 1.5rem; max-width: 600px; margin: 0 auto; padding-bottom: 100px; }
+        
+        .workout-header { margin-bottom: 1.5rem; }
+        .workout-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .workout-meta { display: flex; gap: 1rem; color: #888; font-size: 0.9rem; }
+        
+        .progress-bar { height: 6px; background: var(--medium); border-radius: 3px; margin-bottom: 1.5rem; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
+        
+        .section { margin-bottom: 2rem; }
+        .section-header { font-size: 0.85rem; color: #888; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+        
+        .warmup-box, .cooldown-box { background: var(--dark); border-radius: 16px; padding: 1rem; }
+        .warmup-box p, .cooldown-box p { color: #aaa; font-size: 0.9rem; line-height: 1.6; }
+        
+        .exercise-card { background: var(--dark); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; border: 2px solid transparent; transition: all 0.2s; }
+        .exercise-card.active { border-color: var(--red); }
+        .exercise-card.completed { opacity: 0.5; }
+        
+        .exercise-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+        .exercise-order { width: 28px; height: 28px; background: var(--medium); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; margin-right: 0.75rem; }
+        .exercise-card.completed .exercise-order { background: var(--green); }
+        .exercise-name { font-weight: 600; font-size: 1.1rem; flex: 1; }
+        .exercise-prescription { color: var(--red); font-weight: 700; }
+        
+        .exercise-details { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem; font-size: 0.85rem; color: #888; }
+        .exercise-details span { display: flex; align-items: center; gap: 0.25rem; }
+        
+        .exercise-notes { background: var(--medium); padding: 0.75rem; border-radius: 10px; font-size: 0.85rem; margin-bottom: 0.75rem; }
+        .exercise-notes strong { color: var(--yellow); }
+        
+        .exercise-why { font-size: 0.8rem; color: var(--green); font-style: italic; }
+        
+        .sets-tracker { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .set-btn { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--medium); background: transparent; color: #888; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .set-btn.done { background: var(--green); border-color: var(--green); color: white; }
+        .set-btn:hover { border-color: var(--red); }
+        
+        .complete-btn { position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem 1.5rem; background: var(--black); border-top: 1px solid var(--medium); }
+        .complete-btn button { width: 100%; padding: 1rem; background: var(--green); border: none; border-radius: 12px; color: white; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .complete-btn button:disabled { background: var(--medium); color: #888; cursor: not-allowed; }
+        
+        .rest-timer { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--dark); padding: 3rem; border-radius: 24px; text-align: center; display: none; z-index: 200; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .rest-timer.show { display: block; }
+        .rest-timer h3 { margin-bottom: 1rem; }
+        .rest-timer .time { font-size: 4rem; font-weight: 700; font-family: monospace; }
+        .rest-timer button { margin-top: 1rem; padding: 0.75rem 2rem; background: var(--red); border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; }
+        
+        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; z-index: 150; }
+        .overlay.show { display: block; }
+        
+        /* Feedback Modal */
+        .feedback-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 300; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
+        .feedback-modal.show { display: flex; }
+        .feedback-content { background: var(--dark); border-radius: 24px; padding: 2rem; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
+        .feedback-content h2 { margin-bottom: 1.5rem; text-align: center; }
+        
+        .feedback-group { margin-bottom: 1.5rem; }
+        .feedback-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        
+        .emoji-scale { display: flex; justify-content: space-between; gap: 0.5rem; }
+        .emoji-btn { flex: 1; padding: 1rem 0.5rem; background: var(--medium); border: 2px solid transparent; border-radius: 12px; font-size: 1.5rem; cursor: pointer; transition: all 0.2s; }
+        .emoji-btn:hover { border-color: var(--red); }
+        .emoji-btn.selected { border-color: var(--green); background: rgba(34, 197, 94, 0.2); }
+        .emoji-btn span { display: block; font-size: 0.65rem; color: #888; margin-top: 0.25rem; }
+        
+        .feedback-textarea { width: 100%; background: var(--medium); border: none; border-radius: 12px; padding: 1rem; color: white; font-family: inherit; font-size: 0.9rem; min-height: 80px; resize: none; }
+        .feedback-textarea::placeholder { color: #666; }
+        
+        .feedback-submit { width: 100%; padding: 1rem; background: var(--green); border: none; border-radius: 12px; color: white; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+        
+        .stats-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-box { background: var(--medium); border-radius: 12px; padding: 1rem; text-align: center; }
+        .stat-box .value { font-size: 1.5rem; font-weight: 700; color: var(--green); }
+        .stat-box .label { font-size: 0.75rem; color: #888; margin-top: 0.25rem; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="back-btn" onclick="confirmExit()"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title">Allenamento</span>
+        <span class="timer" id="totalTimer">00:00</span>
+    </header>
+    
+    <main class="main">
+        <div class="workout-header">
+            <div class="workout-name" id="workoutName">Caricamento...</div>
+            <div class="workout-meta">
+                <span><i class="fas fa-clock"></i> <span id="duration">-</span> min</span>
+                <span><i class="fas fa-dumbbell"></i> <span id="exerciseCount">-</span> esercizi</span>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        
+        <div id="warmupSection" class="section" style="display:none;">
+            <div class="section-header"><i class="fas fa-fire"></i> Warm-up</div>
+            <div class="warmup-box"><p id="warmupContent"></p></div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header"><i class="fas fa-dumbbell"></i> Esercizi</div>
+            <div id="exercisesList"></div>
+        </div>
+        
+        <div id="cooldownSection" class="section" style="display:none;">
+            <div class="section-header"><i class="fas fa-snowflake"></i> Cool-down</div>
+            <div class="cooldown-box"><p id="cooldownContent"></p></div>
+        </div>
+    </main>
+    
+    <div class="complete-btn">
+        <button id="completeBtn" disabled onclick="showFeedback()">
+            <i class="fas fa-check-circle"></i> Completa Allenamento
+        </button>
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
+    <div class="rest-timer" id="restTimer">
+        <h3>⏱️ Recupero</h3>
+        <div class="time" id="restTime">90</div>
+        <button onclick="skipRest()">Salta</button>
+    </div>
+    
+    <!-- Feedback Modal -->
+    <div class="feedback-modal" id="feedbackModal">
+        <div class="feedback-content">
+            <h2>🏆 Ottimo lavoro!</h2>
+            
+            <div class="stats-preview">
+                <div class="stat-box">
+                    <div class="value" id="statTime">--</div>
+                    <div class="label">Minuti</div>
+                </div>
+                <div class="stat-box">
+                    <div class="value" id="statSets">--</div>
+                    <div class="label">Set completati</div>
+                </div>
+                <div class="stat-box">
+                    <div class="value">+100</div>
+                    <div class="label">XP</div>
+                </div>
+            </div>
+            
+            <div class="feedback-group">
+                <label>Come ti sei sentito?</label>
+                <div class="emoji-scale" id="feelingScale">
+                    <button class="emoji-btn" data-value="1" onclick="selectFeeling(this)">😫<span>Distrutto</span></button>
+                    <button class="emoji-btn" data-value="2" onclick="selectFeeling(this)">😓<span>Difficile</span></button>
+                    <button class="emoji-btn" data-value="3" onclick="selectFeeling(this)">😊<span>Bene</span></button>
+                    <button class="emoji-btn" data-value="4" onclick="selectFeeling(this)">💪<span>Forte</span></button>
+                    <button class="emoji-btn" data-value="5" onclick="selectFeeling(this)">🔥<span>Top!</span></button>
+                </div>
+            </div>
+            
+            <div class="feedback-group">
+                <label>Livello di fatica (RPE)</label>
+                <div class="emoji-scale" id="rpeScale">
+                    <button class="emoji-btn" data-value="6" onclick="selectRPE(this)">6<span>Facile</span></button>
+                    <button class="emoji-btn" data-value="7" onclick="selectRPE(this)">7<span>Medio</span></button>
+                    <button class="emoji-btn" data-value="8" onclick="selectRPE(this)">8<span>Duro</span></button>
+                    <button class="emoji-btn" data-value="9" onclick="selectRPE(this)">9<span>Molto</span></button>
+                    <button class="emoji-btn" data-value="10" onclick="selectRPE(this)">10<span>Max</span></button>
+                </div>
+            </div>
+            
+            <div class="feedback-group">
+                <label>Note (dolori, problemi, sensazioni)</label>
+                <textarea class="feedback-textarea" id="feedbackNotes" placeholder="Es: Leggero fastidio alla spalla destra, squat sembrava leggero oggi..."></textarea>
+            </div>
+            
+            <button class="feedback-submit" onclick="submitFeedback()">
+                <i class="fas fa-check"></i> Salva e Completa
+            </button>
+        </div>
+    </div>
+    
+    <script src="js/supabase-client.js"></script>
+    <script>
+        const workoutId = new URLSearchParams(window.location.search).get('id');
+        const athleteId = localStorage.getItem('gr_athlete_id');
+        
+        let workout = null;
+        let exercises = [];
+        let completedSets = {};
+        let totalSets = 0;
+        let completedTotal = 0;
+        let startTime = Date.now();
+        let restInterval = null;
+        let selectedFeeling = 3; // Default: Bene
+        let selectedRPE = 7; // Default: Medio
+        
+        async function loadWorkout() {
+            if (!workoutId) {
+                alert('Workout ID mancante');
+                history.back();
+                return;
+            }
+            
+            const workouts = await supabase.fetch('workouts', `?id=eq.${workoutId}`);
+            workout = workouts[0];
+            
+            if (!workout) {
+                alert('Workout non trovato');
+                history.back();
+                return;
+            }
+            
+            document.getElementById('workoutName').textContent = workout.name;
+            document.getElementById('duration').textContent = workout.estimated_duration_minutes || 60;
+            
+            // Parse exercises - handle different formats from AI
+            if (workout.exercises?.main) {
+                // Elite format
+                exercises = workout.exercises.main;
+            } else if (Array.isArray(workout.exercises)) {
+                // Simple array format
+                exercises = workout.exercises;
+            } else {
+                exercises = [];
+            }
+            
+            document.getElementById('exerciseCount').textContent = exercises.length;
+            
+            // Warmup
+            if (workout.exercises?.warmup) {
+                document.getElementById('warmupSection').style.display = 'block';
+                const wu = workout.exercises.warmup;
+                const warmupItems = wu.exercises || [];
+                const warmupText = warmupItems.length > 0 
+                    ? warmupItems.join(' → ') 
+                    : (wu.protocol || 'Warm-up generale');
+                document.getElementById('warmupContent').innerHTML = `
+                    <strong>🔥 ${wu.duration || '10 min'}</strong><br>
+                    ${warmupText}
+                `;
+            }
+            
+            // Cooldown
+            if (workout.exercises?.cooldown) {
+                document.getElementById('cooldownSection').style.display = 'block';
+                const cd = workout.exercises.cooldown;
+                const cooldownItems = cd.exercises || [];
+                const cooldownText = cooldownItems.length > 0 
+                    ? cooldownItems.join(' → ') 
+                    : (cd.protocol || 'Stretching defaticamento');
+                document.getElementById('cooldownContent').innerHTML = `
+                    <strong>❄️ ${cd.duration || '5 min'}</strong><br>
+                    ${cooldownText}
+                `;
+            }
+            
+            renderExercises();
+            startTimer();
+        }
+        
+        function renderExercises() {
+            let html = '';
+            
+            exercises.forEach((ex, i) => {
+                const sets = parseInt(ex.sets) || 3;
+                totalSets += sets;
+                completedSets[i] = 0;
+                
+                // Handle technique cues (array or string)
+                const cues = ex.technique_cues || ex.notes;
+                let cuesText = '';
+                if (Array.isArray(cues)) {
+                    cuesText = cues.join(' • ');
+                } else if (cues) {
+                    cuesText = cues;
+                }
+                
+                // Build details
+                const details = [];
+                if (ex.tempo) details.push(`<span><i class="fas fa-stopwatch"></i> Tempo: ${ex.tempo}</span>`);
+                if (ex.rest_seconds) details.push(`<span><i class="fas fa-hourglass-half"></i> ${ex.rest_seconds}s rest</span>`);
+                if (ex.RPE_target) details.push(`<span><i class="fas fa-fire-alt"></i> RPE ${ex.RPE_target}</span>`);
+                if (ex.load_suggestion) details.push(`<span><i class="fas fa-weight-hanging"></i> ${ex.load_suggestion}</span>`);
+                
+                html += `
+                    <div class="exercise-card" id="exercise-${i}">
+                        <div class="exercise-top">
+                            <div style="display:flex;align-items:center;">
+                                <span class="exercise-order">${ex.order || i + 1}</span>
+                                <span class="exercise-name">${ex.name}</span>
+                            </div>
+                            <span class="exercise-prescription">${sets}x${ex.reps}</span>
+                        </div>
+                        ${details.length > 0 ? `<div class="exercise-details">${details.join('')}</div>` : ''}
+                        ${cuesText ? `<div class="exercise-notes"><strong>💡 Tecnica:</strong> ${cuesText}</div>` : ''}
+                        ${ex.why ? `<div class="exercise-why">🎯 ${ex.why}</div>` : ''}
+                        <div class="sets-tracker" id="sets-${i}">
+                            ${Array(sets).fill(0).map((_, si) => `
+                                <button class="set-btn" onclick="completeSet(${i}, ${si}, ${ex.rest_seconds || 90})">${si + 1}</button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('exercisesList').innerHTML = html || '<p style="color:#888;text-align:center;">Nessun esercizio trovato</p>';
+            
+            // Highlight first exercise
+            if (exercises.length > 0) {
+                document.getElementById('exercise-0').classList.add('active');
+            }
+        }
+        
+        function completeSet(exerciseIndex, setIndex, restSeconds) {
+            const btn = document.querySelectorAll(`#sets-${exerciseIndex} .set-btn`)[setIndex];
+            
+            if (btn.classList.contains('done')) return;
+            
+            btn.classList.add('done');
+            completedSets[exerciseIndex]++;
+            completedTotal++;
+            
+            updateProgress();
+            
+            // Check if exercise completed
+            const totalExSets = parseInt(exercises[exerciseIndex].sets) || 3;
+            if (completedSets[exerciseIndex] >= totalExSets) {
+                document.getElementById(`exercise-${exerciseIndex}`).classList.remove('active');
+                document.getElementById(`exercise-${exerciseIndex}`).classList.add('completed');
+                
+                // Activate next exercise
+                if (exerciseIndex + 1 < exercises.length) {
+                    document.getElementById(`exercise-${exerciseIndex + 1}`).classList.add('active');
+                    document.getElementById(`exercise-${exerciseIndex + 1}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            } else {
+                // Show rest timer
+                showRestTimer(restSeconds);
+            }
+            
+            // Check if all done
+            checkAllCompleted();
+        }
+        
+        function updateProgress() {
+            const percent = (completedTotal / totalSets) * 100;
+            document.getElementById('progressFill').style.width = `${percent}%`;
+        }
+        
+        function checkAllCompleted() {
+            if (completedTotal >= totalSets) {
+                document.getElementById('completeBtn').disabled = false;
+            }
+        }
+        
+        function showRestTimer(seconds) {
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('restTimer').classList.add('show');
+            document.getElementById('restTime').textContent = seconds;
+            
+            let remaining = seconds;
+            restInterval = setInterval(() => {
+                remaining--;
+                document.getElementById('restTime').textContent = remaining;
+                
+                if (remaining <= 0) {
+                    skipRest();
+                }
+            }, 1000);
+        }
+        
+        function skipRest() {
+            clearInterval(restInterval);
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('restTimer').classList.remove('show');
+        }
+        
+        function startTimer() {
+            setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                const secs = (elapsed % 60).toString().padStart(2, '0');
+                document.getElementById('totalTimer').textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+        
+        function confirmExit() {
+            if (completedTotal > 0 && completedTotal < totalSets) {
+                if (confirm('Vuoi davvero uscire? L\'allenamento non è completo.')) {
+                    history.back();
+                }
+            } else {
+                history.back();
+            }
+        }
+        
+        function showFeedback() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000 / 60);
+            document.getElementById('statTime').textContent = elapsed;
+            document.getElementById('statSets').textContent = `${completedTotal}/${totalSets}`;
+            document.getElementById('feedbackModal').classList.add('show');
+        }
+        
+        function selectFeeling(btn) {
+            document.querySelectorAll('#feelingScale .emoji-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedFeeling = parseInt(btn.dataset.value);
+        }
+        
+        function selectRPE(btn) {
+            document.querySelectorAll('#rpeScale .emoji-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedRPE = parseInt(btn.dataset.value);
+        }
+        
+        async function submitFeedback() {
+            const notes = document.getElementById('feedbackNotes').value;
+            const elapsed = Math.floor((Date.now() - startTime) / 1000 / 60);
+            
+            try {
+                // Update workout status
+                await supabase.update('workouts', workoutId, {
+                    status: 'completed',
+                    completed_at: new Date().toISOString(),
+                    actual_duration_minutes: elapsed,
+                    athlete_feedback: {
+                        feeling: selectedFeeling,
+                        rpe: selectedRPE,
+                        notes: notes,
+                        completed_sets: completedTotal,
+                        total_sets: totalSets,
+                        submitted_at: new Date().toISOString()
+                    }
+                });
+                
+                // Update athlete XP
+                if (athleteId) {
+                    const athletes = await supabase.fetch('athletes', `?id=eq.${athleteId}`);
+                    const athlete = athletes[0];
+                    if (athlete) {
+                        const xpGained = 100;
+                        const newXP = (athlete.total_xp || 0) + xpGained;
+                        // Level up every 500 XP
+                        const newLevel = Math.floor(newXP / 500) + 1;
+                        await supabase.update('athletes', athleteId, {
+                            total_xp: newXP,
+                            current_level: newLevel
+                        });
+                    }
+                }
+                
+                // Success redirect
+                window.location.href = 'app-dashboard.html?completed=true';
+                
+            } catch (error) {
+                console.error('Errore salvataggio:', error);
+                alert('Errore durante il salvataggio. Riprova.');
+            }
+        }
+        
+        // Initialize
+        loadWorkout();
+    </script>
+</body>
+</html>

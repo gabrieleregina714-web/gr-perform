@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sfide - GR Perform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --black: #0A0A0A; --dark: #1A1A1A; --medium: #2D2D2D; --white: #FFF; --red: #E63946; --green: #22C55E; --yellow: #F59E0B; --blue: #3B82F6; --purple: #8B5CF6; --orange: #F97316; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; padding-bottom: 100px; }
+        
+        .header { padding: 1.5rem; border-bottom: 1px solid var(--medium); }
+        .header h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+        .header p { color: #888; font-size: 0.9rem; }
+        
+        .main { padding: 1rem; max-width: 600px; margin: 0 auto; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 0.5rem; }
+        .tab { padding: 0.75rem 1.25rem; background: var(--dark); border: none; border-radius: 25px; color: #888; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .tab.active { background: var(--red); color: white; }
+        
+        /* Active Challenge Banner */
+        .active-challenge { background: linear-gradient(135deg, var(--purple), #6D28D9); border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; }
+        .active-challenge::before { content: '🏆'; position: absolute; right: -10px; top: -10px; font-size: 6rem; opacity: 0.15; }
+        .challenge-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .active-challenge h2 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+        .active-challenge p { opacity: 0.9; font-size: 0.9rem; margin-bottom: 1rem; }
+        .challenge-progress { background: rgba(255,255,255,0.2); border-radius: 10px; height: 12px; margin-bottom: 0.5rem; overflow: hidden; }
+        .challenge-progress-fill { height: 100%; background: white; border-radius: 10px; transition: width 0.5s; }
+        .challenge-stats { display: flex; justify-content: space-between; font-size: 0.85rem; }
+        
+        /* Leaderboard */
+        .section-title { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        
+        .leaderboard { background: var(--dark); border-radius: 16px; overflow: hidden; }
+        .leader-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--medium); }
+        .leader-item:last-child { border: none; }
+        .leader-item.me { background: rgba(230,57,70,0.1); }
+        
+        .leader-rank { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; }
+        .leader-rank.gold { background: linear-gradient(135deg, #FFD700, #FFA500); border-radius: 50%; color: #000; }
+        .leader-rank.silver { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); border-radius: 50%; color: #000; }
+        .leader-rank.bronze { background: linear-gradient(135deg, #CD7F32, #8B4513); border-radius: 50%; color: #FFF; }
+        
+        .leader-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem; }
+        .leader-info { flex: 1; }
+        .leader-name { font-weight: 600; font-size: 0.95rem; }
+        .leader-sport { font-size: 0.8rem; color: #888; }
+        .leader-score { text-align: right; }
+        .leader-score .value { font-weight: 700; font-size: 1.1rem; color: var(--green); }
+        .leader-score .label { font-size: 0.7rem; color: #888; }
+        
+        /* Challenge Cards */
+        .challenges-grid { display: flex; flex-direction: column; gap: 1rem; }
+        
+        .challenge-card { background: var(--dark); border-radius: 16px; padding: 1.25rem; border: 2px solid transparent; transition: all 0.2s; cursor: pointer; }
+        .challenge-card:hover { border-color: var(--medium); transform: translateY(-2px); }
+        .challenge-card.joined { border-color: var(--green); }
+        
+        .challenge-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+        .challenge-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .challenge-icon.strength { background: linear-gradient(135deg, var(--red), #B91C1C); }
+        .challenge-icon.cardio { background: linear-gradient(135deg, var(--blue), #1D4ED8); }
+        .challenge-icon.consistency { background: linear-gradient(135deg, var(--green), #15803D); }
+        .challenge-icon.team { background: linear-gradient(135deg, var(--purple), #6D28D9); }
+        
+        .challenge-type { font-size: 0.7rem; background: var(--medium); padding: 0.2rem 0.5rem; border-radius: 10px; color: #888; }
+        
+        .challenge-title { font-weight: 600; margin-bottom: 0.25rem; }
+        .challenge-desc { font-size: 0.85rem; color: #888; margin-bottom: 0.75rem; }
+        
+        .challenge-meta { display: flex; gap: 1rem; font-size: 0.8rem; color: #888; margin-bottom: 0.75rem; }
+        .challenge-meta i { margin-right: 0.25rem; }
+        
+        .challenge-footer { display: flex; justify-content: space-between; align-items: center; }
+        .participants { display: flex; }
+        .participant-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--dark); margin-left: -8px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 600; }
+        .participant-avatar:first-child { margin-left: 0; }
+        .participant-count { margin-left: 0.5rem; font-size: 0.8rem; color: #888; }
+        
+        .join-btn { padding: 0.5rem 1rem; background: var(--red); border: none; border-radius: 20px; color: white; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+        .join-btn.joined { background: var(--green); }
+        
+        /* Achievements */
+        .achievements-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .achievement { background: var(--dark); border-radius: 16px; padding: 1rem; text-align: center; }
+        .achievement.locked { opacity: 0.4; }
+        .achievement-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .achievement.locked .achievement-icon { filter: grayscale(1); }
+        .achievement-name { font-size: 0.8rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .achievement-desc { font-size: 0.7rem; color: #888; }
+        .achievement-progress { margin-top: 0.5rem; font-size: 0.7rem; color: var(--green); }
+        
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark); border-top: 1px solid var(--medium); display: flex; justify-content: space-around; padding: 0.75rem 0; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; color: #666; font-size: 0.7rem; cursor: pointer; padding: 0.5rem 1rem; }
+        .nav-btn i { font-size: 1.25rem; }
+        .nav-btn.active { color: var(--red); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>🏆 Sfide & Classifiche</h1>
+        <p>Competi con altri atleti GR Perform</p>
+    </header>
+    
+    <main class="main">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('challenges')">Sfide</button>
+            <button class="tab" onclick="showTab('leaderboard')">Classifica</button>
+            <button class="tab" onclick="showTab('achievements')">Achievement</button>
+        </div>
+        
+        <!-- Challenges Tab -->
+        <div id="challengesTab">
+            <!-- Active Challenge -->
+            <div class="active-challenge" id="activeChallenge" style="display:none;">
+                <span class="challenge-badge">⚡ IN CORSO</span>
+                <h2 id="activeName">-</h2>
+                <p id="activeDesc">-</p>
+                <div class="challenge-progress">
+                    <div class="challenge-progress-fill" id="activeProgress" style="width: 0%"></div>
+                </div>
+                <div class="challenge-stats">
+                    <span id="activeStatus">0/0</span>
+                    <span id="activeTime">-</span>
+                </div>
+            </div>
+            
+            <h3 class="section-title"><i class="fas fa-fire"></i> Sfide Disponibili</h3>
+            <div class="challenges-grid" id="challengesList"></div>
+        </div>
+        
+        <!-- Leaderboard Tab -->
+        <div id="leaderboardTab" style="display:none;">
+            <div class="tabs" style="margin-bottom:1rem;">
+                <button class="tab active" onclick="filterLeaderboard('all')">Tutti</button>
+                <button class="tab" onclick="filterLeaderboard('calcio')">Calcio</button>
+                <button class="tab" onclick="filterLeaderboard('basket')">Basket</button>
+                <button class="tab" onclick="filterLeaderboard('palestra')">Palestra</button>
+            </div>
+            
+            <div class="leaderboard" id="leaderboard"></div>
+        </div>
+        
+        <!-- Achievements Tab -->
+        <div id="achievementsTab" style="display:none;">
+            <h3 class="section-title"><i class="fas fa-medal"></i> I Tuoi Achievement</h3>
+            <div class="achievements-grid" id="achievementsList"></div>
+        </div>
+    </main>
+    
+    <nav class="bottom-nav">
+        <div class="nav-btn" onclick="location.href='app-dashboard.html'"><i class="fas fa-home"></i> Home</div>
+        <div class="nav-btn active"><i class="fas fa-trophy"></i> Sfide</div>
+        <div class="nav-btn" onclick="location.href='app-chat.html'"><i class="fas fa-comments"></i> Coach</div>
+        <div class="nav-btn" onclick="location.href='app-progress.html'"><i class="fas fa-chart-line"></i> Progressi</div>
+        <div class="nav-btn" onclick="location.href='app-profile.html'"><i class="fas fa-user"></i> Profilo</div>
+    </nav>
+    
+    <script src="js/supabase-client.js"></script>
+    <script>
+        const athleteId = localStorage.getItem('gr_athlete_id');
+        let currentAthlete = null;
+        
+        // Sample challenges data
+        const challenges = [
+            {
+                id: 1,
+                name: 'Settimana Perfetta',
+                description: 'Completa tutti i workout della settimana',
+                icon: 'consistency',
+                type: 'Consistenza',
+                target: 4,
+                unit: 'workout',
+                duration: '7 giorni',
+                participants: 45,
+                xp_reward: 500
+            },
+            {
+                id: 2,
+                name: '1000kg Club',
+                description: 'Totalizza 1000kg tra squat, panca e stacco in una sessione',
+                icon: 'strength',
+                type: 'Forza',
+                target: 1000,
+                unit: 'kg',
+                duration: '30 giorni',
+                participants: 23,
+                xp_reward: 1000
+            },
+            {
+                id: 3,
+                name: 'Maratoneta',
+                description: 'Accumula 300 minuti di allenamento',
+                icon: 'cardio',
+                type: 'Volume',
+                target: 300,
+                unit: 'min',
+                duration: '14 giorni',
+                participants: 67,
+                xp_reward: 750
+            },
+            {
+                id: 4,
+                name: 'Team Challenge',
+                description: 'La tua squadra deve completare 50 workout totali',
+                icon: 'team',
+                type: 'Team',
+                target: 50,
+                unit: 'workout',
+                duration: '7 giorni',
+                participants: 12,
+                xp_reward: 300
+            }
+        ];
+        
+        const achievements = [
+            { id: 1, icon: '🔥', name: 'Prima Fiamma', desc: '1° allenamento', unlocked: true },
+            { id: 2, icon: '💪', name: 'Costante', desc: '10 allenamenti', unlocked: true, progress: '10/10' },
+            { id: 3, icon: '🏆', name: 'Campione', desc: '50 allenamenti', unlocked: false, progress: '23/50' },
+            { id: 4, icon: '⚡', name: 'Inarrestabile', desc: '100 allenamenti', unlocked: false, progress: '23/100' },
+            { id: 5, icon: '🎯', name: 'Precisione', desc: 'RPE sempre giusto', unlocked: true },
+            { id: 6, icon: '📊', name: 'Analitico', desc: '10 feedback completi', unlocked: false, progress: '7/10' },
+            { id: 7, icon: '🌟', name: 'Settimana Top', desc: '5 stelle di fila', unlocked: false },
+            { id: 8, icon: '💎', name: 'Diamante', desc: 'Livello 10', unlocked: false },
+            { id: 9, icon: '👑', name: 'Leggenda', desc: '1 anno con GR', unlocked: false }
+        ];
+        
+        // Sample leaderboard
+        const leaderboardData = [
+            { id: 1, name: 'Marco R.', sport: 'Calcio', xp: 4520, avatar_color: '#E63946' },
+            { id: 2, name: 'Luca B.', sport: 'Basket', xp: 4100, avatar_color: '#3B82F6' },
+            { id: 3, name: 'Andrea M.', sport: 'Palestra', xp: 3850, avatar_color: '#22C55E' },
+            { id: 4, name: 'Giovanni P.', sport: 'Calcio', xp: 3600, avatar_color: '#F59E0B' },
+            { id: 5, name: 'Francesco L.', sport: 'Boxe', xp: 3200, avatar_color: '#8B5CF6' },
+            { id: 6, name: 'Tu', sport: 'Calcio', xp: 2800, avatar_color: '#E63946', isMe: true },
+            { id: 7, name: 'Davide S.', sport: 'Basket', xp: 2650, avatar_color: '#3B82F6' },
+            { id: 8, name: 'Simone T.', sport: 'Palestra', xp: 2400, avatar_color: '#22C55E' }
+        ];
+        
+        function showTab(tab) {
+            document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('challengesTab').style.display = tab === 'challenges' ? 'block' : 'none';
+            document.getElementById('leaderboardTab').style.display = tab === 'leaderboard' ? 'block' : 'none';
+            document.getElementById('achievementsTab').style.display = tab === 'achievements' ? 'block' : 'none';
+        }
+        
+        function renderChallenges() {
+            const colors = ['#E63946', '#3B82F6', '#22C55E', '#8B5CF6', '#F59E0B'];
+            
+            let html = '';
+            challenges.forEach((c, i) => {
+                html += `
+                    <div class="challenge-card" onclick="joinChallenge(${c.id})">
+                        <div class="challenge-header">
+                            <div class="challenge-icon ${c.icon}">${getIconEmoji(c.icon)}</div>
+                            <span class="challenge-type">${c.type}</span>
+                        </div>
+                        <div class="challenge-title">${c.name}</div>
+                        <div class="challenge-desc">${c.description}</div>
+                        <div class="challenge-meta">
+                            <span><i class="fas fa-clock"></i> ${c.duration}</span>
+                            <span><i class="fas fa-star"></i> +${c.xp_reward} XP</span>
+                        </div>
+                        <div class="challenge-footer">
+                            <div class="participants">
+                                ${[0,1,2].map(j => `<div class="participant-avatar" style="background:${colors[(i+j)%5]}">${String.fromCharCode(65+j+i)}</div>`).join('')}
+                                <span class="participant-count">+${c.participants}</span>
+                            </div>
+                            <button class="join-btn" id="joinBtn${c.id}">Partecipa</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('challengesList').innerHTML = html;
+        }
+        
+        function getIconEmoji(type) {
+            const emojis = { strength: '💪', cardio: '🏃', consistency: '🔥', team: '👥' };
+            return emojis[type] || '🎯';
+        }
+        
+        function joinChallenge(id) {
+            const btn = document.getElementById(`joinBtn${id}`);
+            if (btn.classList.contains('joined')) return;
+            
+            btn.classList.add('joined');
+            btn.textContent = '✓ Iscritto';
+            
+            // Show active challenge
+            const challenge = challenges.find(c => c.id === id);
+            document.getElementById('activeChallenge').style.display = 'block';
+            document.getElementById('activeName').textContent = challenge.name;
+            document.getElementById('activeDesc').textContent = challenge.description;
+            document.getElementById('activeProgress').style.width = '25%';
+            document.getElementById('activeStatus').textContent = `1/${challenge.target} ${challenge.unit}`;
+            document.getElementById('activeTime').textContent = `${challenge.duration} rimanenti`;
+        }
+        
+        function renderLeaderboard(filter = 'all') {
+            let data = leaderboardData;
+            if (filter !== 'all') {
+                data = data.filter(l => l.sport.toLowerCase() === filter);
+            }
+            
+            // Sort by XP
+            data.sort((a, b) => b.xp - a.xp);
+            
+            let html = '';
+            data.forEach((l, i) => {
+                const rank = i + 1;
+                let rankClass = '';
+                if (rank === 1) rankClass = 'gold';
+                else if (rank === 2) rankClass = 'silver';
+                else if (rank === 3) rankClass = 'bronze';
+                
+                html += `
+                    <div class="leader-item ${l.isMe ? 'me' : ''}">
+                        <div class="leader-rank ${rankClass}">${rank}</div>
+                        <div class="leader-avatar" style="background:${l.avatar_color}">${l.name.split(' ').map(n=>n[0]).join('')}</div>
+                        <div class="leader-info">
+                            <div class="leader-name">${l.name} ${l.isMe ? '(Tu)' : ''}</div>
+                            <div class="leader-sport">${l.sport}</div>
+                        </div>
+                        <div class="leader-score">
+                            <div class="value">${l.xp.toLocaleString()}</div>
+                            <div class="label">XP</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('leaderboard').innerHTML = html;
+        }
+        
+        function filterLeaderboard(filter) {
+            document.querySelectorAll('#leaderboardTab .tabs .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderLeaderboard(filter);
+        }
+        
+        function renderAchievements() {
+            let html = '';
+            achievements.forEach(a => {
+                html += `
+                    <div class="achievement ${a.unlocked ? '' : 'locked'}">
+                        <div class="achievement-icon">${a.icon}</div>
+                        <div class="achievement-name">${a.name}</div>
+                        <div class="achievement-desc">${a.desc}</div>
+                        ${a.progress ? `<div class="achievement-progress">${a.progress}</div>` : ''}
+                    </div>
+                `;
+            });
+            document.getElementById('achievementsList').innerHTML = html;
+        }
+        
+        // Load real data
+        async function loadRealData() {
+            if (!athleteId) return;
+            
+            try {
+                // Load all athletes for real leaderboard
+                const allAthletes = await supabase.fetch('athletes', '?select=id,first_name,last_name,sport,total_xp&order=total_xp.desc&limit=20');
+                
+                if (allAthletes && allAthletes.length > 0) {
+                    // Replace fake leaderboard with real data
+                    const colors = ['#E63946', '#3B82F6', '#22C55E', '#F59E0B', '#8B5CF6'];
+                    leaderboardData.length = 0; // Clear array
+                    
+                    allAthletes.forEach((a, i) => {
+                        leaderboardData.push({
+                            id: a.id,
+                            name: a.first_name + (a.last_name ? ' ' + a.last_name.charAt(0) + '.' : ''),
+                            sport: a.sport || 'Sport',
+                            xp: a.total_xp || 0,
+                            avatar_color: colors[i % colors.length],
+                            isMe: a.id === athleteId
+                        });
+                    });
+                }
+                
+                // Get current athlete
+                currentAthlete = allAthletes?.find(a => a.id === athleteId);
+                
+                // Load workout count for achievements
+                const workouts = await supabase.fetch('workouts', `?athlete_id=eq.${athleteId}&status=eq.completed&select=id`);
+                const completedCount = workouts?.length || 0;
+                
+                // Update achievements based on real data
+                updateAchievements(completedCount);
+                
+            } catch (error) {
+                console.error('Error loading real data:', error);
+            }
+            
+            renderLeaderboard();
+        }
+        
+        function updateAchievements(completedCount) {
+            // Update achievements based on workout count
+            achievements[0].unlocked = completedCount >= 1; // Prima Fiamma
+            achievements[1].unlocked = completedCount >= 10; // Costante
+            achievements[1].progress = `${Math.min(completedCount, 10)}/10`;
+            achievements[2].unlocked = completedCount >= 50; // Campione
+            achievements[2].progress = `${Math.min(completedCount, 50)}/50`;
+            achievements[3].unlocked = completedCount >= 100; // Inarrestabile
+            achievements[3].progress = `${Math.min(completedCount, 100)}/100`;
+            
+            // Update level badge
+            if (currentAthlete) {
+                const level = currentAthlete.current_level || Math.floor((currentAthlete.total_xp || 0) / 500) + 1;
+                achievements[7].unlocked = level >= 10; // Diamante
+            }
+            
+            renderAchievements();
+        }
+        
+        // Init
+        renderChallenges();
+        renderLeaderboard();
+        renderAchievements();
+        loadRealData();
+    </script>
+</body>
+</html>

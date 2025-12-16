@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispositivi - GR Perform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --black: #0A0A0A; --dark: #1A1A1A; --medium: #2D2D2D; --white: #FFF; --red: #E63946; --green: #22C55E; --yellow: #F59E0B; --blue: #3B82F6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; padding-bottom: 100px; }
+        
+        .header { padding: 1.5rem; border-bottom: 1px solid var(--medium); }
+        .header h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+        .header p { color: #888; font-size: 0.9rem; }
+        
+        .main { padding: 1.5rem; max-width: 600px; margin: 0 auto; }
+        
+        /* Readiness Card */
+        .readiness-card { background: linear-gradient(135deg, #1E3A5F, #0F172A); border-radius: 24px; padding: 2rem; margin-bottom: 2rem; text-align: center; position: relative; overflow: hidden; }
+        .readiness-card::before { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%); }
+        
+        .readiness-score { position: relative; width: 160px; height: 160px; margin: 0 auto 1.5rem; }
+        .readiness-ring { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--green) 0deg, var(--green) calc(var(--score) * 3.6deg), var(--medium) calc(var(--score) * 3.6deg)); display: flex; align-items: center; justify-content: center; }
+        .readiness-inner { width: 130px; height: 130px; background: #1E3A5F; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .readiness-value { font-size: 3rem; font-weight: 800; line-height: 1; }
+        .readiness-label { font-size: 0.85rem; color: #888; }
+        
+        .readiness-status { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .readiness-status.high { color: var(--green); }
+        .readiness-status.medium { color: var(--yellow); }
+        .readiness-status.low { color: var(--red); }
+        .readiness-tip { font-size: 0.9rem; color: #aaa; }
+        
+        /* Metrics Grid */
+        .metrics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .metric-card { background: var(--dark); border-radius: 16px; padding: 1.25rem; }
+        .metric-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .metric-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .metric-icon.hr { background: rgba(239,68,68,0.2); color: #EF4444; }
+        .metric-icon.hrv { background: rgba(59,130,246,0.2); color: #3B82F6; }
+        .metric-icon.sleep { background: rgba(139,92,246,0.2); color: #8B5CF6; }
+        .metric-icon.steps { background: rgba(34,197,94,0.2); color: #22C55E; }
+        .metric-icon.calories { background: rgba(249,115,22,0.2); color: #F97316; }
+        .metric-icon.stress { background: rgba(245,158,11,0.2); color: #F59E0B; }
+        
+        .metric-trend { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 10px; }
+        .metric-trend.up { background: rgba(34,197,94,0.2); color: var(--green); }
+        .metric-trend.down { background: rgba(239,68,68,0.2); color: #EF4444; }
+        .metric-trend.stable { background: var(--medium); color: #888; }
+        
+        .metric-value { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .metric-label { font-size: 0.8rem; color: #888; }
+        .metric-subtitle { font-size: 0.75rem; color: #666; }
+        
+        /* Connected Devices */
+        .section-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        
+        .devices-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+        .device-card { background: var(--dark); border-radius: 16px; padding: 1rem; display: flex; align-items: center; gap: 1rem; }
+        .device-icon { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .device-icon.apple { background: linear-gradient(135deg, #FF2D55, #FF375F); }
+        .device-icon.garmin { background: linear-gradient(135deg, #007DC3, #00A0E3); }
+        .device-icon.fitbit { background: linear-gradient(135deg, #00B0B9, #00D4AA); }
+        .device-icon.whoop { background: linear-gradient(135deg, #00D46A, #00A854); }
+        .device-icon.oura { background: linear-gradient(135deg, #B8860B, #DAA520); }
+        .device-icon.strava { background: linear-gradient(135deg, #FC4C02, #FF6B35); }
+        
+        .device-info { flex: 1; }
+        .device-name { font-weight: 600; margin-bottom: 0.2rem; }
+        .device-status { font-size: 0.8rem; color: #888; }
+        .device-status.connected { color: var(--green); }
+        
+        .device-action { padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
+        .device-action.connect { background: var(--red); color: white; }
+        .device-action.connected { background: var(--medium); color: #888; }
+        .device-action.sync { background: var(--blue); color: white; }
+        
+        /* Last Sync */
+        .last-sync { text-align: center; padding: 1rem; background: var(--dark); border-radius: 12px; margin-bottom: 2rem; }
+        .last-sync p { font-size: 0.85rem; color: #888; }
+        .last-sync span { color: var(--green); }
+        .sync-btn { margin-top: 0.75rem; padding: 0.75rem 2rem; background: var(--blue); border: none; border-radius: 25px; color: white; font-weight: 600; cursor: pointer; }
+        
+        /* Sleep Chart */
+        .sleep-chart { background: var(--dark); border-radius: 16px; padding: 1.25rem; margin-bottom: 1.5rem; }
+        .sleep-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .sleep-bars { display: flex; align-items: flex-end; gap: 4px; height: 80px; }
+        .sleep-bar { flex: 1; border-radius: 4px 4px 0 0; transition: all 0.3s; }
+        .sleep-bar.deep { background: #6366F1; }
+        .sleep-bar.light { background: #818CF8; }
+        .sleep-bar.rem { background: #A5B4FC; }
+        .sleep-bar.awake { background: #EF4444; }
+        .sleep-legend { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; font-size: 0.75rem; }
+        .sleep-legend span { display: flex; align-items: center; gap: 0.25rem; color: #888; }
+        .sleep-legend span::before { content: ''; width: 10px; height: 10px; border-radius: 3px; }
+        .sleep-legend .deep::before { background: #6366F1; }
+        .sleep-legend .light::before { background: #818CF8; }
+        .sleep-legend .rem::before { background: #A5B4FC; }
+        
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark); border-top: 1px solid var(--medium); display: flex; justify-content: space-around; padding: 0.75rem 0; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; color: #666; font-size: 0.7rem; cursor: pointer; padding: 0.5rem 1rem; }
+        .nav-btn i { font-size: 1.25rem; }
+        .nav-btn.active { color: var(--red); }
+        
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
+        .modal.show { display: flex; }
+        .modal-content { background: var(--dark); border-radius: 24px; padding: 2rem; max-width: 400px; width: 100%; text-align: center; }
+        .modal-content h2 { margin-bottom: 1rem; }
+        .modal-content p { color: #888; margin-bottom: 1.5rem; }
+        .modal-content .device-logo { font-size: 4rem; margin-bottom: 1rem; }
+        .modal-btn { width: 100%; padding: 1rem; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; margin-bottom: 0.75rem; }
+        .modal-btn.primary { background: var(--green); color: white; }
+        .modal-btn.secondary { background: var(--medium); color: white; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>⌚ Dispositivi & Metriche</h1>
+        <p>I tuoi dati biometrici in tempo reale</p>
+    </header>
+    
+    <main class="main">
+        <!-- Readiness Score -->
+        <div class="readiness-card">
+            <div class="readiness-score">
+                <div class="readiness-ring" style="--score: 78">
+                    <div class="readiness-inner">
+                        <span class="readiness-value" id="readinessValue">78</span>
+                        <span class="readiness-label">Readiness</span>
+                    </div>
+                </div>
+            </div>
+            <div class="readiness-status high" id="readinessStatus">Pronto per allenarti! 💪</div>
+            <div class="readiness-tip" id="readinessTip">HRV sopra la media, sonno di qualità. Oggi puoi spingere.</div>
+        </div>
+        
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon hr"><i class="fas fa-heartbeat"></i></div>
+                    <span class="metric-trend down">↓ 3%</span>
+                </div>
+                <div class="metric-value">58</div>
+                <div class="metric-label">BPM a riposo</div>
+                <div class="metric-subtitle">Media 7gg: 61</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon hrv"><i class="fas fa-wave-square"></i></div>
+                    <span class="metric-trend up">↑ 8%</span>
+                </div>
+                <div class="metric-value">52</div>
+                <div class="metric-label">HRV (ms)</div>
+                <div class="metric-subtitle">Ottimo recupero</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon sleep"><i class="fas fa-moon"></i></div>
+                    <span class="metric-trend up">↑ 12%</span>
+                </div>
+                <div class="metric-value">7h 42m</div>
+                <div class="metric-label">Sonno</div>
+                <div class="metric-subtitle">85% qualità</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon steps"><i class="fas fa-shoe-prints"></i></div>
+                    <span class="metric-trend stable">→</span>
+                </div>
+                <div class="metric-value">8,432</div>
+                <div class="metric-label">Passi oggi</div>
+                <div class="metric-subtitle">Goal: 10,000</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon calories"><i class="fas fa-fire-alt"></i></div>
+                    <span class="metric-trend up">↑ 5%</span>
+                </div>
+                <div class="metric-value">2,340</div>
+                <div class="metric-label">Calorie</div>
+                <div class="metric-subtitle">+540 attive</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon stress"><i class="fas fa-brain"></i></div>
+                    <span class="metric-trend down">↓ 15%</span>
+                </div>
+                <div class="metric-value">28</div>
+                <div class="metric-label">Stress Score</div>
+                <div class="metric-subtitle">Basso</div>
+            </div>
+        </div>
+        
+        <!-- Sleep Chart -->
+        <div class="sleep-chart">
+            <div class="sleep-header">
+                <span style="font-weight:600;">🌙 Analisi Sonno</span>
+                <span style="color:#888;font-size:0.85rem;">Stanotte</span>
+            </div>
+            <div class="sleep-bars">
+                <div class="sleep-bar awake" style="height:5%"></div>
+                <div class="sleep-bar light" style="height:30%"></div>
+                <div class="sleep-bar deep" style="height:45%"></div>
+                <div class="sleep-bar rem" style="height:35%"></div>
+                <div class="sleep-bar light" style="height:25%"></div>
+                <div class="sleep-bar deep" style="height:55%"></div>
+                <div class="sleep-bar light" style="height:20%"></div>
+                <div class="sleep-bar rem" style="height:40%"></div>
+                <div class="sleep-bar deep" style="height:50%"></div>
+                <div class="sleep-bar light" style="height:15%"></div>
+                <div class="sleep-bar awake" style="height:8%"></div>
+                <div class="sleep-bar light" style="height:28%"></div>
+            </div>
+            <div class="sleep-legend">
+                <span class="deep">Profondo 2h 15m</span>
+                <span class="light">Leggero 3h 30m</span>
+                <span class="rem">REM 1h 45m</span>
+            </div>
+        </div>
+        
+        <!-- Last Sync -->
+        <div class="last-sync">
+            <p>Ultimo aggiornamento: <span id="lastSync">Oggi, 07:32</span></p>
+            <button class="sync-btn" onclick="syncDevices()"><i class="fas fa-sync"></i> Sincronizza ora</button>
+        </div>
+        
+        <!-- Connected Devices -->
+        <h3 class="section-title"><i class="fas fa-link"></i> Dispositivi Connessi</h3>
+        <div class="devices-list">
+            <div class="device-card">
+                <div class="device-icon apple">⌚</div>
+                <div class="device-info">
+                    <div class="device-name">Apple Watch Series 9</div>
+                    <div class="device-status connected">● Connesso</div>
+                </div>
+                <button class="device-action sync" onclick="syncDevice('apple')"><i class="fas fa-sync"></i></button>
+            </div>
+        </div>
+        
+        <h3 class="section-title"><i class="fas fa-plus-circle"></i> Aggiungi Dispositivo</h3>
+        <div class="devices-list">
+            <div class="device-card" onclick="showConnectModal('garmin')">
+                <div class="device-icon garmin">G</div>
+                <div class="device-info">
+                    <div class="device-name">Garmin</div>
+                    <div class="device-status">Fenix, Forerunner, Venu...</div>
+                </div>
+                <button class="device-action connect">Connetti</button>
+            </div>
+            
+            <div class="device-card" onclick="showConnectModal('fitbit')">
+                <div class="device-icon fitbit">F</div>
+                <div class="device-info">
+                    <div class="device-name">Fitbit</div>
+                    <div class="device-status">Charge, Sense, Versa...</div>
+                </div>
+                <button class="device-action connect">Connetti</button>
+            </div>
+            
+            <div class="device-card" onclick="showConnectModal('whoop')">
+                <div class="device-icon whoop">W</div>
+                <div class="device-info">
+                    <div class="device-name">WHOOP</div>
+                    <div class="device-status">WHOOP 4.0</div>
+                </div>
+                <button class="device-action connect">Connetti</button>
+            </div>
+            
+            <div class="device-card" onclick="showConnectModal('oura')">
+                <div class="device-icon oura">O</div>
+                <div class="device-info">
+                    <div class="device-name">Oura Ring</div>
+                    <div class="device-status">Gen 3</div>
+                </div>
+                <button class="device-action connect">Connetti</button>
+            </div>
+            
+            <div class="device-card" onclick="showConnectModal('strava')">
+                <div class="device-icon strava">S</div>
+                <div class="device-info">
+                    <div class="device-name">Strava</div>
+                    <div class="device-status">Sync attività</div>
+                </div>
+                <button class="device-action connect">Connetti</button>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Connect Modal -->
+    <div class="modal" id="connectModal">
+        <div class="modal-content">
+            <div class="device-logo" id="modalLogo">G</div>
+            <h2 id="modalTitle">Connetti Garmin</h2>
+            <p id="modalDesc">Verrai reindirizzato alla pagina di autorizzazione Garmin Connect</p>
+            <button class="modal-btn primary" onclick="connectDevice()">Autorizza Connessione</button>
+            <button class="modal-btn secondary" onclick="closeModal()">Annulla</button>
+        </div>
+    </div>
+    
+    <nav class="bottom-nav">
+        <div class="nav-btn" onclick="location.href='app-dashboard.html'"><i class="fas fa-home"></i> Home</div>
+        <div class="nav-btn" onclick="location.href='app-challenges.html'"><i class="fas fa-trophy"></i> Sfide</div>
+        <div class="nav-btn" onclick="location.href='app-chat.html'"><i class="fas fa-comments"></i> Coach</div>
+        <div class="nav-btn active"><i class="fas fa-heartbeat"></i> Metriche</div>
+        <div class="nav-btn" onclick="location.href='app-profile.html'"><i class="fas fa-user"></i> Profilo</div>
+    </nav>
+    
+    <script src="js/supabase-client.js"></script>
+    <script>
+        const athleteId = localStorage.getItem('gr_athlete_id');
+        let selectedDevice = null;
+        
+        const deviceInfo = {
+            garmin: { logo: 'G', name: 'Garmin Connect', color: '#007DC3' },
+            fitbit: { logo: 'F', name: 'Fitbit', color: '#00B0B9' },
+            whoop: { logo: 'W', name: 'WHOOP', color: '#00D46A' },
+            oura: { logo: 'O', name: 'Oura', color: '#DAA520' },
+            strava: { logo: 'S', name: 'Strava', color: '#FC4C02' }
+        };
+        
+        function showConnectModal(device) {
+            selectedDevice = device;
+            const info = deviceInfo[device];
+            document.getElementById('modalLogo').textContent = info.logo;
+            document.getElementById('modalLogo').style.background = info.color;
+            document.getElementById('modalLogo').style.borderRadius = '20px';
+            document.getElementById('modalLogo').style.padding = '0.5rem 1rem';
+            document.getElementById('modalTitle').textContent = `Connetti ${info.name}`;
+            document.getElementById('connectModal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('connectModal').classList.remove('show');
+        }
+        
+        function connectDevice() {
+            // In production, this would redirect to OAuth flow
+            alert(`🔗 In produzione, verrai reindirizzato all'OAuth di ${deviceInfo[selectedDevice].name}.\n\nPer ora simuliamo la connessione!`);
+            closeModal();
+            
+            // Simulate connected device
+            setTimeout(() => {
+                alert('✅ Dispositivo connesso con successo!');
+                location.reload();
+            }, 1000);
+        }
+        
+        function syncDevices() {
+            const btn = document.querySelector('.sync-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sincronizzazione...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                document.getElementById('lastSync').textContent = 'Adesso';
+                btn.innerHTML = '<i class="fas fa-check"></i> Sincronizzato!';
+                btn.style.background = 'var(--green)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-sync"></i> Sincronizza ora';
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }, 2000);
+            }, 1500);
+        }
+        
+        function syncDevice(device) {
+            event.stopPropagation();
+            const btn = event.target.closest('.device-action');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                btn.style.background = 'var(--green)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-sync"></i>';
+                    btn.style.background = '';
+                }, 2000);
+            }, 1500);
+        }
+        
+        // Calculate readiness from biometrics
+        function calculateReadiness(data) {
+            let score = 50; // Base
+            
+            // HRV impact (higher = better, range 20-80ms typical)
+            if (data.hrv >= 50) score += 15;
+            else if (data.hrv >= 40) score += 10;
+            else if (data.hrv >= 30) score += 5;
+            else score -= 10;
+            
+            // Resting HR impact (lower = better for athletes)
+            if (data.restingHR <= 55) score += 10;
+            else if (data.restingHR <= 60) score += 5;
+            else if (data.restingHR >= 70) score -= 10;
+            
+            // Sleep impact
+            const sleepHours = data.sleepMinutes / 60;
+            if (sleepHours >= 7.5) score += 15;
+            else if (sleepHours >= 7) score += 10;
+            else if (sleepHours >= 6) score += 5;
+            else score -= 15;
+            
+            // Sleep quality
+            if (data.sleepQuality >= 85) score += 10;
+            else if (data.sleepQuality >= 70) score += 5;
+            else score -= 5;
+            
+            return Math.max(0, Math.min(100, Math.round(score)));
+        }
+        
+        // Update UI based on readiness
+        function updateReadinessUI(score) {
+            document.getElementById('readinessValue').textContent = score;
+            document.querySelector('.readiness-ring').style.setProperty('--score', score);
+            
+            const statusEl = document.getElementById('readinessStatus');
+            const tipEl = document.getElementById('readinessTip');
+            
+            if (score >= 75) {
+                statusEl.className = 'readiness-status high';
+                statusEl.textContent = 'Pronto per allenarti! 💪';
+                tipEl.textContent = 'HRV sopra la media, sonno di qualità. Oggi puoi spingere.';
+            } else if (score >= 50) {
+                statusEl.className = 'readiness-status medium';
+                statusEl.textContent = 'Allenamento moderato consigliato 👍';
+                tipEl.textContent = 'Recupero nella norma. Evita sessioni ad altissima intensità.';
+            } else {
+                statusEl.className = 'readiness-status low';
+                statusEl.textContent = 'Giorno di recupero attivo 🧘';
+                tipEl.textContent = 'Bassa readiness. Considera mobilità/stretching invece di allenamento intenso.';
+            }
+        }
+        
+        // Simulated data (in production comes from wearable APIs)
+        const biometricData = {
+            hrv: 52,
+            restingHR: 58,
+            sleepMinutes: 462, // 7h 42m
+            sleepQuality: 85,
+            steps: 8432,
+            calories: 2340,
+            stressScore: 28
+        };
+        
+        // Calculate and update
+        const readinessScore = calculateReadiness(biometricData);
+        updateReadinessUI(readinessScore);
+        
+        // Save to database
+        async function saveReadiness() {
+            if (!athleteId) return;
+            
+            await supabase.update('athletes', athleteId, {
+                readiness_score: readinessScore,
+                biometric_data: biometricData,
+                biometric_updated_at: new Date().toISOString()
+            });
+        }
+        
+        saveReadiness();
+    </script>
+</body>
+</html>

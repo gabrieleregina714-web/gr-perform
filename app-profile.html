@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilo - GR Perform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --black: #0A0A0A; --dark: #1A1A1A; --medium: #2D2D2D; --light: #4A4A4A; --white: #FFF; --red: #E63946; --green: #22C55E; --yellow: #F59E0B; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; padding-bottom: 100px; }
+        
+        .header { padding: 1.5rem; text-align: center; border-bottom: 1px solid var(--medium); }
+        
+        .main { padding: 1.5rem; max-width: 600px; margin: 0 auto; }
+        
+        /* Profile Card */
+        .profile-card { text-align: center; margin-bottom: 2rem; }
+        .avatar { width: 100px; height: 100px; background: linear-gradient(135deg, var(--red), #B71C1C); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 700; margin: 0 auto 1rem; }
+        .profile-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .profile-meta { color: #888; font-size: 0.9rem; margin-bottom: 1rem; }
+        
+        .level-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--dark); padding: 0.5rem 1rem; border-radius: 20px; }
+        .level-badge .level { color: var(--red); font-weight: 700; }
+        .level-badge .xp { color: #888; font-size: 0.85rem; }
+        
+        /* Stats Row */
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
+        .stat-box { background: var(--dark); border-radius: 16px; padding: 1rem; text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--green); }
+        .stat-label { font-size: 0.75rem; color: #888; margin-top: 0.25rem; }
+        
+        /* Sections */
+        .section { margin-bottom: 1.5rem; }
+        .section-title { font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.75rem; padding-left: 0.5rem; }
+        
+        .menu-card { background: var(--dark); border-radius: 16px; overflow: hidden; }
+        .menu-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--medium); cursor: pointer; transition: background 0.2s; }
+        .menu-item:last-child { border-bottom: none; }
+        .menu-item:hover { background: var(--medium); }
+        .menu-item:active { background: var(--light); }
+        .menu-icon { width: 40px; height: 40px; background: var(--medium); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .menu-icon.red { background: rgba(230, 57, 70, 0.2); color: var(--red); }
+        .menu-icon.green { background: rgba(34, 197, 94, 0.2); color: var(--green); }
+        .menu-icon.blue { background: rgba(59, 130, 246, 0.2); color: #3B82F6; }
+        .menu-icon.yellow { background: rgba(245, 158, 11, 0.2); color: var(--yellow); }
+        .menu-info { flex: 1; }
+        .menu-info h4 { font-size: 0.95rem; margin-bottom: 0.1rem; }
+        .menu-info p { font-size: 0.8rem; color: #888; }
+        .menu-arrow { color: #666; }
+        .menu-badge { background: var(--green); color: white; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 10px; }
+        
+        /* Wearable Status */
+        .wearable-status { display: flex; align-items: center; gap: 0.5rem; }
+        .wearable-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .wearable-dot.connected { background: var(--green); }
+        .wearable-dot.disconnected { background: #666; }
+        
+        /* Info Cards */
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+        .info-card { background: var(--dark); border-radius: 12px; padding: 1rem; }
+        .info-card label { font-size: 0.75rem; color: #888; display: block; margin-bottom: 0.25rem; }
+        .info-card .value { font-weight: 600; }
+        
+        /* Logout Button */
+        .logout-btn { width: 100%; padding: 1rem; background: transparent; border: 1px solid var(--red); color: var(--red); border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; transition: all 0.2s; }
+        .logout-btn:hover { background: var(--red); color: white; }
+        
+        /* Avatar Upload */
+        .avatar-container { position: relative; display: inline-block; }
+        .avatar-edit { position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; background: var(--red); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid var(--black); }
+        .avatar-edit i { font-size: 0.8rem; }
+        .avatar-edit input { display: none; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark); border-top: 1px solid var(--medium); display: flex; justify-content: space-around; padding: 0.75rem 0; }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; color: #666; font-size: 0.7rem; cursor: pointer; padding: 0.5rem 1rem; text-decoration: none; }
+        .nav-btn i { font-size: 1.25rem; }
+        .nav-btn.active { color: var(--red); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <img src="https://cdn.shopify.com/s/files/1/0917/4204/3027/files/Frame_6.png?v=1733431122" alt="GR Perform" style="height: 28px;">
+    </header>
+    
+    <main class="main">
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <div class="avatar-container">
+                <div class="avatar" id="avatar">MR</div>
+                <label class="avatar-edit" title="Cambia foto">
+                    <i class="fas fa-camera"></i>
+                    <input type="file" accept="image/*" onchange="uploadPhoto(this)">
+                </label>
+            </div>
+            <div class="profile-name" id="profileName">Marco Rossi</div>
+            <div class="profile-meta" id="profileMeta">Calcio • Centrocampista • Intermedio</div>
+            <div class="level-badge">
+                <span class="level">Lv. <span id="userLevel">1</span></span>
+                <span class="xp"><span id="userXP">0</span> XP</span>
+            </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-value" id="statWorkouts">0</div>
+                <div class="stat-label">Allenamenti</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="statStreak">0</div>
+                <div class="stat-label">🔥 Streak</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="statWeeks">0</div>
+                <div class="stat-label">Settimane</div>
+            </div>
+        </div>
+        
+        <!-- Wearables -->
+        <div class="section">
+            <div class="section-title">Dispositivi</div>
+            <div class="menu-card">
+                <div class="menu-item" onclick="location.href='app-wearables.html'">
+                    <div class="menu-icon green"><i class="fas fa-watch"></i></div>
+                    <div class="menu-info">
+                        <h4>Wearables</h4>
+                        <div class="wearable-status">
+                            <span class="wearable-dot" id="wearableDot"></span>
+                            <span id="wearableStatus">Non connesso</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Account -->
+        <div class="section">
+            <div class="section-title">Account</div>
+            <div class="menu-card">
+                <div class="menu-item" onclick="editProfile()">
+                    <div class="menu-icon blue"><i class="fas fa-user-edit"></i></div>
+                    <div class="menu-info">
+                        <h4>Modifica Profilo</h4>
+                        <p>Nome, foto, dati fisici</p>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+                <div class="menu-item" onclick="location.href='anamnesi.html'">
+                    <div class="menu-icon yellow"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="menu-info">
+                        <h4>Anamnesi</h4>
+                        <p>Obiettivi, disponibilità, infortuni</p>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-icon"><i class="fas fa-bell"></i></div>
+                    <div class="menu-info">
+                        <h4>Notifiche</h4>
+                        <p>Reminder allenamenti</p>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Personali -->
+        <div class="section">
+            <div class="section-title">Dati Fisici</div>
+            <div class="info-grid">
+                <div class="info-card">
+                    <label>Altezza</label>
+                    <div class="value" id="infoHeight">- cm</div>
+                </div>
+                <div class="info-card">
+                    <label>Peso</label>
+                    <div class="value" id="infoWeight">- kg</div>
+                </div>
+                <div class="info-card">
+                    <label>Età</label>
+                    <div class="value" id="infoAge">- anni</div>
+                </div>
+                <div class="info-card">
+                    <label>Pacchetto</label>
+                    <div class="value" id="infoPackage">-</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Abbonamento -->
+        <div class="section">
+            <div class="section-title">Abbonamento</div>
+            <div class="menu-card">
+                <div class="menu-item">
+                    <div class="menu-icon red"><i class="fas fa-crown"></i></div>
+                    <div class="menu-info">
+                        <h4 id="packageName">Piano Completo</h4>
+                        <p id="packageExpiry">Attivo</p>
+                    </div>
+                    <span class="menu-badge">PRO</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Support -->
+        <div class="section">
+            <div class="section-title">Supporto</div>
+            <div class="menu-card">
+                <div class="menu-item" onclick="location.href='app-support.html'" style="cursor:pointer">
+                    <div class="menu-icon"><i class="fas fa-question-circle"></i></div>
+                    <div class="menu-info">
+                        <h4>Centro Assistenza</h4>
+                        <p>FAQ e guide</p>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+                <div class="menu-item" onclick="location.href='app-chat.html'" style="cursor:pointer">
+                    <div class="menu-icon"><i class="fas fa-comments"></i></div>
+                    <div class="menu-info">
+                        <h4>Chat con Coach</h4>
+                        <p>Parla direttamente con il tuo coach</p>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+                <div class="menu-item" onclick="location.href='mailto:help@grperform.it'" style="cursor:pointer">
+                    <div class="menu-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="menu-info">
+                        <h4>Contatta Supporto</h4>
+                        <p>help@grperform.it</p>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
+            </div>
+        </div>
+        
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Esci
+        </button>
+        
+        <p style="text-align: center; color: #666; font-size: 0.75rem; margin-top: 2rem;">
+            GR Perform v1.0.0 • Made with ❤️ in Italy
+        </p>
+    </main>
+    
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="app-dashboard.html" class="nav-btn"><i class="fas fa-home"></i> Home</a>
+        <a href="app-challenges.html" class="nav-btn"><i class="fas fa-trophy"></i> Sfide</a>
+        <a href="app-chat.html" class="nav-btn"><i class="fas fa-comments"></i> Coach</a>
+        <a href="app-progress.html" class="nav-btn"><i class="fas fa-chart-line"></i> Progressi</a>
+        <a href="app-profile.html" class="nav-btn active"><i class="fas fa-user"></i> Profilo</a>
+    </nav>
+    
+    <script src="js/supabase-client.js"></script>
+    <script>
+        const athleteId = localStorage.getItem('gr_athlete_id');
+        
+        if (!athleteId) {
+            window.location.href = 'login.html';
+        }
+        
+        async function loadProfile() {
+            const athletes = await supabase.fetch('athletes', `?id=eq.${athleteId}`);
+            const athlete = athletes[0];
+            
+            if (!athlete) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Profile Card
+            document.getElementById('avatar').textContent = athlete.first_name[0] + athlete.last_name[0];
+            
+            // Show profile photo if exists
+            if (athlete.profile_photo) {
+                document.getElementById('avatar').innerHTML = `<img src="${athlete.profile_photo}" alt="Profile">`;
+            }
+            
+            document.getElementById('profileName').textContent = `${athlete.first_name} ${athlete.last_name}`;
+            document.getElementById('profileMeta').textContent = `${athlete.sport} • ${athlete.experience_level}`;
+            document.getElementById('userLevel').textContent = athlete.current_level || 1;
+            document.getElementById('userXP').textContent = athlete.total_xp || 0;
+            
+            // Info Cards
+            document.getElementById('infoHeight').textContent = athlete.height_cm ? `${athlete.height_cm} cm` : '-';
+            document.getElementById('infoWeight').textContent = athlete.weight_kg ? `${athlete.weight_kg} kg` : '-';
+            document.getElementById('infoPackage').textContent = athlete.package_type || '-';
+            
+            // Calculate age
+            if (athlete.birth_date) {
+                const birth = new Date(athlete.birth_date);
+                const today = new Date();
+                let age = today.getFullYear() - birth.getFullYear();
+                const m = today.getMonth() - birth.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+                document.getElementById('infoAge').textContent = `${age} anni`;
+            }
+            
+            // Wearable status
+            if (athlete.biometrics_data?.hasData) {
+                document.getElementById('wearableDot').classList.add('connected');
+                document.getElementById('wearableStatus').textContent = `${athlete.biometrics_data.source} connesso`;
+            } else {
+                document.getElementById('wearableDot').classList.add('disconnected');
+            }
+            
+            // Stats - count completed workouts
+            const workouts = await supabase.fetch('workouts', `?athlete_id=eq.${athleteId}&status=eq.completed`);
+            document.getElementById('statWorkouts').textContent = workouts.length;
+            
+            // Calculate weeks trained
+            const programs = await supabase.fetch('programs', `?athlete_id=eq.${athleteId}`);
+            const totalWeeks = programs.reduce((sum, p) => sum + (p.current_week || 0), 0);
+            document.getElementById('statWeeks').textContent = totalWeeks;
+            
+            // Streak (simplified)
+            document.getElementById('statStreak').textContent = Math.min(workouts.length, 7);
+        }
+        
+        async function uploadPhoto(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // Show loading
+            const avatar = document.getElementById('avatar');
+            const originalContent = avatar.innerHTML;
+            avatar.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:2rem;"></i>';
+            
+            try {
+                // Convert to base64 for simple storage
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const base64 = e.target.result;
+                    
+                    // For production, would upload to Supabase Storage
+                    // For now, store as base64 in profile_photo column
+                    await supabase.update('athletes', athleteId, {
+                        profile_photo: base64
+                    });
+                    
+                    // Update UI
+                    avatar.innerHTML = `<img src="${base64}" alt="Profile">`;
+                };
+                reader.readAsDataURL(file);
+                
+            } catch (error) {
+                console.error('Errore upload:', error);
+                avatar.innerHTML = originalContent;
+                alert('Errore durante il caricamento. Riprova.');
+            }
+        }
+        
+        function editProfile() {
+            alert('Funzionalità in arrivo!');
+        }
+        
+        function logout() {
+            if (confirm('Sei sicuro di voler uscire?')) {
+                localStorage.removeItem('gr_athlete_id');
+                localStorage.removeItem('gr_athlete_name');
+                window.location.href = 'login.html';
+            }
+        }
+        
+        loadProfile();
+    </script>
+</body>
+</html>

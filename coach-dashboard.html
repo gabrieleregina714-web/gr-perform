@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GR Perform - Coach Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --red: #E63946;
+            --black: #000;
+            --gray-900: #0A0A0A;
+            --gray-800: #111;
+            --gray-700: #1A1A1A;
+            --gray-600: #222;
+            --gray-400: #888;
+            --gray-500: #666;
+            --white: #FFF;
+            --green: #00D26A;
+            --yellow: #FFB800;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* SIDEBAR MINIMAL */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: 72px; height: 100vh;
+            background: var(--gray-900);
+            border-right: 1px solid var(--gray-600);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 100;
+        }
+
+        .logo {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #E63946, #FF6B6B);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            margin-bottom: 40px;
+            cursor: pointer;
+        }
+
+        .nav-item {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .nav-item:hover { background: var(--gray-700); color: var(--white); }
+        .nav-item.active { background: var(--gray-700); color: var(--white); }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-badge {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 8px; height: 8px;
+            background: var(--red);
+            border-radius: 50%;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        /* MAIN */
+        .main { margin-left: 72px; }
+
+        /* HERO WITH VIDEO */
+        .hero {
+            position: relative;
+            height: 65vh;
+            min-height: 480px;
+            overflow: hidden;
+        }
+
+        .hero-video {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.3) 0%, 
+                rgba(0,0,0,0.6) 60%,
+                rgba(0,0,0,1) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 50px;
+        }
+
+        .hero-label {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .hero-title {
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            color: var(--gray-400);
+            max-width: 400px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 50px;
+            margin-top: 36px;
+        }
+
+        .hero-stat-value {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .hero-stat-label {
+            font-size: 11px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* CONTENT */
+        .content { padding: 50px; }
+
+        .section { margin-bottom: 50px; }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .section-link {
+            font-size: 13px;
+            color: var(--gray-400);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+
+        .section-link:hover { color: var(--white); }
+
+        /* ATHLETES GRID */
+        .athletes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .athlete-card {
+            background: var(--gray-800);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .athlete-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--red);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .athlete-top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .athlete-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E63946, #FF6B6B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .athlete-name { font-size: 16px; font-weight: 700; }
+        .athlete-meta { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+
+        .athlete-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+            padding-top: 14px;
+            border-top: 1px solid var(--gray-600);
+        }
+
+        .athlete-stat-value { font-size: 18px; font-weight: 800; }
+        .athlete-stat-label { font-size: 9px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 14px;
+        }
+
+        .tag.green { background: rgba(0,210,106,0.15); color: var(--green); }
+        .tag.yellow { background: rgba(255,184,0,0.15); color: var(--yellow); }
+        .tag.red { background: rgba(230,57,70,0.15); color: var(--red); }
+
+        /* QUICK ACTIONS */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .action-card {
+            background: var(--gray-800);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--gray-500);
+        }
+
+        .action-card.featured {
+            background: linear-gradient(135deg, #E63946, #B71C1C);
+            grid-column: span 2;
+        }
+
+        .action-card.featured:hover {
+            border-color: transparent;
+            box-shadow: 0 20px 40px rgba(230,57,70,0.3);
+        }
+
+        .action-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            background: var(--gray-700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .action-card.featured .action-icon {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .action-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .action-desc { font-size: 12px; color: var(--gray-400); }
+        .action-card.featured .action-desc { color: rgba(255,255,255,0.7); }
+
+        /* ACTIVITY */
+        .activity-card {
+            background: var(--gray-800);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .activity-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-600);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-title { font-size: 16px; font-weight: 700; }
+
+        .activity-list { max-height: 320px; overflow-y: auto; }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gray-700);
+            transition: background 0.2s;
+        }
+
+        .activity-item:hover { background: var(--gray-700); }
+
+        .activity-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .activity-icon.workout { background: rgba(230,57,70,0.15); color: var(--red); }
+        .activity-icon.message { background: rgba(33,150,243,0.15); color: #2196F3; }
+        .activity-icon.achievement { background: rgba(255,184,0,0.15); color: var(--yellow); }
+
+        .activity-text { font-size: 13px; flex: 1; }
+        .activity-text strong { font-weight: 600; }
+        .activity-time { font-size: 11px; color: var(--gray-500); }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .actions-grid { grid-template-columns: repeat(2, 1fr); }
+            .action-card.featured { grid-column: span 2; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { 
+                width: 100%; height: 64px;
+                bottom: 0; top: auto;
+                flex-direction: row;
+                padding: 0 16px;
+                justify-content: space-around;
+            }
+            .logo { margin-bottom: 0; width: 36px; height: 36px; }
+            .nav-item { margin-bottom: 0; }
+            .nav-spacer { display: none; }
+            .main { margin-left: 0; margin-bottom: 64px; }
+            .hero { height: 50vh; min-height: 360px; }
+            .hero-content { padding: 24px; }
+            .hero-title { font-size: 36px; }
+            .hero-stats { gap: 24px; }
+            .hero-stat-value { font-size: 28px; }
+            .content { padding: 24px; }
+            .actions-grid { grid-template-columns: 1fr; }
+            .action-card.featured { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">GR</div>
+        <a href="coach-dashboard.html" class="nav-item active"><i class="fas fa-th-large"></i></a>
+        <a href="coach-team.html" class="nav-item"><i class="fas fa-users"></i></a>
+        <a href="coach-chat.html" class="nav-item">
+            <i class="fas fa-comments"></i>
+            <span class="nav-badge" id="chat-badge" style="display:none;"></span>
+        </a>
+        <a href="coach-generate.html" class="nav-item"><i class="fas fa-bolt"></i></a>
+        <a href="coach-review.html" class="nav-item"><i class="fas fa-clipboard-check"></i></a>
+        <div class="nav-spacer"></div>
+        <a href="login.html" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
+    </nav>
+
+    <main class="main">
+        <section class="hero">
+            <video class="hero-video" autoplay muted loop playsinline>
+                <source src="https://cdn.shopify.com/videos/c/o/v/4e1c6acfb7834b46aea4d169fd262d61.mp4" type="video/mp4">
+            </video>
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <p class="hero-label">Coach Dashboard</p>
+                <h1 class="hero-title">Buongiorno,<br>Gabriele</h1>
+                <p class="hero-subtitle">Gestisci i tuoi atleti, crea workout e monitora i progressi</p>
+                <div class="hero-stats">
+                    <div>
+                        <div class="hero-stat-value" id="stat-athletes">-</div>
+                        <div class="hero-stat-label">Atleti Attivi</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-value" id="stat-workouts">-</div>
+                        <div class="hero-stat-label">Workout Totali</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-value" id="stat-pending">-</div>
+                        <div class="hero-stat-label">Da Revieware</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="content">
+            <!-- Quick Actions -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Azioni Rapide</h2>
+                </div>
+                <div class="actions-grid">
+                    <a href="coach-generate.html" class="action-card featured">
+                        <div class="action-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="action-title">Genera Nuovo Workout</div>
+                        <div class="action-desc">Crea workout personalizzati con AI per i tuoi atleti</div>
+                    </a>
+                    <a href="coach-review.html" class="action-card">
+                        <div class="action-icon"><i class="fas fa-clipboard-check"></i></div>
+                        <div class="action-title">Review Feedback</div>
+                        <div class="action-desc" id="pending-text">Feedback da rivedere</div>
+                    </a>
+                    <a href="coach-chat.html" class="action-card">
+                        <div class="action-icon"><i class="fas fa-comments"></i></div>
+                        <div class="action-title">Messaggi</div>
+                        <div class="action-desc" id="messages-text">Rispondi agli atleti</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Athletes -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">I Tuoi Atleti</h2>
+                    <a href="coach-team.html" class="section-link">Vedi tutti <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="athletes-grid" id="athletes-grid">
+                    <!-- Loaded from Supabase -->
+                </div>
+            </section>
+
+            <!-- Activity -->
+            <section class="section">
+                <div class="activity-card">
+                    <div class="activity-header">
+                        <h2 class="activity-title">Attività Recente</h2>
+                    </div>
+                    <div class="activity-list" id="activity-list">
+                        <!-- Loaded from Supabase -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/supabase-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Load athletes
+                const athletes = await supabase.fetch('athletes', '?select=*&order=created_at.desc');
+                document.getElementById('stat-athletes').textContent = athletes.length;
+                
+                // Load workouts
+                const workouts = await supabase.fetch('workouts', '?select=id');
+                document.getElementById('stat-workouts').textContent = workouts.length;
+                
+                // Load pending feedback
+                const pending = await supabase.fetch('feedback', '?reviewed=eq.false&select=id');
+                const pendingCount = pending?.length || 0;
+                document.getElementById('stat-pending').textContent = pendingCount;
+                document.getElementById('pending-text').textContent = `${pendingCount} feedback da rivedere`;
+                
+                // Load unread messages
+                const unread = await supabase.fetch('chat_messages', '?sender=eq.athlete&read=eq.false&select=id');
+                const unreadCount = unread?.length || 0;
+                if (unreadCount > 0) {
+                    document.getElementById('chat-badge').style.display = 'block';
+                    document.getElementById('messages-text').textContent = `${unreadCount} messaggi non letti`;
+                }
+                
+                // Render athletes (max 6)
+                const grid = document.getElementById('athletes-grid');
+                grid.innerHTML = athletes.slice(0, 6).map(a => {
+                    const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+                    const status = a.workouts_completed > 5 ? 'green' : a.workouts_completed > 0 ? 'yellow' : 'red';
+                    const statusText = status === 'green' ? 'Attivo' : status === 'yellow' ? 'In Progress' : 'Nuovo';
+                    return `
+                        <div class="athlete-card" onclick="location.href='coach-team.html'">
+                            <div class="athlete-top">
+                                <div class="athlete-avatar">${initials}</div>
+                                <div>
+                                    <div class="athlete-name">${a.first_name} ${a.last_name}</div>
+                                    <div class="athlete-meta">${a.sport || 'Fitness'} • Livello ${a.level || 1}</div>
+                                </div>
+                            </div>
+                            <div class="athlete-stats">
+                                <div>
+                                    <div class="athlete-stat-value">${a.workouts_completed || 0}</div>
+                                    <div class="athlete-stat-label">Workout</div>
+                                </div>
+                                <div>
+                                    <div class="athlete-stat-value">${a.xp || 0}</div>
+                                    <div class="athlete-stat-label">XP</div>
+                                </div>
+                                <div>
+                                    <div class="athlete-stat-value">${a.level || 1}</div>
+                                    <div class="athlete-stat-label">Livello</div>
+                                </div>
+                            </div>
+                            <span class="tag ${status}">${statusText}</span>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Load recent activity (messages + feedback)
+                const messages = await supabase.fetch('chat_messages', '?select=*,athletes(first_name,last_name)&order=created_at.desc&limit=5');
+                const activityList = document.getElementById('activity-list');
+                
+                if (messages && messages.length > 0) {
+                    activityList.innerHTML = messages.map(m => {
+                        const name = m.athletes ? `${m.athletes.first_name} ${m.athletes.last_name}` : 'Atleta';
+                        const time = new Date(m.created_at).toLocaleString('it-IT', { 
+                            hour: '2-digit', 
+                            minute: '2-digit',
+                            day: '2-digit',
+                            month: 'short'
+                        });
+                        const icon = m.sender === 'athlete' ? 'message' : 'workout';
+                        const iconClass = m.sender === 'athlete' ? 'fa-comment' : 'fa-reply';
+                        return `
+                            <div class="activity-item">
+                                <div class="activity-icon ${icon}"><i class="fas ${iconClass}"></i></div>
+                                <div class="activity-text"><strong>${name}</strong> ${m.sender === 'athlete' ? 'ha inviato un messaggio' : 'ha ricevuto risposta'}</div>
+                                <div class="activity-time">${time}</div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    activityList.innerHTML = '<div class="activity-item"><div class="activity-text" style="color: var(--gray-400);">Nessuna attività recente</div></div>';
+                }
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        });
+    </script>
+</body>
+</html>
