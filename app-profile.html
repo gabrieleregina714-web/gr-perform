@@ -74,6 +74,11 @@
             inset: 0;
             background-size: cover;
             background-position: center top;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .profile-hero-bg.loaded {
             opacity: 0.7;
         }
 
@@ -97,6 +102,13 @@
         }
         .profile-hero-bg.boxe, .profile-hero-bg.boxing {
             background-image: url('https://images.pexels.com/photos/3797/black-and-white-sport-fight-boxer.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            background-position: center 20%;
+        }
+
+        @media (min-width: 768px) {
+            .profile-hero-bg.boxe, .profile-hero-bg.boxing {
+                background-position: center 30%;
+            }
         }
         .profile-hero-bg.palestra, .profile-hero-bg.fitness, .profile-hero-bg.gym {
             background-image: url('https://images.pexels.com/photos/949132/pexels-photo-949132.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
@@ -732,7 +744,7 @@
 
     <!-- PROFILE HERO -->
     <section class="profile-hero" id="profileHero">
-        <div class="profile-hero-bg default" id="heroBg"></div>
+        <div class="profile-hero-bg" id="heroBg"></div>
         <div class="profile-hero-overlay"></div>
         <div class="profile-hero-content">
             <div class="avatar-container">
@@ -1059,6 +1071,9 @@
                     heroBg.classList.add('default');
                 }
 
+                // Show background with fade-in after correct class is set
+                setTimeout(() => heroBg.classList.add('loaded'), 50);
+
                 // Avatar
                 const initials = (athlete.first_name?.[0] || '') + (athlete.last_name?.[0] || '');
                 const avatarEl = document.getElementById('avatar');
@@ -1373,32 +1388,47 @@
             if (!file) return;
 
             const avatar = document.getElementById('avatar');
+            const originalContent = avatar.innerHTML;
             avatar.innerHTML = '<div class="loading-spinner"></div>';
 
-            try {
-                const reader = new FileReader();
-                reader.onload = async (e) => {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
                     const base64 = e.target.result;
 
                     // Resize image before saving (higher quality)
                     const resized = await resizeImage(base64, 400);
 
-                    await supabase.update('athletes', athleteId, {
+                    // Save to Supabase
+                    const result = await supabase.update('athletes', athleteId, {
                         profile_photo: resized
                     });
 
+                    console.log('Photo saved to Supabase:', result ? 'success' : 'failed');
+
+                    // Update local athlete object
+                    athlete.profile_photo = resized;
+
+                    // Update avatar
                     avatar.innerHTML = `<img src="${resized}" alt="Profile">`;
                     
                     // Store in localStorage for chat use
                     localStorage.setItem('gr_athlete_photo', resized);
-                };
-                reader.readAsDataURL(file);
 
-            } catch (error) {
-                console.error('Upload error:', error);
-                avatar.textContent = athlete.first_name[0] + athlete.last_name[0];
-                alert('Errore durante il caricamento');
-            }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    avatar.innerHTML = originalContent;
+                    alert('Errore durante il caricamento. Riprova.');
+                }
+            };
+
+            reader.onerror = () => {
+                console.error('File read error');
+                avatar.innerHTML = originalContent;
+                alert('Errore nella lettura del file.');
+            };
+
+            reader.readAsDataURL(file);
         }
 
         function resizeImage(base64, maxSize) {
