@@ -1024,11 +1024,6 @@
             </div>
 
             <!-- RIGHT: WORKOUT BUILDER -->
-            <!-- Mobile FAB -->
-            <button class="mobile-fab" onclick="toggleWorkoutPanel()">
-                <i class="fas fa-dumbbell"></i>
-            </button>
-            
             <div class="workout-panel" id="workout-panel">
                 <button class="close-mobile" onclick="toggleWorkoutPanel()">
                     <i class="fas fa-times"></i>
@@ -1064,6 +1059,11 @@
             </div>
         </div>
     </main>
+
+    <!-- Mobile FAB - outside main for visibility -->
+    <button class="mobile-fab" onclick="toggleWorkoutPanel()">
+        <i class="fas fa-dumbbell"></i>
+    </button>
 
     <style>
         /* WORKOUT PANEL STYLES */

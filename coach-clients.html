@@ -1461,12 +1461,12 @@
         <a href="#" onclick="coachLogout(event)" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
     </nav>
 
+    <!-- Mobile FAB - outside containers -->
+    <button class="mobile-fab" onclick="toggleClientsPanel()">
+        <i class="fas fa-users"></i>
+    </button>
+
     <div class="main-container">
-        <!-- Mobile FAB -->
-        <button class="mobile-fab" onclick="toggleClientsPanel()">
-            <i class="fas fa-users"></i>
-        </button>
-        
         <!-- LEFT: Client List -->
         <div class="clients-panel" id="clients-panel">
             <button class="close-mobile" onclick="toggleClientsPanel()">
