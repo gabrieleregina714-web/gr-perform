@@ -256,6 +256,18 @@
             font-weight: 700;
         }
 
+        .client-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--gray-500);
+            margin-left: auto;
+        }
+
+        .client-status.active {
+            background: var(--green);
+        }
+
         /* RIGHT PANEL - CLIENT DETAIL */
         .detail-panel {
             display: flex;
@@ -456,6 +468,23 @@
             letter-spacing: 1px;
             margin-bottom: 16px;
             color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-title i {
+            color: var(--red);
+            font-size: 16px;
+        }
+
+        .schedule-day {
+            display: inline-block;
+            background: var(--gray-700);
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin: 2px 4px 2px 0;
+            font-size: 12px;
         }
 
         .info-grid {
@@ -869,6 +898,42 @@
         ::-webkit-scrollbar-thumb { background: var(--gray-600); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--gray-500); }
 
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 320px 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            .clients-panel {
+                display: none;
+            }
+            .clients-panel.mobile-show {
+                display: flex;
+                position: fixed;
+                inset: 0;
+                margin-left: 72px;
+                z-index: 50;
+            }
+        }
+
+        /* Animazioni */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-pane.active {
+            animation: fadeIn 0.3s ease;
+        }
+
         /* MODAL */
         .modal-overlay {
             position: fixed;
@@ -983,7 +1048,10 @@
         <!-- LEFT: Client List -->
         <div class="clients-panel">
             <div class="search-header">
-                <h2 class="search-title">I Tuoi Clienti</h2>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <h2 class="search-title" style="margin-bottom:0;">I Tuoi Clienti</h2>
+                    <span id="clients-count" style="background:var(--red);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">0</span>
+                </div>
                 <div class="search-box">
                     <i class="fas fa-search"></i>
                     <input type="text" id="search-input" placeholder="Cerca cliente...">
@@ -1162,6 +1230,7 @@
         async function loadAthletes() {
             try {
                 allAthletes = await supabase.fetch('athletes', '?select=*&order=first_name.asc');
+                document.getElementById('clients-count').textContent = allAthletes.length;
                 renderAthletes(allAthletes);
                 renderSportFilters();
             } catch (error) {
@@ -1186,9 +1255,14 @@
 
         function renderAthletes(athletes) {
             const container = document.getElementById('clients-list');
+            if (athletes.length === 0) {
+                container.innerHTML = '<p style="color:var(--gray-500);text-align:center;padding:40px;">Nessun cliente trovato</p>';
+                return;
+            }
             container.innerHTML = athletes.map(a => {
                 const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
                 const hasPhoto = a.profile_photo;
+                const isActive = a.workouts_completed > 0;
                 return `
                     <div class="client-card" data-id="${a.id}" onclick="selectClient('${a.id}')">
                         <div class="client-avatar">
@@ -1201,6 +1275,7 @@
                                 <span class="client-level">Lv. ${a.level || 1}</span>
                             </div>
                         </div>
+                        <div class="client-status ${isActive ? 'active' : ''}" title="${isActive ? 'Attivo' : 'Nuovo'}"></div>
                     </div>
                 `;
             }).join('');
