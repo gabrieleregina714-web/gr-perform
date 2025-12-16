@@ -1297,6 +1297,27 @@
         async function loadProfileTab() {
             const a = selectedAthlete;
             
+            // Carica dati aggiuntivi
+            let sportData = {};
+            let scheduleData = {};
+            let goals = [];
+            let injuries = [];
+            
+            try {
+                const [sportRes, scheduleRes, goalsRes, injuriesRes] = await Promise.all([
+                    supabase.fetch('sport_specific_data', `?athlete_id=eq.${a.id}`).catch(() => []),
+                    supabase.fetch('weekly_schedule', `?athlete_id=eq.${a.id}`).catch(() => []),
+                    supabase.fetch('athlete_goals', `?athlete_id=eq.${a.id}&select=*,goals(name)`).catch(() => []),
+                    supabase.fetch('injuries_conditions', `?athlete_id=eq.${a.id}`).catch(() => [])
+                ]);
+                sportData = sportRes?.[0] || {};
+                scheduleData = scheduleRes?.[0] || {};
+                goals = goalsRes || [];
+                injuries = injuriesRes || [];
+            } catch (e) {
+                console.log('Error loading extra data:', e);
+            }
+            
             // Calcola età
             let age = '-';
             if (a.birth_date) {
@@ -1310,6 +1331,76 @@
                 const h = a.height_cm / 100;
                 bmi = (a.weight_kg / (h * h)).toFixed(1);
             }
+            
+            // Prepara dati specifici sport
+            let sportSpecificHtml = '';
+            if (a.sport === 'calcio' || a.sport === 'basket') {
+                const prefix = a.sport === 'calcio' ? 'football' : 'basket';
+                sportSpecificHtml = `
+                    <div class="info-item">
+                        <span class="info-label">Ruolo</span>
+                        <span class="info-value">${sportData[prefix + '_role'] || '-'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Squadra</span>
+                        <span class="info-value">${sportData[prefix + '_team_name'] || '-'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Livello Squadra</span>
+                        <span class="info-value">${sportData[prefix + '_team_level'] || '-'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Giorno Partita</span>
+                        <span class="info-value">${sportData[prefix + '_match_day'] || '-'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Allenamenti Squadra/Sett</span>
+                        <span class="info-value">${sportData[prefix + '_weekly_team_sessions'] || '-'}</span>
+                    </div>
+                `;
+            } else if (a.sport === 'boxe') {
+                sportSpecificHtml = `
+                    <div class="info-item">
+                        <span class="info-label">Categoria Peso</span>
+                        <span class="info-value">${sportData.boxing_weight_class || '-'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Guardia</span>
+                        <span class="info-value">${sportData.boxing_stance || '-'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Stile</span>
+                        <span class="info-value">${sportData.boxing_style || '-'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Palestra</span>
+                        <span class="info-value">${sportData.boxing_gym_name || '-'}</span>
+                    </div>
+                `;
+            } else if (a.sport === 'palestra') {
+                sportSpecificHtml = `
+                    <div class="info-item">
+                        <span class="info-label">Obiettivo Principale</span>
+                        <span class="info-value">${sportData.gym_primary_goal || '-'}</span>
+                    </div>
+                `;
+            }
+            
+            // Prepara schedule
+            const days = {monday: 'Lunedì', tuesday: 'Martedì', wednesday: 'Mercoledì', thursday: 'Giovedì', friday: 'Venerdì', saturday: 'Sabato', sunday: 'Domenica'};
+            let scheduleHtml = '';
+            for (const [key, label] of Object.entries(days)) {
+                const val = scheduleData[key];
+                if (val && val !== 'rest') {
+                    scheduleHtml += `<span class="schedule-day">${label}: ${val}</span> `;
+                }
+            }
+            
+            // Prepara obiettivi
+            const goalsText = goals.map(g => g.goals?.name || g.goal_id).join(', ') || 'Non specificati';
+            
+            // Prepara infortuni
+            const injuriesText = injuries.map(i => i.notes || i.injury_type).join(', ') || 'Nessuno';
             
             document.getElementById('tab-profile').innerHTML = `
                 <div class="stats-grid">
@@ -1339,8 +1430,16 @@
                             <span class="info-value">${a.email || '-'}</span>
                         </div>
                         <div class="info-item">
+                            <span class="info-label">Telefono</span>
+                            <span class="info-value">${a.phone || '-'}</span>
+                        </div>
+                        <div class="info-item">
                             <span class="info-label">Età</span>
                             <span class="info-value">${age !== '-' ? age + ' anni' : '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Sesso</span>
+                            <span class="info-value">${a.gender === 'male' ? 'Maschio' : a.gender === 'female' ? 'Femmina' : '-'}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Altezza</span>
@@ -1355,38 +1454,47 @@
                             <span class="info-value">${bmi}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Sesso</span>
-                            <span class="info-value">${a.gender === 'male' ? 'Maschio' : a.gender === 'female' ? 'Femmina' : '-'}</span>
+                            <span class="info-label">Pacchetto</span>
+                            <span class="info-value">${a.package_type || '-'}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="info-section">
-                    <h3 class="info-title"><i class="fas fa-bullseye"></i> Programmazione</h3>
+                    <h3 class="info-title"><i class="fas fa-running"></i> Sport & Ruolo</h3>
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Sport</span>
-                            <span class="info-value">${a.sport || 'Fitness'}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Obiettivo</span>
-                            <span class="info-value">${a.goal || '-'}</span>
+                            <span class="info-value">${a.sport || '-'}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Livello Esperienza</span>
                             <span class="info-value">${a.experience_level || '-'}</span>
                         </div>
-                        <div class="info-item">
-                            <span class="info-label">Giorni/Settimana</span>
-                            <span class="info-value">${a.training_days || '-'}</span>
+                        ${sportSpecificHtml}
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3 class="info-title"><i class="fas fa-bullseye"></i> Obiettivi</h3>
+                    <div class="info-grid">
+                        <div class="info-item" style="grid-column: span 2;">
+                            <span class="info-label">Obiettivi Selezionati</span>
+                            <span class="info-value">${goalsText}</span>
                         </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3 class="info-title"><i class="fas fa-calendar-alt"></i> Programmazione Settimanale</h3>
+                    <div class="info-grid">
                         <div class="info-item">
-                            <span class="info-label">Durata Sessione</span>
-                            <span class="info-value">${a.session_duration ? a.session_duration + ' min' : '-'}</span>
+                            <span class="info-label">Sessioni GR Max/Settimana</span>
+                            <span class="info-value">${scheduleData.max_gr_sessions_per_week || '-'}</span>
                         </div>
-                        <div class="info-item">
-                            <span class="info-label">Attrezzatura</span>
-                            <span class="info-value">${a.equipment || '-'}</span>
+                        <div class="info-item" style="grid-column: span 2;">
+                            <span class="info-label">Disponibilità</span>
+                            <span class="info-value">${scheduleHtml || 'Non specificata'}</span>
                         </div>
                     </div>
                 </div>
@@ -1396,15 +1504,7 @@
                     <div class="info-grid">
                         <div class="info-item" style="grid-column: span 2;">
                             <span class="info-label">Infortuni / Limitazioni</span>
-                            <span class="info-value">${a.injuries || 'Nessuno'}</span>
-                        </div>
-                        <div class="info-item" style="grid-column: span 2;">
-                            <span class="info-label">Condizioni Mediche</span>
-                            <span class="info-value">${a.medical_conditions || 'Nessuna'}</span>
-                        </div>
-                        <div class="info-item" style="grid-column: span 2;">
-                            <span class="info-label">Note Aggiuntive</span>
-                            <span class="info-value">${a.notes || 'Nessuna'}</span>
+                            <span class="info-value">${injuriesText}</span>
                         </div>
                     </div>
                 </div>
