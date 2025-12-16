@@ -62,9 +62,50 @@
 
         /* PROFILE HERO */
         .profile-hero {
+            position: relative;
             text-align: center;
             padding: 32px 20px;
-            background: linear-gradient(180deg, var(--gray-800) 0%, var(--black) 100%);
+            min-height: 280px;
+            overflow: hidden;
+        }
+
+        .profile-hero-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center top;
+            opacity: 0.4;
+        }
+
+        .profile-hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,1) 100%);
+        }
+
+        .profile-hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Sport backgrounds */
+        .profile-hero-bg.calcio, .profile-hero-bg.football {
+            background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800');
+        }
+        .profile-hero-bg.basket, .profile-hero-bg.basketball {
+            background-image: url('https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800');
+        }
+        .profile-hero-bg.boxe, .profile-hero-bg.boxing {
+            background-image: url('https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800');
+        }
+        .profile-hero-bg.palestra, .profile-hero-bg.fitness, .profile-hero-bg.gym {
+            background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800');
+        }
+        .profile-hero-bg.running, .profile-hero-bg.corsa {
+            background-image: url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800');
+        }
+        .profile-hero-bg.default {
+            background-image: url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800');
         }
 
         .avatar-container {
@@ -74,16 +115,18 @@
         }
 
         .avatar {
-            width: 100px;
-            height: 100px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--red), #B71C1C);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 38px;
             font-weight: 800;
             overflow: hidden;
+            border: 3px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
         .avatar img {
@@ -688,21 +731,25 @@
     </header>
 
     <!-- PROFILE HERO -->
-    <section class="profile-hero">
-        <div class="avatar-container">
-            <div class="avatar" id="avatar">--</div>
-            <label class="avatar-edit" title="Cambia foto">
-                <i class="fas fa-camera"></i>
-                <input type="file" accept="image/*" id="photoInput" onchange="uploadPhoto(this)">
-            </label>
-        </div>
-        <h1 class="profile-name" id="profileName">-</h1>
-        <p class="profile-meta" id="profileMeta">-</p>
-        <div class="level-badge">
-            <div class="level-icon"><i class="fas fa-bolt"></i></div>
-            <div class="level-info">
-                <div class="level-title">Livello <span id="userLevel">1</span></div>
-                <div class="level-xp"><span id="userXP">0</span> XP totali</div>
+    <section class="profile-hero" id="profileHero">
+        <div class="profile-hero-bg default" id="heroBg"></div>
+        <div class="profile-hero-overlay"></div>
+        <div class="profile-hero-content">
+            <div class="avatar-container">
+                <div class="avatar" id="avatar">--</div>
+                <label class="avatar-edit" title="Cambia foto">
+                    <i class="fas fa-camera"></i>
+                    <input type="file" accept="image/*" id="photoInput" onchange="uploadPhoto(this)">
+                </label>
+            </div>
+            <h1 class="profile-name" id="profileName">-</h1>
+            <p class="profile-meta" id="profileMeta">-</p>
+            <div class="level-badge">
+                <div class="level-icon"><i class="fas fa-bolt"></i></div>
+                <div class="level-info">
+                    <div class="level-title">Livello <span id="userLevel">1</span></div>
+                    <div class="level-xp"><span id="userXP">0</span> XP totali</div>
+                </div>
             </div>
         </div>
     </section>
@@ -982,7 +1029,6 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadProfile();
-            checkHealthKit();
         });
 
         async function loadProfile() {
@@ -995,11 +1041,30 @@
                     return;
                 }
 
+                // Set sport-specific background
+                const sport = (athlete.sport || '').toLowerCase().replace(/\s/g, '');
+                const heroBg = document.getElementById('heroBg');
+                heroBg.className = 'profile-hero-bg';
+                if (['calcio', 'football', 'soccer'].includes(sport)) {
+                    heroBg.classList.add('calcio');
+                } else if (['basket', 'basketball', 'pallacanestro'].includes(sport)) {
+                    heroBg.classList.add('basket');
+                } else if (['boxe', 'boxing', 'pugilato'].includes(sport)) {
+                    heroBg.classList.add('boxe');
+                } else if (['palestra', 'fitness', 'gym', 'bodybuilding'].includes(sport)) {
+                    heroBg.classList.add('palestra');
+                } else if (['running', 'corsa', 'atletica'].includes(sport)) {
+                    heroBg.classList.add('running');
+                } else {
+                    heroBg.classList.add('default');
+                }
+
                 // Avatar
                 const initials = (athlete.first_name?.[0] || '') + (athlete.last_name?.[0] || '');
                 const avatarEl = document.getElementById('avatar');
                 if (athlete.profile_photo) {
                     avatarEl.innerHTML = `<img src="${athlete.profile_photo}" alt="Profile">`;
+                    localStorage.setItem('gr_athlete_photo', athlete.profile_photo);
                 } else {
                     avatarEl.textContent = initials.toUpperCase();
                 }
@@ -1047,6 +1112,9 @@
                 document.getElementById('editBirthDate').value = athlete.birth_date || '';
                 document.getElementById('editHeight').value = athlete.height_cm || '';
                 document.getElementById('editWeight').value = athlete.weight_kg || '';
+
+                // Now check wearables AFTER athlete is loaded
+                checkHealthKit();
 
             } catch (error) {
                 console.error('Error loading profile:', error);
@@ -1110,7 +1178,7 @@
                     </div>
                     <h3 class="wearable-title">Connetti il tuo dispositivo</h3>
                     <p class="wearable-text">
-                        Sincronizza i dati da Apple Watch, Google Fit, Garmin o Fitbit per un monitoraggio completo
+                        Sincronizzando Apple Watch, Google Fit, Garmin o Fitbit permetti al tuo coach di monitorare frequenza cardiaca, qualità del sonno e livelli di energia per creare allenamenti ancora più personalizzati.
                     </p>
                     <button class="btn btn-primary" onclick="connectHealthKit()">
                         <i class="fas fa-link"></i> Connetti Dispositivo
@@ -1312,8 +1380,8 @@
                 reader.onload = async (e) => {
                     const base64 = e.target.result;
 
-                    // Resize image before saving
-                    const resized = await resizeImage(base64, 200);
+                    // Resize image before saving (higher quality)
+                    const resized = await resizeImage(base64, 400);
 
                     await supabase.update('athletes', athleteId, {
                         profile_photo: resized
@@ -1357,7 +1425,7 @@
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.8));
+                    resolve(canvas.toDataURL('image/jpeg', 0.92));
                 };
                 img.src = base64;
             });
