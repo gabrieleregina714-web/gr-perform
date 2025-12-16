@@ -3,47 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#E63946">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GR Perform">
-    <meta name="description" content="App di coaching fitness per atleti e coach professionisti">
-    
-    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/icon-72.png">
-    
-    <title>GR Perform - Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>GR Perform - Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        :root {
-            --black: #000000;
-            --gray-900: #0A0A0A;
-            --gray-800: #111111;
-            --gray-700: #1A1A1A;
-            --gray-600: #222222;
-            --gray-500: #333333;
-            --gray-400: #666666;
-            --gray-300: #888888;
-            --white: #FFFFFF;
-            --accent: #FFFFFF;
-        }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--black);
-            color: var(--white);
+            background: #000;
+            color: #fff;
             min-height: 100vh;
-            padding-bottom: 100px;
+            padding-bottom: 90px;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* HEADER BAR - Nike Style */
-        .header-bar {
+        /* HEADER */
+        .header {
             position: fixed;
             top: 0;
             left: 0;
@@ -53,324 +35,327 @@
             justify-content: space-between;
             align-items: center;
             padding: 16px 20px;
-            background: transparent;
-            transition: background 0.3s;
-        }
-
-        .header-bar.scrolled {
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
         }
 
         .header-logo img {
             height: 32px;
-            filter: invert(1);
         }
 
-        .header-actions {
+        .header-right {
             display: flex;
-            gap: 16px;
+            gap: 12px;
         }
 
         .header-btn {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             background: rgba(255,255,255,0.1);
             border: none;
-            color: white;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s;
+            backdrop-filter: blur(10px);
         }
 
-        .header-btn:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        /* HERO WITH IMAGE - Nike Style */
+        /* HERO SECTION */
         .hero {
             position: relative;
-            height: 60vh;
-            min-height: 450px;
+            height: 55vh;
+            min-height: 400px;
             overflow: hidden;
         }
 
         .hero-bg {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            object-fit: cover;
-            opacity: 0.6;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800') center/cover;
         }
 
         .hero-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, 
-                rgba(0,0,0,0.3) 0%, 
-                rgba(0,0,0,0.5) 50%,
-                rgba(0,0,0,1) 100%
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.2) 0%,
+                rgba(0,0,0,0.5) 60%,
+                #000 100%
             );
         }
 
         .hero-content {
-            position: relative;
-            z-index: 10;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 30px 24px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 32px 24px;
         }
 
-        .hero-greeting {
-            font-size: 14px;
+        .greeting {
+            font-size: 11px;
+            font-weight: 700;
             letter-spacing: 3px;
             text-transform: uppercase;
-            color: var(--gray-300);
+            color: rgba(255,255,255,0.5);
             margin-bottom: 8px;
-            font-weight: 500;
         }
 
-        .hero-title {
-            font-size: 42px;
+        .user-name {
+            font-size: 36px;
             font-weight: 900;
-            letter-spacing: -2px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
             line-height: 1;
-            margin-bottom: 12px;
-            text-transform: uppercase;
         }
 
-        .hero-subtitle {
-            font-size: 14px;
-            color: var(--gray-400);
-            font-weight: 500;
+        /* TODAY'S WORKOUT - BIG CARD */
+        .workout-section {
+            padding: 0 20px;
+            margin-top: -20px;
+            position: relative;
+            z-index: 10;
         }
 
-        /* LEVEL BAR - Minimal Nike Style */
-        .level-bar {
-            background: var(--gray-800);
-            padding: 20px 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .level-badge {
-            width: 52px; height: 52px;
-            border-radius: 50%;
-            background: var(--white);
-            color: var(--black);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 20px;
-        }
-
-        .level-info { flex: 1; }
-        
-        .level-text { 
-            font-size: 12px; 
-            font-weight: 700; 
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .level-progress {
-            height: 4px;
-            background: var(--gray-600);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .level-progress-fill {
-            height: 100%;
-            background: var(--white);
-            border-radius: 2px;
-            transition: width 0.5s ease;
-        }
-
-        .level-xp {
-            font-size: 11px;
-            color: var(--gray-400);
-            text-align: right;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        /* CONTENT */
-        .content { padding: 24px; }
-
-        .section { margin-bottom: 40px; }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .section-title {
-            font-size: 13px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .section-link {
-            font-size: 11px;
-            color: var(--gray-400);
-            text-decoration: none;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* TODAY WORKOUT CARD - Nike Style */
         .workout-card {
-            background: var(--gray-800);
-            border-radius: 0;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 1px solid #2a2a2a;
             padding: 28px;
             position: relative;
             overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s;
-            border: 1px solid var(--gray-700);
         }
 
-        .workout-card:hover { 
-            transform: translateY(-4px);
-            border-color: var(--gray-500);
+        .workout-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
         }
 
         .workout-label {
             font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--gray-400);
             font-weight: 700;
-            margin-bottom: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 16px;
         }
 
-        .workout-name {
+        .workout-title {
             font-size: 28px;
             font-weight: 900;
-            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: -1px;
+            margin-bottom: 8px;
         }
 
         .workout-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .workout-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 13px;
-            color: var(--gray-400);
-            margin-bottom: 24px;
-            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .workout-meta-item i {
+            font-size: 14px;
         }
 
         .workout-btn {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            background: var(--white);
-            color: var(--black);
-            padding: 14px 28px;
+            gap: 12px;
+            background: #fff;
+            color: #000;
+            padding: 16px 32px;
             border-radius: 30px;
+            font-size: 13px;
             font-weight: 700;
-            font-size: 12px;
-            text-decoration: none;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-decoration: none;
             transition: all 0.2s;
         }
 
         .workout-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(255,255,255,0.15);
+            transform: scale(1.03);
+            box-shadow: 0 8px 32px rgba(255,255,255,0.2);
         }
 
-        /* STATS GRID - Nike Style */
+        /* STATS ROW */
+        .stats-section {
+            padding: 32px 20px;
+        }
+
+        .section-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 16px;
+        }
+
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 2px;
-            background: var(--gray-700);
+            background: #1a1a1a;
         }
 
         .stat-card {
-            background: var(--gray-800);
-            padding: 24px;
+            background: #000;
+            padding: 20px 12px;
             text-align: center;
         }
 
         .stat-value {
-            font-size: 36px;
+            font-size: 28px;
             font-weight: 900;
-            margin-bottom: 4px;
             letter-spacing: -1px;
         }
 
         .stat-label {
-            font-size: 10px;
-            color: var(--gray-400);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
+            font-size: 9px;
             font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
         }
 
-        /* QUICK ACTIONS - Nike Style */
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+        /* LEVEL PROGRESS */
+        .level-section {
+            padding: 0 20px 32px;
         }
 
-        .action-item {
-            background: var(--gray-800);
-            border: 1px solid var(--gray-700);
-            border-radius: 0;
-            padding: 20px 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            color: var(--white);
+        .level-card {
+            background: #111;
+            border: 1px solid #222;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        .action-item:hover { 
-            background: var(--gray-700);
-            border-color: var(--gray-500);
-        }
-
-        .action-icon {
-            width: 44px; height: 44px;
+        .level-badge {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background: var(--white);
-            color: var(--black);
+            background: #fff;
+            color: #000;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            margin: 0 auto 12px;
+            font-size: 24px;
+            font-weight: 900;
         }
 
-        .action-label {
-            font-size: 10px;
+        .level-info {
+            flex: 1;
+        }
+
+        .level-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .level-progress-bar {
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .level-progress-fill {
+            height: 100%;
+            background: #fff;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .level-xp {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 8px;
+        }
+
+        /* QUICK ACTIONS */
+        .actions-section {
+            padding: 0 20px 32px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .action-card {
+            background: #111;
+            border: 1px solid #222;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.2s;
+        }
+
+        .action-card:hover {
+            background: #1a1a1a;
+            border-color: #333;
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #fff;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .action-info h4 {
+            font-size: 14px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        /* BOTTOM NAV - Nike Style */
+        .action-info p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 2px;
+        }
+
+        /* BOTTOM NAV */
         .bottom-nav {
             position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: var(--black);
-            border-top: 1px solid var(--gray-700);
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #000;
+            border-top: 1px solid #1a1a1a;
             display: flex;
             justify-content: space-around;
             padding: 12px 0 24px;
@@ -382,127 +367,154 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            color: var(--gray-500);
+            color: rgba(255,255,255,0.3);
             text-decoration: none;
             font-size: 9px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             transition: color 0.2s;
+            padding: 4px 12px;
         }
 
-        .nav-item i { font-size: 20px; }
-        .nav-item:hover, .nav-item.active { color: var(--white); }
+        .nav-item i {
+            font-size: 20px;
+        }
+
+        .nav-item.active,
+        .nav-item:hover {
+            color: #fff;
+        }
+
+        /* Safe area iOS */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .bottom-nav {
+                padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            }
+            body {
+                padding-bottom: calc(90px + env(safe-area-inset-bottom));
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Header Bar -->
-    <header class="header-bar" id="header-bar">
+    <!-- HEADER -->
+    <header class="header">
         <div class="header-logo">
             <img src="https://cdn.shopify.com/s/files/1/0969/1801/2243/files/Black_White_Bold_Modern_Clothing_Brand_Logo_97389bbf-665b-4465-82ec-d71a0fa4b35e.png?v=1758700090" alt="GR Perform">
         </div>
-        <div class="header-actions">
+        <div class="header-right">
             <button class="header-btn" onclick="location.href='app-profile.html'">
                 <i class="fas fa-user"></i>
             </button>
         </div>
     </header>
 
-    <!-- Hero -->
+    <!-- HERO -->
     <section class="hero">
-        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800" alt="" class="hero-bg">
+        <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <p class="hero-greeting">Bentornato</p>
-            <h1 class="hero-title" id="user-name">Caricamento...</h1>
-            <p class="hero-subtitle" id="user-sport">Pronto per allenarti?</p>
+            <p class="greeting">Bentornato</p>
+            <h1 class="user-name" id="userName">Atleta</h1>
         </div>
     </section>
 
-    <!-- Level Bar -->
-    <div class="level-bar">
-        <div class="level-badge" id="level-badge">1</div>
-        <div class="level-info">
-            <div class="level-text">Livello <span id="level-num">1</span></div>
-            <div class="level-progress">
-                <div class="level-progress-fill" id="level-progress" style="width: 0%"></div>
+    <!-- TODAY'S WORKOUT -->
+    <section class="workout-section">
+        <div class="workout-card">
+            <p class="workout-label">Workout di oggi</p>
+            <h2 class="workout-title" id="workoutName">Caricamento...</h2>
+            <div class="workout-meta">
+                <div class="workout-meta-item">
+                    <i class="fas fa-dumbbell"></i>
+                    <span id="workoutExercises">-</span>
+                </div>
+                <div class="workout-meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span id="workoutDuration">-</span>
+                </div>
+            </div>
+            <a href="workout-session.html" class="workout-btn">
+                <i class="fas fa-play"></i>
+                Inizia
+            </a>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats-section">
+        <h3 class="section-title">Le tue statistiche</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="statWorkouts">0</div>
+                <div class="stat-label">Workout</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statStreak">0</div>
+                <div class="stat-label">Streak 🔥</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statXP">0</div>
+                <div class="stat-label">XP</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statWeek">0</div>
+                <div class="stat-label">Settimana</div>
             </div>
         </div>
-        <div class="level-xp">
-            <div id="xp-text">0 / 500 XP</div>
+    </section>
+
+    <!-- LEVEL -->
+    <section class="level-section">
+        <div class="level-card">
+            <div class="level-badge" id="levelBadge">1</div>
+            <div class="level-info">
+                <div class="level-title">Livello <span id="levelNum">1</span></div>
+                <div class="level-progress-bar">
+                    <div class="level-progress-fill" id="levelProgress" style="width: 0%"></div>
+                </div>
+                <div class="level-xp" id="levelXP">0 / 500 XP</div>
+            </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Content -->
-    <div class="content">
-        <!-- Today Workout -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">Workout di Oggi</h2>
-            </div>
-            <div class="workout-card" id="workout-card" onclick="location.href='workout-session.html'">
-                <div class="workout-label">In Programma</div>
-                <div class="workout-name" id="workout-name">Caricamento...</div>
-                <div class="workout-meta" id="workout-meta">-</div>
-                <a href="workout-session.html" class="workout-btn">
-                    <i class="fas fa-play"></i>
-                    Inizia Workout
-                </a>
-            </div>
-        </section>
+    <!-- QUICK ACTIONS -->
+    <section class="actions-section">
+        <h3 class="section-title">Azioni Rapide</h3>
+        <div class="actions-grid">
+            <a href="app-progress.html" class="action-card">
+                <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="action-info">
+                    <h4>Progressi</h4>
+                    <p>Vedi i tuoi risultati</p>
+                </div>
+            </a>
+            <a href="app-chat.html" class="action-card">
+                <div class="action-icon"><i class="fas fa-comment"></i></div>
+                <div class="action-info">
+                    <h4>Chat</h4>
+                    <p>Parla col coach</p>
+                </div>
+            </a>
+            <a href="app-challenges.html" class="action-card">
+                <div class="action-icon"><i class="fas fa-trophy"></i></div>
+                <div class="action-info">
+                    <h4>Sfide</h4>
+                    <p>Completa le missioni</p>
+                </div>
+            </a>
+            <a href="app-wearables.html" class="action-card">
+                <div class="action-icon"><i class="fas fa-heart"></i></div>
+                <div class="action-info">
+                    <h4>Wearables</h4>
+                    <p>Collega i dispositivi</p>
+                </div>
+            </a>
+        </div>
+    </section>
 
-        <!-- Stats -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">Le Tue Stats</h2>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-workouts">0</div>
-                    <div class="stat-label">Workout</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-streak">0</div>
-                    <div class="stat-label">Streak 🔥</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-xp">0</div>
-                    <div class="stat-label">XP Totali</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-week">0</div>
-                    <div class="stat-label">Questa Settimana</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Quick Actions -->
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">Azioni Rapide</h2>
-            </div>
-            <div class="actions-grid">
-                <a href="app-progress.html" class="action-item">
-                    <div class="action-icon"><i class="fas fa-chart-line"></i></div>
-                    <div class="action-label">Progressi</div>
-                </a>
-                <a href="app-chat.html" class="action-item">
-                    <div class="action-icon"><i class="fas fa-comment"></i></div>
-                    <div class="action-label">Chat</div>
-                </a>
-                <a href="app-challenges.html" class="action-item">
-                    <div class="action-icon"><i class="fas fa-trophy"></i></div>
-                    <div class="action-label">Sfide</div>
-                </a>
-                <a href="app-profile.html" class="action-item">
-                    <div class="action-icon"><i class="fas fa-user"></i></div>
-                    <div class="action-label">Profilo</div>
-                </a>
-            </div>
-        </section>
-    </div>
-
-    <!-- Bottom Nav -->
+    <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
         <a href="app-dashboard.html" class="nav-item active">
             <i class="fas fa-home"></i>
@@ -547,8 +559,7 @@
                 }
 
                 // Update UI
-                document.getElementById('user-name').textContent = `${athlete.first_name} ${athlete.last_name}`;
-                document.getElementById('user-sport').textContent = athlete.sport || 'Fitness';
+                document.getElementById('userName').textContent = athlete.first_name || 'Atleta';
                 
                 const level = athlete.level || 1;
                 const xp = athlete.xp || 0;
@@ -556,15 +567,15 @@
                 const xpInLevel = xp % xpForLevel;
                 const progress = (xpInLevel / xpForLevel) * 100;
 
-                document.getElementById('level-badge').textContent = level;
-                document.getElementById('level-num').textContent = level;
-                document.getElementById('level-progress').style.width = progress + '%';
-                document.getElementById('xp-text').textContent = `${xpInLevel} / ${xpForLevel} XP`;
+                document.getElementById('levelBadge').textContent = level;
+                document.getElementById('levelNum').textContent = level;
+                document.getElementById('levelProgress').style.width = progress + '%';
+                document.getElementById('levelXP').textContent = `${xpInLevel} / ${xpForLevel} XP`;
                 
-                document.getElementById('stat-workouts').textContent = athlete.workouts_completed || 0;
-                document.getElementById('stat-xp').textContent = xp;
-                document.getElementById('stat-streak').textContent = athlete.streak || 0;
-                document.getElementById('stat-week').textContent = Math.min(athlete.workouts_completed || 0, 5);
+                document.getElementById('statWorkouts').textContent = athlete.workouts_completed || 0;
+                document.getElementById('statXP').textContent = xp;
+                document.getElementById('statStreak').textContent = athlete.streak || 0;
+                document.getElementById('statWeek').textContent = Math.min(athlete.workouts_completed || 0, 5);
 
                 // Load today's workout
                 const workouts = await supabase.fetch('workouts', 
@@ -573,11 +584,13 @@
                 
                 if (workouts.length > 0) {
                     const w = workouts[0];
-                    document.getElementById('workout-name').textContent = w.name || 'Workout del Giorno';
-                    document.getElementById('workout-meta').textContent = `${w.exercises?.length || 0} esercizi • ~45 min`;
+                    document.getElementById('workoutName').textContent = w.name || 'Workout del Giorno';
+                    document.getElementById('workoutExercises').textContent = `${w.exercises?.length || 0} esercizi`;
+                    document.getElementById('workoutDuration').textContent = '~45 min';
                 } else {
-                    document.getElementById('workout-name').textContent = 'Nessun workout';
-                    document.getElementById('workout-meta').textContent = 'Contatta il coach';
+                    document.getElementById('workoutName').textContent = 'Nessun workout';
+                    document.getElementById('workoutExercises').textContent = 'Contatta il coach';
+                    document.getElementById('workoutDuration').textContent = '-';
                 }
 
             } catch (error) {
@@ -585,13 +598,9 @@
             }
         });
 
-        // Register Service Worker for PWA
+        // Register Service Worker
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('SW registered:', reg.scope))
-                    .catch(err => console.log('SW registration failed:', err));
-            });
+            navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
         }
     </script>
 </body>
