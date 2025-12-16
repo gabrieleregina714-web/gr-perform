@@ -733,6 +733,231 @@
             font-size: 18px;
         }
 
+        /* MEDIA GALLERY (WhatsApp style) */
+        .media-toggle-btn {
+            padding: 8px 16px;
+            background: var(--gray-700);
+            border: none;
+            border-radius: 20px;
+            color: var(--gray-300);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            margin-left: auto;
+        }
+
+        .media-toggle-btn:hover {
+            background: var(--gray-600);
+        }
+
+        .media-toggle-btn i {
+            font-size: 14px;
+        }
+
+        .media-gallery-panel {
+            position: absolute;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gray-900);
+            transition: right 0.3s ease;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .media-gallery-panel.open {
+            right: 0;
+        }
+
+        .media-gallery-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--gray-800);
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .media-back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gray-700);
+            border: none;
+            color: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .media-gallery-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .media-tabs {
+            display: flex;
+            background: var(--gray-800);
+            padding: 0 20px;
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .media-tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-400);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .media-tab.active {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+
+        .media-tab-count {
+            background: var(--gray-700);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 6px;
+        }
+
+        .media-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        .media-item {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .media-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s;
+        }
+
+        .media-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .media-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 6px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            font-size: 10px;
+            color: var(--gray-300);
+        }
+
+        .media-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: var(--gray-500);
+        }
+
+        .media-empty i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .media-month-group {
+            margin-bottom: 24px;
+        }
+
+        .media-month-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+
+        /* Lightbox */
+        .media-lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .media-lightbox.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .media-lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            background: var(--gray-800);
+            border: none;
+            border-radius: 50%;
+            color: var(--white);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .lightbox-info {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-800);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--gray-300);
+        }
+
         /* WORKOUT TAB */
         .workout-list {
             display: flex;
@@ -1034,8 +1259,8 @@
 </head>
 <body>
     <nav class="sidebar">
-        <a href="coach-dashboard.html" class="logo" style="background:linear-gradient(135deg, #E63946, #FF6B6B);font-weight:900;font-size:16px;text-decoration:none;color:#fff;">
-            GR
+        <a href="coach-dashboard.html" class="logo" style="overflow:hidden;border-radius:12px;">
+            <img src="https://cdn.shopify.com/s/files/1/0969/1801/2243/files/Black_White_Bold_Modern_Clothing_Brand_Logo_97389bbf-665b-4465-82ec-d71a0fa4b35e.png?v=1758700090" alt="GR" style="width:100%;height:100%;object-fit:cover;">
         </a>
         <a href="coach-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i></a>
         <a href="coach-clients.html" class="nav-item active"><i class="fas fa-users"></i></a>
@@ -1239,10 +1464,16 @@
         }
 
         function renderSportFilters() {
-            const sports = [...new Set(allAthletes.map(a => a.sport).filter(Boolean))];
+            // Sport supportati
+            const supportedSports = ['calcio', 'basket', 'boxe', 'palestra'];
+            const athleteSports = [...new Set(allAthletes.map(a => a.sport?.toLowerCase()).filter(Boolean))];
+            // Mostra solo sport che hanno atleti
+            const sports = supportedSports.filter(s => athleteSports.includes(s));
+            
             const container = document.getElementById('sport-filters');
+            const sportLabels = {calcio: 'Calcio', basket: 'Basket', boxe: 'Boxe', palestra: 'Palestra'};
             container.innerHTML = `<button class="filter-btn active" data-sport="all">Tutti</button>` +
-                sports.map(s => `<button class="filter-btn" data-sport="${s}">${s}</button>`).join('');
+                sports.map(s => `<button class="filter-btn" data-sport="${s}">${sportLabels[s] || s}</button>`).join('');
             
             container.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -1606,6 +1837,13 @@
             const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
             const athletePhoto = a.profile_photo;
             
+            // Estrai media dai messaggi
+            const mediaItems = messages.filter(m => m.image_url).map(m => ({
+                url: m.image_url,
+                date: new Date(m.created_at),
+                sender: m.sender
+            }));
+            
             // Raggruppa messaggi per data
             let lastDate = '';
             let messagesHtml = '';
@@ -1628,7 +1866,7 @@
                         </div>
                         <div class="message-content">
                             <div class="message-bubble">
-                                ${m.image_url ? `<img src="${m.image_url}" class="message-image" onclick="window.open('${m.image_url}')">` : ''}
+                                ${m.image_url ? `<img src="${m.image_url}" class="message-image" onclick="openLightbox('${m.image_url}', '${new Date(m.created_at).toLocaleString('it-IT')}')">` : ''}
                                 ${m.message ? `<p>${m.message}</p>` : ''}
                             </div>
                             <div class="message-time">${time}</div>
@@ -1637,8 +1875,44 @@
                 `;
             });
             
+            // Genera HTML per media gallery
+            const mediaByMonth = {};
+            mediaItems.forEach(item => {
+                const monthKey = item.date.toLocaleString('it-IT', { month: 'long', year: 'numeric' });
+                if (!mediaByMonth[monthKey]) mediaByMonth[monthKey] = [];
+                mediaByMonth[monthKey].push(item);
+            });
+            
+            let mediaHtml = '';
+            if (mediaItems.length === 0) {
+                mediaHtml = `
+                    <div class="media-empty">
+                        <i class="fas fa-images"></i>
+                        <p>Nessun media condiviso</p>
+                    </div>
+                `;
+            } else {
+                Object.keys(mediaByMonth).reverse().forEach(month => {
+                    mediaHtml += `
+                        <div class="media-month-group">
+                            <div class="media-month-label">${month}</div>
+                            <div class="media-grid">
+                                ${mediaByMonth[month].map(item => `
+                                    <div class="media-item" onclick="openLightbox('${item.url}', '${item.date.toLocaleString('it-IT')}')">
+                                        <img src="${item.url}" alt="">
+                                        <div class="media-item-overlay">
+                                            ${item.sender === 'coach' ? 'Tu' : a.first_name}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
             document.getElementById('tab-chat').innerHTML = `
-                <div class="chat-container">
+                <div class="chat-container" style="position: relative; overflow: hidden;">
                     <div class="chat-header-bar">
                         <div class="chat-user-info">
                             <div class="chat-user-avatar">
@@ -1649,6 +1923,10 @@
                                 <div class="chat-user-sport">${a.sport || 'Fitness'}</div>
                             </div>
                         </div>
+                        <button class="media-toggle-btn" onclick="toggleMediaGallery()">
+                            <i class="fas fa-images"></i>
+                            Media ${mediaItems.length > 0 ? `(${mediaItems.length})` : ''}
+                        </button>
                     </div>
                     <div class="messages-area" id="messages-area">
                         ${messages.length === 0 ? '<p style="color:var(--gray-500);text-align:center;margin-top:40px;">Inizia una conversazione con questo atleta</p>' : messagesHtml}
@@ -1661,12 +1939,71 @@
                         <textarea class="chat-input" id="chat-message" placeholder="Scrivi un messaggio..." rows="1" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
                         <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
                     </div>
+                    
+                    <!-- Media Gallery Panel (WhatsApp style) -->
+                    <div class="media-gallery-panel" id="media-gallery-panel">
+                        <div class="media-gallery-header">
+                            <button class="media-back-btn" onclick="toggleMediaGallery()">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <span class="media-gallery-title">Media, link e documenti</span>
+                        </div>
+                        <div class="media-tabs">
+                            <div class="media-tab active" data-media-tab="photos">
+                                <i class="fas fa-image"></i> Foto
+                                <span class="media-tab-count">${mediaItems.length}</span>
+                            </div>
+                            <div class="media-tab" data-media-tab="links">
+                                <i class="fas fa-link"></i> Link
+                                <span class="media-tab-count">0</span>
+                            </div>
+                            <div class="media-tab" data-media-tab="docs">
+                                <i class="fas fa-file"></i> Docs
+                                <span class="media-tab-count">0</span>
+                            </div>
+                        </div>
+                        <div class="media-content" id="media-content">
+                            ${mediaHtml}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lightbox -->
+                <div class="media-lightbox" id="media-lightbox" onclick="closeLightbox()">
+                    <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
+                    <img src="" id="lightbox-image" alt="">
+                    <div class="lightbox-info" id="lightbox-info"></div>
                 </div>
             `;
 
             // Scroll to bottom
             const area = document.getElementById('messages-area');
             if (area) area.scrollTop = area.scrollHeight;
+        }
+        
+        function toggleMediaGallery() {
+            const panel = document.getElementById('media-gallery-panel');
+            if (panel) {
+                panel.classList.toggle('open');
+            }
+        }
+        
+        function openLightbox(url, info) {
+            const lightbox = document.getElementById('media-lightbox');
+            const img = document.getElementById('lightbox-image');
+            const infoEl = document.getElementById('lightbox-info');
+            if (lightbox && img) {
+                img.src = url;
+                infoEl.textContent = info;
+                lightbox.classList.add('open');
+            }
+        }
+        
+        function closeLightbox() {
+            const lightbox = document.getElementById('media-lightbox');
+            if (lightbox) {
+                lightbox.classList.remove('open');
+            }
         }
 
         async function sendImage(input) {

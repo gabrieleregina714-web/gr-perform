@@ -402,8 +402,8 @@
 </head>
 <body>
     <nav class="sidebar">
-        <a href="coach-dashboard.html" class="logo" style="background:linear-gradient(135deg, #E63946, #FF6B6B);font-weight:900;font-size:16px;text-decoration:none;color:#fff;">
-            GR
+        <a href="coach-dashboard.html" class="logo" style="overflow:hidden;border-radius:12px;">
+            <img src="https://cdn.shopify.com/s/files/1/0969/1801/2243/files/Black_White_Bold_Modern_Clothing_Brand_Logo_97389bbf-665b-4465-82ec-d71a0fa4b35e.png?v=1758700090" alt="GR" style="width:100%;height:100%;object-fit:cover;">
         </a>
         <a href="coach-dashboard.html" class="nav-item active"><i class="fas fa-th-large"></i></a>
         <a href="coach-clients.html" class="nav-item"><i class="fas fa-users"></i></a>
@@ -546,12 +546,15 @@
                 const grid = document.getElementById('athletes-grid');
                 grid.innerHTML = athletes.slice(0, 6).map(a => {
                     const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+                    const hasPhoto = a.profile_photo;
                     const status = a.workouts_completed > 5 ? 'green' : a.workouts_completed > 0 ? 'yellow' : 'red';
                     const statusText = status === 'green' ? 'Attivo' : status === 'yellow' ? 'In Progress' : 'Nuovo';
                     return `
-                        <div class="athlete-card" onclick="location.href='coach-team.html'">
+                        <div class="athlete-card" onclick="location.href='coach-clients.html'">
                             <div class="athlete-top">
-                                <div class="athlete-avatar">${initials}</div>
+                                <div class="athlete-avatar" style="overflow:hidden;">
+                                    ${hasPhoto ? `<img src="${a.profile_photo}" style="width:100%;height:100%;object-fit:cover;">` : initials}
+                                </div>
                                 <div>
                                     <div class="athlete-name">${a.first_name} ${a.last_name}</div>
                                     <div class="athlete-meta">${a.sport || 'Fitness'} • Livello ${a.level || 1}</div>
