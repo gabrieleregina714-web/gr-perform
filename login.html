@@ -583,9 +583,8 @@
                 
                 localStorage.setItem('gr_athlete_id', athlete.id);
                 localStorage.setItem('gr_athlete_name', `${athlete.first_name} ${athlete.last_name}`);
-                localStorage.setItem('gr_logged_in', 'true');
                 
-                window.location.href = 'app-dashboard.html';
+                window.location.replace('app-dashboard.html');
                 
             } catch (error) {
                 errorMsg.textContent = error.message;
@@ -596,8 +595,8 @@
             btn.textContent = 'Accedi';
         });
         
-        if (localStorage.getItem('gr_logged_in') === 'true') {
-            window.location.href = 'app-dashboard.html';
+        if (localStorage.getItem('gr_athlete_id')) {
+            window.location.replace('app-dashboard.html');
         }
     </script>
 </body>
