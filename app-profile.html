@@ -251,6 +251,186 @@
             margin-top: 4px;
         }
 
+        /* BADGES */
+        .badges-section {
+            padding: 0 16px 24px;
+        }
+
+        .badges-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .badges-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-300);
+        }
+
+        .badges-count {
+            font-size: 12px;
+            color: var(--gray-300);
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .badge-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .badge-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--gray-700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 6px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .badge-item.unlocked .badge-icon {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
+        }
+
+        .badge-item.locked .badge-icon {
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        .badge-item.locked .badge-icon::after {
+            content: '🔒';
+            position: absolute;
+            font-size: 12px;
+            bottom: -2px;
+            right: -2px;
+        }
+
+        .badge-name {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--gray-300);
+            max-width: 70px;
+            line-height: 1.2;
+        }
+
+        .badge-item.unlocked .badge-name {
+            color: var(--white);
+        }
+
+        /* Badge Modal */
+        .badge-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .badge-modal.visible {
+            display: flex;
+        }
+
+        .badge-modal-content {
+            background: var(--gray-800);
+            border-radius: 24px;
+            padding: 32px;
+            text-align: center;
+            max-width: 320px;
+            animation: badgeModalIn 0.3s ease;
+        }
+
+        @keyframes badgeModalIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .badge-modal-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
+        }
+
+        .badge-modal-icon.locked {
+            background: var(--gray-700);
+            filter: grayscale(1);
+            opacity: 0.5;
+        }
+
+        .badge-modal-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .badge-modal-desc {
+            color: var(--gray-300);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .badge-modal-date {
+            font-size: 12px;
+            color: var(--green);
+        }
+
+        .badge-modal-progress {
+            background: var(--gray-700);
+            border-radius: 8px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .badge-modal-progress-fill {
+            height: 100%;
+            background: var(--red);
+            border-radius: 8px;
+        }
+
+        .badge-modal-progress-text {
+            font-size: 12px;
+            color: var(--gray-300);
+        }
+
+        .badge-modal-close {
+            margin-top: 20px;
+            padding: 12px 32px;
+            background: var(--gray-700);
+            border: none;
+            border-radius: 12px;
+            color: var(--white);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
         /* CONTENT */
         .content {
             padding: 0 16px;
@@ -786,6 +966,28 @@
         </div>
     </div>
 
+    <!-- BADGES SECTION -->
+    <section class="badges-section" id="badges">
+        <div class="badges-header">
+            <div class="badges-title">🏆 I Miei Badge</div>
+            <div class="badges-count"><span id="badgesUnlocked">0</span>/8 sbloccati</div>
+        </div>
+        <div class="badges-grid" id="badgesGrid">
+            <!-- Loaded by JS -->
+        </div>
+    </section>
+
+    <!-- BADGE MODAL -->
+    <div class="badge-modal" id="badgeModal" onclick="closeBadgeModal(event)">
+        <div class="badge-modal-content" onclick="event.stopPropagation()">
+            <div class="badge-modal-icon" id="badgeModalIcon">🔥</div>
+            <div class="badge-modal-title" id="badgeModalTitle">-</div>
+            <div class="badge-modal-desc" id="badgeModalDesc">-</div>
+            <div id="badgeModalStatus"></div>
+            <button class="badge-modal-close" onclick="closeBadgeModal()">Chiudi</button>
+        </div>
+    </div>
+
     <div class="content">
         <!-- WEARABLES / BIOMETRICS -->
         <section class="section" id="wearablesSection">
@@ -1133,9 +1335,140 @@
                 // Now check wearables AFTER athlete is loaded
                 checkHealthKit();
 
+                // Load badges
+                await loadBadges();
+
             } catch (error) {
                 console.error('Error loading profile:', error);
             }
+        }
+
+        // ===== BADGES SYSTEM =====
+        
+        const BADGES = [
+            { id: 'first_workout', name: 'Prima Fiamma', icon: '🔥', desc: 'Completa il tuo primo workout', requirement: { type: 'workouts', count: 1 } },
+            { id: 'streak_7', name: 'Costanza', icon: '💪', desc: 'Mantieni una streak di 7 giorni', requirement: { type: 'streak', count: 7 } },
+            { id: 'workouts_10', name: 'Maratoneta', icon: '🏃', desc: 'Completa 10 workout', requirement: { type: 'workouts', count: 10 } },
+            { id: 'workouts_25', name: 'Instancabile', icon: '⚡', desc: 'Completa 25 workout', requirement: { type: 'workouts', count: 25 } },
+            { id: 'workouts_50', name: 'Leggenda', icon: '👑', desc: 'Completa 50 workout', requirement: { type: 'workouts', count: 50 } },
+            { id: 'test_improved', name: 'In Crescita', icon: '📈', desc: 'Migliora un test fisico', requirement: { type: 'tests', count: 1 } },
+            { id: 'level_5', name: 'Atleta', icon: '🎯', desc: 'Raggiungi il livello 5', requirement: { type: 'level', count: 5 } },
+            { id: 'level_10', name: 'Elite', icon: '🏆', desc: 'Raggiungi il livello 10', requirement: { type: 'level', count: 10 } }
+        ];
+
+        let athleteStats = { workouts: 0, streak: 0, tests: 0, level: 1 };
+
+        async function loadBadges() {
+            // Get stats for badge calculation
+            try {
+                const workouts = await supabase.fetch('workouts', 
+                    `?athlete_id=eq.${athleteId}&status=eq.completed&select=id`
+                );
+                athleteStats.workouts = workouts?.length || 0;
+                athleteStats.streak = Math.min(athleteStats.workouts, 7); // Simplified streak
+                athleteStats.level = athlete.current_level || 1;
+                
+                // Check for test improvements
+                try {
+                    const tests = await supabase.fetch('fitness_tests', 
+                        `?athlete_id=eq.${athleteId}&select=test_name`
+                    );
+                    athleteStats.tests = tests?.length || 0;
+                } catch (e) {
+                    athleteStats.tests = 0;
+                }
+            } catch (e) {
+                console.error('Error loading badge stats:', e);
+            }
+
+            renderBadges();
+        }
+
+        function checkBadgeUnlocked(badge) {
+            const req = badge.requirement;
+            switch (req.type) {
+                case 'workouts':
+                    return athleteStats.workouts >= req.count;
+                case 'streak':
+                    return athleteStats.streak >= req.count;
+                case 'tests':
+                    return athleteStats.tests >= req.count;
+                case 'level':
+                    return athleteStats.level >= req.count;
+                default:
+                    return false;
+            }
+        }
+
+        function getBadgeProgress(badge) {
+            const req = badge.requirement;
+            let current = 0;
+            switch (req.type) {
+                case 'workouts':
+                    current = athleteStats.workouts;
+                    break;
+                case 'streak':
+                    current = athleteStats.streak;
+                    break;
+                case 'tests':
+                    current = athleteStats.tests;
+                    break;
+                case 'level':
+                    current = athleteStats.level;
+                    break;
+            }
+            return { current, target: req.count, percent: Math.min(100, (current / req.count) * 100) };
+        }
+
+        function renderBadges() {
+            const grid = document.getElementById('badgesGrid');
+            let unlockedCount = 0;
+
+            grid.innerHTML = BADGES.map(badge => {
+                const unlocked = checkBadgeUnlocked(badge);
+                if (unlocked) unlockedCount++;
+                
+                return `
+                    <div class="badge-item ${unlocked ? 'unlocked' : 'locked'}" onclick="showBadgeModal('${badge.id}')">
+                        <div class="badge-icon">${badge.icon}</div>
+                        <div class="badge-name">${badge.name}</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('badgesUnlocked').textContent = unlockedCount;
+        }
+
+        function showBadgeModal(badgeId) {
+            const badge = BADGES.find(b => b.id === badgeId);
+            if (!badge) return;
+
+            const unlocked = checkBadgeUnlocked(badge);
+            const progress = getBadgeProgress(badge);
+
+            document.getElementById('badgeModalIcon').textContent = badge.icon;
+            document.getElementById('badgeModalIcon').className = `badge-modal-icon ${unlocked ? '' : 'locked'}`;
+            document.getElementById('badgeModalTitle').textContent = badge.name;
+            document.getElementById('badgeModalDesc').textContent = badge.desc;
+
+            const statusEl = document.getElementById('badgeModalStatus');
+            if (unlocked) {
+                statusEl.innerHTML = '<div class="badge-modal-date">✅ Sbloccato!</div>';
+            } else {
+                statusEl.innerHTML = `
+                    <div class="badge-modal-progress">
+                        <div class="badge-modal-progress-fill" style="width: ${progress.percent}%"></div>
+                    </div>
+                    <div class="badge-modal-progress-text">${progress.current}/${progress.target}</div>
+                `;
+            }
+
+            document.getElementById('badgeModal').classList.add('visible');
+        }
+
+        function closeBadgeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('badgeModal').classList.remove('visible');
         }
 
         async function loadStats() {
