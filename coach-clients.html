@@ -1291,6 +1291,56 @@
             }
         }
 
+        /* Mobile FAB to show clients */
+        .mobile-fab {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            background: var(--red);
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(230,57,70,0.4);
+            z-index: 40;
+        }
+        
+        @media (max-width: 900px) {
+            .mobile-fab {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        
+        .clients-panel .close-mobile {
+            display: none;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            background: var(--gray-700);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 60;
+        }
+        
+        @media (max-width: 900px) {
+            .clients-panel .close-mobile {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
         /* Animazioni */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -1412,8 +1462,16 @@
     </nav>
 
     <div class="main-container">
+        <!-- Mobile FAB -->
+        <button class="mobile-fab" onclick="toggleClientsPanel()">
+            <i class="fas fa-users"></i>
+        </button>
+        
         <!-- LEFT: Client List -->
-        <div class="clients-panel">
+        <div class="clients-panel" id="clients-panel">
+            <button class="close-mobile" onclick="toggleClientsPanel()">
+                <i class="fas fa-times"></i>
+            </button>
             <div class="search-header">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                     <h2 class="search-title" style="margin-bottom:0;">I Tuoi Clienti</h2>
@@ -1480,6 +1538,12 @@
         let allAthletes = [];
         let selectedAthlete = null;
         let currentTestId = null;
+
+        // Toggle clients panel on mobile
+        function toggleClientsPanel() {
+            const panel = document.getElementById('clients-panel');
+            panel.classList.toggle('mobile-show');
+        }
 
         // Test database by sport
         const TESTS_BY_SPORT = {

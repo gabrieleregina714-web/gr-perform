@@ -694,6 +694,13 @@
         @media (max-width: 900px) {
             .chat-container { grid-template-columns: 1fr; }
             .contacts { display: none; }
+            .contacts.mobile-show {
+                display: flex;
+                position: fixed;
+                inset: 0;
+                z-index: 50;
+                background: var(--gray-900);
+            }
         }
 
         @media (max-width: 768px) {
@@ -708,6 +715,52 @@
             .nav-item { margin-bottom: 0; }
             .nav-spacer { display: none; }
             .chat-container { margin-left: 0; margin-bottom: 64px; height: calc(100vh - 64px); }
+        }
+
+        /* Mobile FAB */
+        .mobile-fab {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            background: var(--red);
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(230,57,70,0.4);
+            z-index: 40;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @media (max-width: 900px) {
+            .mobile-fab { display: flex; }
+        }
+        
+        .contacts .close-mobile {
+            display: none;
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            background: var(--gray-700);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 60;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @media (max-width: 900px) {
+            .contacts .close-mobile { display: flex; }
         }
     </style>
 </head>
@@ -725,7 +778,15 @@
     </nav>
 
     <div class="chat-container">
+        <!-- Mobile FAB -->
+        <button class="mobile-fab" onclick="toggleContacts()">
+            <i class="fas fa-users"></i>
+        </button>
+        
         <div class="contacts" id="contacts">
+            <button class="close-mobile" onclick="toggleContacts()">
+                <i class="fas fa-times"></i>
+            </button>
             <div class="contacts-header">
                 <h2>Chat <span id="unread-total">0</span></h2>
                 <div class="search-box">
@@ -776,6 +837,12 @@
         let unreadMap = {};
         let currentFilter = 'all';
         let pendingMedia = [];
+        
+        // Toggle contacts panel on mobile
+        function toggleContacts() {
+            const contacts = document.getElementById('contacts');
+            contacts.classList.toggle('mobile-show');
+        }
 
         document.addEventListener('DOMContentLoaded', async () => {
             athletes = await supabase.fetch('athletes', '?select=*');
