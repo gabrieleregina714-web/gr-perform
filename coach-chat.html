@@ -917,6 +917,11 @@
                 // Hide FAB on mobile when coming from profile
                 const fab = document.querySelector('.mobile-fab');
                 if (fab) fab.style.display = 'none';
+            } else {
+                // On mobile show contacts by default so you can pick an athlete
+                if (window.innerWidth <= 900) {
+                    document.getElementById('contacts').classList.add('mobile-show');
+                }
             }
         });
 
@@ -1013,8 +1018,17 @@
         async function selectAthlete(id) {
             id = String(id);
             selectedAthleteId = id;
-            const athlete = athletes.find(a => a.id === id);
-            if (!athlete) return;
+            let athlete = athletes.find(a => a.id === id);
+            // Fallback: fetch athlete if not already loaded (e.g., deep link)
+            if (!athlete) {
+                const fetched = await supabase.fetch('athletes', `?id=eq.${id}&select=*`);
+                if (fetched && fetched[0]) {
+                    athlete = { ...fetched[0], id: String(fetched[0].id) };
+                    athletes.push(athlete);
+                } else {
+                    return;
+                }
+            }
             
             // Mark as read
             await fetch(`https://unkzjnlrorluzfahmize.supabase.co/rest/v1/chat_messages?athlete_id=eq.${id}&sender=eq.athlete&read=eq.false`, {
