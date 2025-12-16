@@ -294,9 +294,20 @@
         .chat-header-info p { font-size: 12px; color: var(--gray-400); display: flex; align-items: center; gap: 6px; }
         .chat-header-info p i { font-size: 8px; }
 
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gray-500);
+            display: inline-block;
+        }
+
+        .status-dot.offline { background: var(--red); }
+
         .chat-header-actions {
             display: flex;
             gap: 8px;
+            align-items: center;
         }
 
         .header-action {
@@ -326,6 +337,13 @@
                 radial-gradient(circle at 80% 30%, rgba(255,255,255,0.02), transparent 45%),
                 #0b141a;
         }
+
+            /* Keep input always visible */
+            .chat-area {
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
 
         /* DATE SEPARATOR */
         .date-separator {
@@ -499,6 +517,10 @@
             padding: 10px 12px;
             border-top: 1px solid rgba(255,255,255,0.06);
             background: #111b21;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
         }
 
         /* MEDIA PREVIEW */
@@ -557,6 +579,127 @@
             display: flex;
             align-items: flex-end;
             gap: 10px;
+        }
+
+        /* MEDIA HISTORY MODAL */
+        .media-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1200;
+        }
+
+        .media-modal.show { display: flex; }
+
+        .media-panel {
+            width: min(720px, 100%);
+            max-height: 85vh;
+            background: #0b141a;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px 18px 0 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .media-panel-header {
+            padding: 14px 16px;
+            background: #111b21;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .media-panel-title {
+            font-size: 16px;
+            font-weight: 800;
+            flex: 1;
+        }
+
+        .media-filters {
+            padding: 12px 16px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .media-filter {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: var(--white);
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .media-list {
+            padding: 12px 16px 18px;
+            overflow-y: auto;
+        }
+
+        .media-day {
+            margin-top: 14px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .media-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .media-item + .media-item { margin-top: 10px; }
+
+        .media-thumb {
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.06);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .media-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-meta {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .media-name {
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .media-sub {
+            margin-top: 2px;
+            font-size: 12px;
+            color: var(--gray-400);
         }
 
         .input-actions {
@@ -806,6 +949,22 @@
         <img id="lightbox-img" src="">
     </div>
 
+    <!-- MEDIA HISTORY -->
+    <div class="media-modal" id="media-modal" onclick="closeMediaHistory(event)">
+        <div class="media-panel" onclick="event.stopPropagation()">
+            <div class="media-panel-header">
+                <div class="media-panel-title">Cronologia multimediale</div>
+                <button class="header-action" onclick="closeMediaHistory()" title="Chiudi"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="media-filters">
+                <input class="media-filter" type="month" id="media-filter-month" onchange="renderMediaHistory()" />
+                <input class="media-filter" type="date" id="media-filter-date" onchange="renderMediaHistory()" />
+                <button class="header-action" onclick="clearMediaFilters()" title="Reset"><i class="fas fa-rotate-left"></i></button>
+            </div>
+            <div class="media-list" id="media-list"></div>
+        </div>
+    </div>
+
     <script src="js/supabase-client.js"></script>
     <script>
         // Check if coach is logged in
@@ -826,6 +985,7 @@
         let pendingMedia = [];
         let cameFromProfile = false;
         let currentAthlete = null;
+        let currentMessages = [];
 
         function showMissing(message = 'Apri la chat dal profilo di un atleta') {
             selectedAthleteId = null;
@@ -913,6 +1073,8 @@
                 `?athlete_id=eq.${id}&select=*&order=created_at.asc`
             );
 
+            currentMessages = Array.isArray(messages) ? messages : [];
+
             const initials = (athlete.first_name?.[0] || '') + (athlete.last_name?.[0] || '');
             
             document.getElementById('chat-area').innerHTML = `
@@ -921,11 +1083,12 @@
                     <div class="chat-header-avatar">${initials}</div>
                     <div class="chat-header-info">
                         <h3>${athlete.first_name} ${athlete.last_name}</h3>
-                        <p><i class="fas fa-circle"></i> Online ora</p>
+                        <p id="connection-status"><span class="status-dot" id="connection-dot"></span> <span id="connection-text">Online</span></p>
                     </div>
                     <div class="chat-header-actions">
                         <button class="header-action" onclick="location.href='athlete-profile.html?id=${id}'" title="Profilo"><i class="fas fa-user"></i></button>
                         <button class="header-action" onclick="callAthlete('${athlete.phone || ''}')" title="Chiama"><i class="fas fa-phone"></i></button>
+                        <button class="header-action" onclick="openMediaHistory()" title="Media"><i class="fas fa-photo-film"></i></button>
                     </div>
                 </div>
                 <div class="chat-messages" id="messages">
@@ -948,7 +1111,110 @@
                     </div>
             `;
 
+                updateConnectionStatus();
+
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        }
+
+        function updateConnectionStatus() {
+            const dot = document.getElementById('connection-dot');
+            const text = document.getElementById('connection-text');
+            if (!dot || !text) return;
+
+            const isOnline = navigator.onLine;
+            text.textContent = isOnline ? 'Online' : 'Offline';
+            dot.classList.toggle('offline', !isOnline);
+        }
+
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+
+        function openMediaHistory() {
+            if (!selectedAthleteId) return;
+            document.getElementById('media-modal').classList.add('show');
+            renderMediaHistory();
+        }
+
+        function closeMediaHistory(event) {
+            if (event && event.target && event.target.closest && event.target.closest('.media-panel')) return;
+            const modal = document.getElementById('media-modal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function clearMediaFilters() {
+            const month = document.getElementById('media-filter-month');
+            const date = document.getElementById('media-filter-date');
+            if (month) month.value = '';
+            if (date) date.value = '';
+            renderMediaHistory();
+        }
+
+        function renderMediaHistory() {
+            const list = document.getElementById('media-list');
+            if (!list) return;
+
+            const month = (document.getElementById('media-filter-month')?.value || '').trim();
+            const date = (document.getElementById('media-filter-date')?.value || '').trim();
+
+            const media = (currentMessages || []).filter(m => m.media_type && m.media_url);
+
+            const filtered = media.filter(m => {
+                const d = new Date(m.created_at);
+                if (date) {
+                    const wanted = new Date(date);
+                    return d.getFullYear() === wanted.getFullYear() && d.getMonth() === wanted.getMonth() && d.getDate() === wanted.getDate();
+                }
+                if (month) {
+                    const [y, mo] = month.split('-').map(x => parseInt(x, 10));
+                    return d.getFullYear() === y && (d.getMonth() + 1) === mo;
+                }
+                return true;
+            });
+
+            if (!filtered.length) {
+                list.innerHTML = `<div style="text-align:center;color:var(--gray-500);padding:26px 10px;">Nessun media trovato</div>`;
+                return;
+            }
+
+            // Group by day
+            const groups = new Map();
+            for (const m of filtered) {
+                const d = new Date(m.created_at);
+                const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
+                if (!groups.has(key)) groups.set(key, []);
+                groups.get(key).push(m);
+            }
+
+            const sortedKeys = Array.from(groups.keys()).sort((a, b) => (a < b ? 1 : -1));
+            let html = '';
+            for (const key of sortedKeys) {
+                const d = new Date(key + 'T00:00:00');
+                const label = d.toLocaleDateString('it-IT', { weekday: 'long', day: '2-digit', month: 'long' });
+                html += `<div class="media-day">${label}</div>`;
+                for (const m of groups.get(key)) {
+                    const t = new Date(m.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+                    const typeLabel = m.media_type === 'image' ? 'Foto' : (m.media_type === 'video' ? 'Video' : 'File');
+                    const name = m.file_name || typeLabel;
+                    const thumb = m.media_type === 'image' ? `<img src="${m.media_url}" alt="">` : `<i class="fas fa-${m.media_type === 'video' ? 'video' : 'file'}" style="color:var(--gray-400);"></i>`;
+
+                    const onClick = m.media_type === 'image'
+                        ? `openLightbox('${m.media_url.replace(/'/g, "\\'")}')`
+                        : `window.open('${m.media_url.replace(/'/g, "\\'")}')`;
+
+                    html += `
+                        <div class="media-item" onclick="${onClick}">
+                            <div class="media-thumb">${thumb}</div>
+                            <div class="media-meta">
+                                <div class="media-name">${name}</div>
+                                <div class="media-sub">${typeLabel} • ${t}</div>
+                            </div>
+                            <i class="fas fa-chevron-right" style="color:var(--gray-500);"></i>
+                        </div>
+                    `;
+                }
+            }
+
+            list.innerHTML = html;
         }
 
         function renderMessages(messages) {
@@ -1172,6 +1438,11 @@
                 );
                 const el = document.getElementById('messages');
                 if (el) el.innerHTML = renderMessages(messages);
+                currentMessages = Array.isArray(messages) ? messages : [];
+                // Keep media modal in sync if open
+                if (document.getElementById('media-modal')?.classList.contains('show')) {
+                    renderMediaHistory();
+                }
             }
         }, 5000);
     </script>
