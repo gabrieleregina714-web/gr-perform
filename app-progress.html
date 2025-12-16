@@ -670,6 +670,16 @@
 
             await loadData();
             setupTabs();
+            
+            // Scroll to tests section if #tests in URL
+            if (window.location.hash === '#tests') {
+                setTimeout(() => {
+                    const testsSection = document.getElementById('testsSection');
+                    if (testsSection) {
+                        testsSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 500);
+            }
         });
 
         async function loadData() {
