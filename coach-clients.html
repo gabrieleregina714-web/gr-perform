@@ -486,22 +486,91 @@
             display: flex;
             flex-direction: column;
             height: calc(100vh - 280px);
+            background: var(--gray-900);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .chat-header-bar {
+            padding: 16px 20px;
+            background: var(--gray-800);
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .chat-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red), #FF6B6B);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            overflow: hidden;
+        }
+
+        .chat-user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .chat-user-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .chat-user-sport {
+            font-size: 12px;
+            color: var(--gray-400);
+        }
+
+        .date-separator {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .date-separator span {
+            background: var(--gray-700);
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
         }
 
         .messages-area {
             flex: 1;
             overflow-y: auto;
-            padding: 16px 0;
+            padding: 20px;
         }
 
         .message {
             display: flex;
             gap: 12px;
             margin-bottom: 16px;
+            align-items: flex-end;
         }
 
         .message.sent {
             flex-direction: row-reverse;
+        }
+
+        .message.received .message-content {
+            align-items: flex-start;
+        }
+
+        .message.sent .message-content {
+            align-items: flex-end;
         }
 
         .message-avatar {
@@ -516,6 +585,12 @@
             font-weight: 700;
             flex-shrink: 0;
             overflow: hidden;
+            color: var(--gray-400);
+        }
+
+        .message.sent .message-avatar {
+            background: var(--red);
+            color: var(--white);
         }
 
         .message-avatar img {
@@ -524,50 +599,99 @@
             object-fit: cover;
         }
 
-        .message-bubble {
+        .message-content {
+            display: flex;
+            flex-direction: column;
             max-width: 70%;
+        }
+
+        .message-bubble {
             padding: 12px 16px;
-            border-radius: 16px;
+            border-radius: 18px;
             background: var(--gray-800);
             font-size: 14px;
             line-height: 1.5;
         }
 
+        .message-bubble p {
+            margin: 0;
+        }
+
+        .message-image {
+            max-width: 250px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
         .message.sent .message-bubble {
             background: var(--red);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received .message-bubble {
+            border-bottom-left-radius: 4px;
         }
 
         .message-time {
             font-size: 11px;
             color: var(--gray-500);
             margin-top: 4px;
+            padding: 0 4px;
         }
 
         .chat-input-area {
             display: flex;
-            gap: 12px;
-            padding-top: 16px;
+            gap: 10px;
+            padding: 16px 20px;
+            background: var(--gray-800);
             border-top: 1px solid var(--gray-700);
+            align-items: flex-end;
+        }
+
+        .attach-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--gray-700);
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+
+        .attach-btn:hover {
+            background: var(--gray-600);
+            color: var(--white);
         }
 
         .chat-input {
             flex: 1;
-            padding: 14px 18px;
-            background: var(--gray-800);
-            border: 2px solid var(--gray-600);
-            border-radius: 14px;
+            padding: 12px 18px;
+            background: var(--gray-700);
+            border: none;
+            border-radius: 24px;
             color: var(--white);
             font-size: 14px;
             resize: none;
+            max-height: 120px;
+            font-family: inherit;
         }
 
         .chat-input:focus {
             outline: none;
-            border-color: var(--red);
+        }
+
+        .chat-input::placeholder {
+            color: var(--gray-500);
         }
 
         .send-btn {
-            width: 50px;
+            width: 44px;
             height: 50px;
             background: var(--red);
             border: none;
@@ -1172,6 +1296,21 @@
 
         async function loadProfileTab() {
             const a = selectedAthlete;
+            
+            // Calcola età
+            let age = '-';
+            if (a.birth_date) {
+                const birth = new Date(a.birth_date);
+                age = Math.floor((new Date() - birth) / (365.25 * 24 * 60 * 60 * 1000));
+            }
+            
+            // Calcola BMI
+            let bmi = '-';
+            if (a.height_cm && a.weight_kg) {
+                const h = a.height_cm / 100;
+                bmi = (a.weight_kg / (h * h)).toFixed(1);
+            }
+            
             document.getElementById('tab-profile').innerHTML = `
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -1193,29 +1332,37 @@
                 </div>
 
                 <div class="info-section">
-                    <h3 class="info-title">Dati Personali</h3>
+                    <h3 class="info-title"><i class="fas fa-user"></i> Dati Personali</h3>
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Email</span>
                             <span class="info-value">${a.email || '-'}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Data Nascita</span>
-                            <span class="info-value">${a.birth_date || '-'}</span>
+                            <span class="info-label">Età</span>
+                            <span class="info-value">${age !== '-' ? age + ' anni' : '-'}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Altezza</span>
-                            <span class="info-value">${a.height ? a.height + ' cm' : '-'}</span>
+                            <span class="info-value">${a.height_cm ? a.height_cm + ' cm' : '-'}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Peso</span>
-                            <span class="info-value">${a.weight ? a.weight + ' kg' : '-'}</span>
+                            <span class="info-value">${a.weight_kg ? a.weight_kg + ' kg' : '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">BMI</span>
+                            <span class="info-value">${bmi}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Sesso</span>
+                            <span class="info-value">${a.gender === 'male' ? 'Maschio' : a.gender === 'female' ? 'Femmina' : '-'}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="info-section">
-                    <h3 class="info-title">Programmazione</h3>
+                    <h3 class="info-title"><i class="fas fa-bullseye"></i> Programmazione</h3>
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Sport</span>
@@ -1223,15 +1370,41 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label">Obiettivo</span>
-                            <span class="info-value">${a.goal || 'Performance'}</span>
+                            <span class="info-value">${a.goal || '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Livello Esperienza</span>
+                            <span class="info-value">${a.experience_level || '-'}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Giorni/Settimana</span>
-                            <span class="info-value">${a.training_days || 3}</span>
+                            <span class="info-value">${a.training_days || '-'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Durata Sessione</span>
+                            <span class="info-value">${a.session_duration ? a.session_duration + ' min' : '-'}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Attrezzatura</span>
-                            <span class="info-value">${a.equipment || 'Completa'}</span>
+                            <span class="info-value">${a.equipment || '-'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3 class="info-title"><i class="fas fa-notes-medical"></i> Anamnesi</h3>
+                    <div class="info-grid">
+                        <div class="info-item" style="grid-column: span 2;">
+                            <span class="info-label">Infortuni / Limitazioni</span>
+                            <span class="info-value">${a.injuries || 'Nessuno'}</span>
+                        </div>
+                        <div class="info-item" style="grid-column: span 2;">
+                            <span class="info-label">Condizioni Mediche</span>
+                            <span class="info-value">${a.medical_conditions || 'Nessuna'}</span>
+                        </div>
+                        <div class="info-item" style="grid-column: span 2;">
+                            <span class="info-label">Note Aggiuntive</span>
+                            <span class="info-value">${a.notes || 'Nessuna'}</span>
                         </div>
                     </div>
                 </div>
@@ -1246,27 +1419,61 @@
             } catch (e) {}
 
             const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+            const athletePhoto = a.profile_photo;
+            
+            // Raggruppa messaggi per data
+            let lastDate = '';
+            let messagesHtml = '';
+            
+            messages.forEach(m => {
+                const msgDate = new Date(m.created_at).toLocaleDateString('it-IT');
+                if (msgDate !== lastDate) {
+                    messagesHtml += `<div class="date-separator"><span>${msgDate === new Date().toLocaleDateString('it-IT') ? 'Oggi' : msgDate}</span></div>`;
+                    lastDate = msgDate;
+                }
+                
+                const isCoach = m.sender === 'coach';
+                const time = new Date(m.created_at).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+                
+                messagesHtml += `
+                    <div class="message ${isCoach ? 'sent' : 'received'}">
+                        <div class="message-avatar">
+                            ${isCoach ? '<i class="fas fa-user-tie"></i>' : 
+                                (athletePhoto ? `<img src="${athletePhoto}" alt="">` : initials)}
+                        </div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                ${m.image_url ? `<img src="${m.image_url}" class="message-image" onclick="window.open('${m.image_url}')">` : ''}
+                                ${m.message ? `<p>${m.message}</p>` : ''}
+                            </div>
+                            <div class="message-time">${time}</div>
+                        </div>
+                    </div>
+                `;
+            });
             
             document.getElementById('tab-chat').innerHTML = `
                 <div class="chat-container">
+                    <div class="chat-header-bar">
+                        <div class="chat-user-info">
+                            <div class="chat-user-avatar">
+                                ${athletePhoto ? `<img src="${athletePhoto}" alt="">` : initials}
+                            </div>
+                            <div>
+                                <div class="chat-user-name">${a.first_name} ${a.last_name}</div>
+                                <div class="chat-user-sport">${a.sport || 'Fitness'}</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="messages-area" id="messages-area">
-                        ${messages.length === 0 ? '<p style="color:var(--gray-500);text-align:center;">Nessun messaggio</p>' : 
-                            messages.map(m => `
-                                <div class="message ${m.sender === 'coach' ? 'sent' : ''}">
-                                    <div class="message-avatar">
-                                        ${m.sender === 'coach' ? 'GR' : 
-                                            (a.profile_photo ? `<img src="${a.profile_photo}" alt="">` : initials)}
-                                    </div>
-                                    <div>
-                                        <div class="message-bubble">${m.message}</div>
-                                        <div class="message-time">${new Date(m.created_at).toLocaleString('it-IT', {hour:'2-digit',minute:'2-digit',day:'2-digit',month:'short'})}</div>
-                                    </div>
-                                </div>
-                            `).join('')
-                        }
+                        ${messages.length === 0 ? '<p style="color:var(--gray-500);text-align:center;margin-top:40px;">Inizia una conversazione con questo atleta</p>' : messagesHtml}
                     </div>
                     <div class="chat-input-area">
-                        <textarea class="chat-input" id="chat-message" placeholder="Scrivi un messaggio..." rows="1"></textarea>
+                        <button class="attach-btn" onclick="document.getElementById('image-input').click()">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <input type="file" id="image-input" accept="image/*" style="display:none" onchange="sendImage(this)">
+                        <textarea class="chat-input" id="chat-message" placeholder="Scrivi un messaggio..." rows="1" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
                         <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
                     </div>
                 </div>
@@ -1274,7 +1481,30 @@
 
             // Scroll to bottom
             const area = document.getElementById('messages-area');
-            area.scrollTop = area.scrollHeight;
+            if (area) area.scrollTop = area.scrollHeight;
+        }
+
+        async function sendImage(input) {
+            if (!input.files || !input.files[0] || !selectedAthlete) return;
+            
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    await supabase.insert('chat_messages', {
+                        athlete_id: selectedAthlete.id,
+                        sender: 'coach',
+                        message: '',
+                        image_url: e.target.result,
+                        read: false
+                    });
+                    input.value = '';
+                    await loadChatTab();
+                } catch (err) {
+                    console.error('Error sending image:', err);
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         async function sendMessage() {
