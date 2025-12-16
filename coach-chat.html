@@ -893,7 +893,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            athletes = await supabase.fetch('athletes', '?select=*');
+            athletes = (await supabase.fetch('athletes', '?select=*')).map(a => ({ ...a, id: String(a.id) }));
             await loadUnreadCounts();
             renderContacts(athletes);
 
@@ -913,7 +913,7 @@
             const athleteId = urlParams.get('athlete');
             if (athleteId) {
                 cameFromProfile = true;
-                selectAthlete(parseInt(athleteId));
+                selectAthlete(athleteId);
                 // Hide FAB on mobile when coming from profile
                 const fab = document.querySelector('.mobile-fab');
                 if (fab) fab.style.display = 'none';
@@ -1011,9 +1011,10 @@
         }
 
         async function selectAthlete(id) {
-            id = parseInt(id); // Ensure ID is a number
+            id = String(id);
             selectedAthleteId = id;
             const athlete = athletes.find(a => a.id === id);
+            if (!athlete) return;
             
             // Mark as read
             await fetch(`https://unkzjnlrorluzfahmize.supabase.co/rest/v1/chat_messages?athlete_id=eq.${id}&sender=eq.athlete&read=eq.false`, {
