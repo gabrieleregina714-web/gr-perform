@@ -725,8 +725,48 @@
             };
             
             await loadMessages();
+            await checkCoachStatus();
             startPolling();
+            startCoachStatusPolling();
         });
+
+        // Check if coach is online
+        async function checkCoachStatus() {
+            try {
+                const settings = await supabase.fetch('app_settings', '?id=eq.1');
+                if (settings && settings[0] && settings[0].coach_last_active) {
+                    const lastActive = new Date(settings[0].coach_last_active);
+                    const now = new Date();
+                    const diffMinutes = (now - lastActive) / 1000 / 60;
+                    
+                    updateCoachStatus(diffMinutes < 5);
+                } else {
+                    updateCoachStatus(false);
+                }
+            } catch (e) {
+                console.log('Could not check coach status');
+                updateCoachStatus(false);
+            }
+        }
+
+        function updateCoachStatus(isOnline) {
+            const statusEl = document.getElementById('coachStatus');
+            const dotEl = document.getElementById('onlineDot');
+            
+            if (isOnline) {
+                statusEl.innerHTML = '<i class="fas fa-circle" style="font-size: 6px;"></i><span>Online</span>';
+                statusEl.className = 'coach-status';
+                dotEl.style.background = 'var(--green)';
+            } else {
+                statusEl.innerHTML = '<i class="fas fa-circle" style="font-size: 6px;"></i><span>Offline</span>';
+                statusEl.className = 'coach-status offline';
+                dotEl.style.background = 'var(--gray-400)';
+            }
+        }
+
+        function startCoachStatusPolling() {
+            setInterval(checkCoachStatus, 30000); // Check every 30 seconds
+        }
 
         // Load messages
         async function loadMessages() {

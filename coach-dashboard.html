@@ -502,6 +502,24 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             try {
+                // Mark coach as online
+                localStorage.setItem('gr_coach_last_active', Date.now().toString());
+                
+                // Also update in Supabase for cross-device
+                try {
+                    await supabase.update('app_settings', 1, { 
+                        coach_last_active: new Date().toISOString() 
+                    });
+                } catch (e) {
+                    // Table might not exist, create it silently
+                    try {
+                        await supabase.insert('app_settings', { 
+                            id: 1,
+                            coach_last_active: new Date().toISOString() 
+                        });
+                    } catch (e2) {}
+                }
+
                 // Load athletes
                 const athletes = await supabase.fetch('athletes', '?select=*&order=created_at.desc');
                 document.getElementById('stat-athletes').textContent = athletes.length;
@@ -588,6 +606,16 @@
             } catch (error) {
                 console.error('Error loading dashboard:', error);
             }
+
+            // Keep-alive: update coach status every 2 minutes
+            setInterval(async () => {
+                localStorage.setItem('gr_coach_last_active', Date.now().toString());
+                try {
+                    await supabase.update('app_settings', 1, { 
+                        coach_last_active: new Date().toISOString() 
+                    });
+                } catch (e) {}
+            }, 120000);
         });
     </script>
 </body>
