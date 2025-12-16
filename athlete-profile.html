@@ -566,7 +566,7 @@
         <a href="coach-dashboard.html" class="logo">GR</a>
         <a href="coach-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i></a>
         <a href="coach-team.html" class="nav-item"><i class="fas fa-users"></i></a>
-        <a href="coach-chat.html" class="nav-item"><i class="fas fa-comments"></i></a>
+        <a href="coach-chat.html" class="nav-item" id="chat-nav-btn"><i class="fas fa-comments"></i></a>
         <a href="coach-generate.html" class="nav-item"><i class="fas fa-bolt"></i></a>
         <a href="coach-review.html" class="nav-item"><i class="fas fa-clipboard-check"></i></a>
         <div class="nav-spacer"></div>
@@ -856,7 +856,20 @@
             document.getElementById('level').innerHTML = `<i class="fas fa-star"></i> Livello ${athlete.level || 1}`;
             document.getElementById('streak').innerHTML = `<i class="fas fa-fire"></i> ${athlete.streak || 0} giorni`;
 
-            document.getElementById('chat-btn').href = `coach-chat.html?athlete=${athlete.id}`;
+            const chatUrl = `coach-chat.html?athlete=${athlete.id}`;
+            const chatBtn = document.getElementById('chat-btn');
+            chatBtn.href = chatUrl;
+            chatBtn.addEventListener('click', () => {
+                try { localStorage.setItem('gr_last_chat_athlete_id', String(athlete.id)); } catch (_) {}
+            });
+
+            const chatNavBtn = document.getElementById('chat-nav-btn');
+            if (chatNavBtn) {
+                chatNavBtn.href = chatUrl;
+                chatNavBtn.addEventListener('click', () => {
+                    try { localStorage.setItem('gr_last_chat_athlete_id', String(athlete.id)); } catch (_) {}
+                });
+            }
             document.getElementById('workout-btn').href = `coach-generate.html?athlete=${athlete.id}`;
 
             // Stats

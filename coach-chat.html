@@ -93,6 +93,7 @@
             height: 100vh;
             display: grid;
             grid-template-columns: 1fr;
+            background: #0b141a;
         }
 
         /* CONTACTS LIST */
@@ -253,16 +254,16 @@
         .chat-area {
             display: flex;
             flex-direction: column;
-            background: var(--black);
+            background: #0b141a;
         }
 
         .chat-header {
-            padding: 20px 30px;
-            border-bottom: 1px solid var(--gray-700);
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
             display: flex;
             align-items: center;
-            gap: 16px;
-            background: var(--gray-900);
+            gap: 12px;
+            background: #111b21;
         }
 
         .mobile-back-btn {
@@ -316,10 +317,14 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 30px;
+            padding: 18px 14px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.03), transparent 40%),
+                radial-gradient(circle at 80% 30%, rgba(255,255,255,0.02), transparent 45%),
+                #0b141a;
         }
 
         /* DATE SEPARATOR */
@@ -354,20 +359,20 @@
         }
 
         .message {
-            padding: 14px 18px;
-            border-radius: 18px;
+            padding: 10px 12px;
+            border-radius: 14px;
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.45;
             position: relative;
         }
 
         .message.received {
-            background: var(--gray-800);
+            background: #202c33;
             border-bottom-left-radius: 6px;
         }
 
         .message.sent {
-            background: var(--red);
+            background: #005c4b;
             border-bottom-right-radius: 6px;
         }
 
@@ -491,9 +496,9 @@
 
         /* CHAT INPUT */
         .chat-input-area {
-            padding: 16px 30px 24px;
-            border-top: 1px solid var(--gray-700);
-            background: var(--gray-900);
+            padding: 10px 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            background: #111b21;
         }
 
         /* MEDIA PREVIEW */
@@ -551,7 +556,7 @@
         .chat-input-box {
             display: flex;
             align-items: flex-end;
-            gap: 12px;
+            gap: 10px;
         }
 
         .input-actions {
@@ -562,7 +567,7 @@
         .input-action {
             width: 44px; height: 44px;
             border-radius: 12px;
-            background: var(--gray-800);
+            background: #202c33;
             border: none;
             color: var(--gray-400);
             cursor: pointer;
@@ -573,7 +578,7 @@
             position: relative;
         }
 
-        .input-action:hover { background: var(--gray-700); color: var(--white); }
+        .input-action:hover { background: rgba(255,255,255,0.10); color: var(--white); }
 
         .input-action input[type="file"] {
             position: absolute;
@@ -828,7 +833,7 @@
                     <i class="fas fa-comments"></i>
                     <h3>${message}</h3>
                     <p>Vai su Clienti, apri un profilo e premi Chat</p>
-                    <a href="coach-clients.html" style="margin-top:16px;display:inline-block;padding:10px 16px;background:var(--red);color:white;border-radius:12px;text-decoration:none;font-weight:700;">Vai a Clienti</a>
+                    <a href="coach-clients.html" style="margin-top:16px;display:inline-block;padding:10px 16px;background:var(--green);color:var(--black);border-radius:999px;text-decoration:none;font-weight:800;">Vai a Clienti</a>
                 </div>
             `;
         }
@@ -839,7 +844,13 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const athleteId = urlParams.get('athlete');
+            let athleteId = urlParams.get('athlete');
+
+            // Mobile sometimes opens this page from nav without params.
+            // Fallback to last opened athlete.
+            if (!athleteId) {
+                try { athleteId = localStorage.getItem('gr_last_chat_athlete_id'); } catch (_) {}
+            }
 
             if (!athleteId) {
                 showMissing('Nessun atleta selezionato');
@@ -847,6 +858,11 @@
             }
 
             cameFromProfile = true;
+            try { localStorage.setItem('gr_last_chat_athlete_id', String(athleteId)); } catch (_) {}
+            if (!urlParams.get('athlete')) {
+                const newUrl = `${window.location.pathname}?athlete=${encodeURIComponent(String(athleteId))}`;
+                window.history.replaceState({}, '', newUrl);
+            }
             await selectAthlete(String(athleteId));
         });
 
@@ -867,6 +883,7 @@
         async function selectAthlete(id) {
             id = String(id);
             selectedAthleteId = id;
+            try { localStorage.setItem('gr_last_chat_athlete_id', id); } catch (_) {}
             let athlete = currentAthlete && String(currentAthlete.id) === id ? currentAthlete : null;
             if (!athlete) {
                 const fetched = await supabase.fetch('athletes', `?id=eq.${id}&select=*`);
@@ -915,28 +932,11 @@
                     ${renderMessages(messages)}
                 </div>
                 <div class="chat-input-area">
-                    <div class="media-preview" id="media-preview"></div>
-                    <div class="chat-input-box">
-                        <div class="input-actions">
-                            <button class="input-action" title="Allega file">
-                                <i class="fas fa-paperclip"></i>
-                                <input type="file" id="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="handleFileSelect(event)">
-                            </button>
-                            <button class="input-action" title="Invia foto">
-                                <i class="fas fa-image"></i>
-                                <input type="file" id="image-input" accept="image/*" multiple onchange="handleImageSelect(event)">
-                            </button>
-                            <button class="input-action" title="Invia video">
-                                <i class="fas fa-video"></i>
-                                <input type="file" id="video-input" accept="video/*" onchange="handleVideoSelect(event)">
-                            </button>
-                        </div>
-                        <div class="message-input-wrapper">
-                            <textarea class="message-input" id="message-input" placeholder="Scrivi un messaggio..." rows="1" onkeypress="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
-                            <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-                        </div>
-                    </div>
-                </div>
+                    <div class="empty-chat">
+                        <i class="fas fa-comments"></i>
+                        <h3>Apri una chat</h3>
+                        <p>Apri un profilo atleta e premi Chat</p>
+                        <a href="coach-clients.html" style="margin-top:16px;display:inline-block;padding:10px 16px;background:var(--green);color:var(--black);border-radius:999px;text-decoration:none;font-weight:800;">Vai a Clienti</a>
             `;
 
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
