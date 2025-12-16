@@ -1,7 +1,7 @@
-// GR Perform - Service Worker v1.0
-const CACHE_NAME = 'gr-perform-v1';
-const STATIC_CACHE = 'gr-perform-static-v1';
-const DYNAMIC_CACHE = 'gr-perform-dynamic-v1';
+// GR Perform - Service Worker v1.2
+const CACHE_NAME = 'gr-perform-v3';
+const STATIC_CACHE = 'gr-perform-static-v3';
+const DYNAMIC_CACHE = 'gr-perform-dynamic-v3';
 
 // Files to cache for offline use
 const STATIC_FILES = [
@@ -98,7 +98,18 @@ async function cacheFirst(request) {
 // Network-first strategy
 async function networkFirst(request) {
   try {
-    const networkResponse = await fetch(request);
+    const url = new URL(request.url);
+    const isSameOrigin = url.origin === self.location.origin;
+    const accept = request.headers.get('accept') || '';
+    const isHtml = request.mode === 'navigate' || request.destination === 'document' || accept.includes('text/html');
+
+    // Important: for same-origin HTML, bypass HTTP cache to avoid 304 responses.
+    // 304 would prevent updating our dynamic cache and can keep old HTML around on mobile/PWA.
+    const fetchRequest = (isSameOrigin && isHtml)
+      ? new Request(request, { cache: 'no-store' })
+      : request;
+
+    const networkResponse = await fetch(fetchRequest);
     if (networkResponse.ok) {
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, networkResponse.clone());

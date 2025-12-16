@@ -1233,6 +1233,11 @@
             color: var(--gray-400);
             font-size: 16px;
         }
+
+        .landing-status {
+            margin-top: 8px;
+            font-size: 13px;
+        }
         
         .sports-grid {
             display: grid;
@@ -1977,6 +1982,7 @@
         <div class="landing-header">
             <h1 class="landing-title">I Tuoi Atleti</h1>
             <p class="landing-subtitle">Seleziona uno sport per visualizzare i tuoi clienti</p>
+            <p class="landing-subtitle landing-status" id="load-status">Caricamento atleti...</p>
         </div>
         <div class="sports-grid">
             <div class="sport-big-card" onclick="openSportView('calcio')">
@@ -2200,12 +2206,38 @@
             setupAthletesSearch();
         });
 
+        function normalizeSport(value) {
+            return (value ?? '').toString().trim().toLowerCase();
+        }
+
+        function setLoadStatus(message, isError = false) {
+            const el = document.getElementById('load-status');
+            if (!el) return;
+            el.textContent = message;
+            el.style.color = isError ? 'var(--red)' : 'var(--gray-400)';
+        }
+
         async function loadAthletes() {
             try {
-                allAthletes = await supabase.fetch('athletes', '?select=*&order=first_name.asc');
+                setLoadStatus('Caricamento atleti...');
+
+                if (typeof supabase === 'undefined' || !supabase?.fetch) {
+                    throw new Error('Supabase client non inizializzato (js/supabase-client.js non caricato)');
+                }
+
+                const data = await supabase.fetch('athletes', '?select=*&order=first_name.asc');
+                allAthletes = Array.isArray(data) ? data : [];
                 updateSportCounts();
+                if (allAthletes.length === 0) {
+                    setLoadStatus('0 atleti trovati. Se sai che esistono già, prova a ricaricare o chiudere/riaprire l\'app (cache).', true);
+                } else {
+                    setLoadStatus(`${allAthletes.length} atleti totali`);
+                }
             } catch (error) {
                 console.error('Error loading athletes:', error);
+                allAthletes = [];
+                updateSportCounts();
+                setLoadStatus('Errore nel caricamento atleti. Riprova più tardi.', true);
             }
         }
 
@@ -2218,10 +2250,9 @@
             };
             
             allAthletes.forEach(a => {
-                const sport = a.sport?.toLowerCase() || '';
-                if (sportCounts.hasOwnProperty(sport)) {
-                    sportCounts[sport]++;
-                }
+                const sport = normalizeSport(a.sport);
+                const bucket = sportCounts.hasOwnProperty(sport) ? sport : 'palestra';
+                sportCounts[bucket]++;
             });
             
             Object.keys(sportCounts).forEach(sport => {
@@ -2231,7 +2262,7 @@
         }
         
         function openSportView(sport) {
-            currentSport = sport;
+            currentSport = normalizeSport(sport);
             const sportNames = {calcio: 'Calcio', basket: 'Basket', boxe: 'Boxe', palestra: 'Palestra'};
             
             // Hide landing, show athletes view
@@ -2242,9 +2273,7 @@
             document.getElementById('athletes-title').textContent = sportNames[sport] || sport;
             
             // Filter and render athletes
-            const filtered = allAthletes.filter(a => 
-                a.sport?.toLowerCase() === sport.toLowerCase()
-            );
+            const filtered = allAthletes.filter(a => normalizeSport(a.sport) === currentSport);
             
             document.getElementById('athletes-count').textContent = filtered.length;
             renderAthletesList(filtered);
@@ -2287,7 +2316,7 @@
             input.addEventListener('input', () => {
                 const search = input.value.toLowerCase();
                 const filtered = allAthletes.filter(a => {
-                    const matchesSport = a.sport?.toLowerCase() === currentSport?.toLowerCase();
+                    const matchesSport = normalizeSport(a.sport) === normalizeSport(currentSport);
                     const matchesSearch = `${a.first_name} ${a.last_name}`.toLowerCase().includes(search);
                     return matchesSport && matchesSearch;
                 });
