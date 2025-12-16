@@ -262,7 +262,7 @@
         }
 
         .chat-header {
-            padding: 14px 16px;
+            padding: 10px 12px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
             display: flex;
             align-items: center;
@@ -284,18 +284,19 @@
         }
 
         .chat-header-avatar {
-            width: 46px; height: 46px;
+            width: 38px; height: 38px;
             border-radius: 50%;
             background: linear-gradient(135deg, #E63946, #FF6B6B);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
+            font-size: 13px;
         }
 
         .chat-header-info { flex: 1; }
-        .chat-header-info h3 { font-size: 17px; font-weight: 700; }
-        .chat-header-info p { font-size: 12px; color: var(--gray-400); display: flex; align-items: center; gap: 6px; }
+        .chat-header-info h3 { font-size: 15px; font-weight: 800; line-height: 1.15; }
+        .chat-header-info p { font-size: 11px; color: var(--gray-400); display: flex; align-items: center; gap: 6px; margin-top: 2px; }
         .chat-header-info p i { font-size: 8px; }
 
         .status-dot {
@@ -310,13 +311,13 @@
 
         .chat-header-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
         }
 
         .header-action {
-            width: 40px; height: 40px;
-            border-radius: 10px;
+            width: 34px; height: 34px;
+            border-radius: 12px;
             background: var(--gray-800);
             border: none;
             color: var(--gray-400);
@@ -327,12 +328,14 @@
             transition: all 0.2s;
         }
 
+        .header-action i { line-height: 1; }
+
         .header-action:hover { background: var(--gray-700); color: var(--white); }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 18px 14px;
+            padding: 14px 12px;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -518,13 +521,13 @@
 
         /* CHAT INPUT */
         .chat-input-area {
-            padding: 10px 12px;
+            padding: 8px 10px;
             border-top: 1px solid rgba(255,255,255,0.06);
             background: #111b21;
             position: sticky;
             bottom: 0;
             z-index: 10;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            padding-bottom: calc(8px + env(safe-area-inset-bottom));
         }
 
         /* MEDIA PREVIEW */
@@ -713,7 +716,7 @@
         }
 
         .input-action {
-            width: 38px; height: 38px;
+            width: 32px; height: 32px;
             border-radius: 999px;
             background: #202c33;
             border: none;
@@ -725,6 +728,8 @@
             transition: all 0.2s;
             position: relative;
         }
+
+        .input-action i { line-height: 1; font-size: 14px; }
 
         .input-action:hover { background: rgba(255,255,255,0.10); color: var(--white); }
 
@@ -743,7 +748,7 @@
             border-radius: 999px;
             display: flex;
             align-items: flex-end;
-            padding: 4px 6px 4px 14px;
+            padding: 3px 5px 3px 12px;
             transition: border-color 0.2s;
         }
 
@@ -754,27 +759,30 @@
             background: none;
             border: none;
             color: var(--white);
-            font-size: 14px;
+            font-size: 13px;
             outline: none;
             resize: none;
             max-height: 120px;
-            padding: 8px 0;
+            padding: 7px 0;
             font-family: inherit;
+            line-height: 1.25;
         }
 
         .send-btn {
-            width: 34px; height: 34px;
+            width: 30px; height: 30px;
             border-radius: 50%;
             background: var(--red);
             border: none;
             color: var(--white);
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+
+        .send-btn i { line-height: 1; }
 
         .send-btn:hover { transform: scale(1.1); }
         .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
@@ -943,6 +951,12 @@
                 <button class="header-action" onclick="closeMediaHistory()" title="Chiudi"><i class="fas fa-times"></i></button>
             </div>
             <div class="media-filters">
+                <select class="media-filter" id="media-filter-type" onchange="renderMediaHistory()">
+                    <option value="all">Tutto</option>
+                    <option value="image">Foto</option>
+                    <option value="file">File</option>
+                    <option value="video">Video</option>
+                </select>
                 <input class="media-filter" type="month" id="media-filter-month" onchange="renderMediaHistory()" />
                 <input class="media-filter" type="date" id="media-filter-date" onchange="renderMediaHistory()" />
                 <button class="header-action" onclick="clearMediaFilters()" title="Reset"><i class="fas fa-rotate-left"></i></button>
@@ -1143,8 +1157,10 @@
         function clearMediaFilters() {
             const month = document.getElementById('media-filter-month');
             const date = document.getElementById('media-filter-date');
+            const type = document.getElementById('media-filter-type');
             if (month) month.value = '';
             if (date) date.value = '';
+            if (type) type.value = 'all';
             renderMediaHistory();
         }
 
@@ -1152,13 +1168,24 @@
             const list = document.getElementById('media-list');
             if (!list) return;
 
+            const type = (document.getElementById('media-filter-type')?.value || 'all').trim();
             const month = (document.getElementById('media-filter-month')?.value || '').trim();
             const date = (document.getElementById('media-filter-date')?.value || '').trim();
 
-            const media = (currentMessages || []).filter(m => m.image_url);
+            // Support current schema (image_url) and optional future schema (media_type/media_url/file_name)
+            const media = (currentMessages || []).filter(m => {
+                if (m.image_url) return true;
+                if (m.media_url && m.media_type) return true;
+                return false;
+            });
 
             const filtered = media.filter(m => {
                 const d = new Date(m.created_at);
+
+                // Type filter
+                const msgType = m.image_url ? 'image' : (m.media_type || 'file');
+                if (type !== 'all' && msgType !== type) return false;
+
                 if (date) {
                     const wanted = new Date(date);
                     return d.getFullYear() === wanted.getFullYear() && d.getMonth() === wanted.getMonth() && d.getDate() === wanted.getDate();
@@ -1192,10 +1219,20 @@
                 html += `<div class="media-day">${label}</div>`;
                 for (const m of groups.get(key)) {
                     const t = new Date(m.created_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-                    const typeLabel = 'Foto';
-                    const name = 'Immagine';
-                    const thumb = `<img src="${m.image_url}" alt="">`;
-                    const onClick = `openLightbox('${String(m.image_url).replace(/'/g, "\\'")}')`;
+                    const isImage = !!m.image_url || m.media_type === 'image';
+                    const url = m.image_url || m.media_url;
+                    const safeUrl = String(url || '').replace(/'/g, "\\'");
+
+                    const typeLabel = isImage ? 'Foto' : (m.media_type === 'video' ? 'Video' : 'File');
+                    const name = m.file_name || (isImage ? 'Immagine' : typeLabel);
+
+                    const thumb = isImage
+                        ? `<img src="${url}" alt="">`
+                        : `<i class="fas fa-${m.media_type === 'video' ? 'video' : 'file'}" style="color:var(--gray-400);"></i>`;
+
+                    const onClick = isImage
+                        ? `openLightbox('${safeUrl}')`
+                        : `window.open('${safeUrl}')`;
 
                     html += `
                         <div class="media-item" onclick="${onClick}">
