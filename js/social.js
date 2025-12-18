@@ -272,30 +272,43 @@
         const user = await getUser();
         const client = getClient();
         if (!user || !client) {
+            console.error('[Social] addFriend: no user or client');
             safeShowToast('Devi essere loggato per aggiungere amici', 'error');
             return { ok: false };
         }
 
         const cleaned = String(code || '').trim().toUpperCase();
+        console.log('[Social] Searching for invite code:', cleaned);
+        
         if (!cleaned) {
             safeShowToast('Codice non valido', 'error');
             return { ok: false };
         }
 
         const mine = await getMyInviteCodeCloudAware();
+        console.log('[Social] My invite code:', mine);
+        
         if (cleaned === mine) {
             safeShowToast('Non puoi aggiungere te stesso!', 'error');
             return { ok: false };
         }
 
+        console.log('[Social] Querying profiles for invite_code =', cleaned);
         const { data: target, error: tErr } = await client
             .from('profiles')
             .select('id,name,invite_code,avatar_url')
             .eq('invite_code', cleaned)
             .maybeSingle();
 
-        if (tErr) throw tErr;
+        console.log('[Social] Query result:', { target, error: tErr });
+        
+        if (tErr) {
+            console.error('[Social] Query error:', tErr);
+            safeShowToast('Errore ricerca: ' + (tErr.message || 'sconosciuto'), 'error');
+            return { ok: false };
+        }
         if (!target) {
+            console.warn('[Social] No profile found with invite_code:', cleaned);
             safeShowToast('Codice non trovato', 'error');
             return { ok: false };
         }
