@@ -72,6 +72,14 @@ do $$ begin
     );
 exception when duplicate_object then null; end $$;
 
+-- Allow users to update their own profile (name, avatar_url, invite_code)
+do $$ begin
+  create policy "profiles_update_owner" on public.profiles
+    for update
+    using (auth.uid() = id)
+    with check (auth.uid() = id);
+exception when duplicate_object then null; end $$;
+
 -- 3) Friend stats snapshots (visible to friends)
 create table if not exists public.friend_stats (
   user_id uuid primary key references public.profiles(id) on delete cascade,

@@ -57,17 +57,28 @@
     async function syncInviteCodeToProfile() {
         const user = await getUser();
         const client = getClient();
-        if (!user || !client) return;
+        if (!user || !client) {
+            console.warn('[Social] syncInviteCode: no user or client');
+            return false;
+        }
 
         const code = ensureLocalInviteCode();
         try {
             // Try to persist code on the profile (requires `invite_code` column)
-            await client
+            const { error } = await client
                 .from('profiles')
                 .update({ invite_code: code })
                 .eq('id', user.id);
-        } catch (_) {
-            // ignore
+            
+            if (error) {
+                console.error('[Social] syncInviteCode error:', error);
+                return false;
+            }
+            console.log('[Social] Invite code synced to cloud:', code);
+            return true;
+        } catch (e) {
+            console.error('[Social] syncInviteCode exception:', e);
+            return false;
         }
     }
 
