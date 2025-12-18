@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>LIFE TRACKER</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/elite-features.css">
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Auth Check - Redirect to login if not logged in -->
+    <script>
+        (async function() {
+            // Skip if user chose to continue without login
+            if (localStorage.getItem('lt_skip_login') === 'true') return;
+            
+            // Check for existing session using storage directly (avoid creating new client)
+            const storedSession = localStorage.getItem('sb-lmrrqvggziaecilswumm-auth-token');
+            if (!storedSession) {
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div class="app" id="app">
+        
+        <!-- HOME VIEW -->
+        <div class="view active" id="homeView">
+            <section class="hero">
+                <div class="hero-bg" style="background-image: url('images/hero.jpg')"></div>
+                <div class="hero-overlay"></div>
+                <!-- Level Badge in alto a destra -->
+                <button class="hero-level-btn" onclick="openModal('badgesModal')">
+                    <span class="hero-level-number" id="heroLevel">1</span>
+                </button>
+                <div class="hero-content">
+                    <div class="hero-badge"><i class="fas fa-fire"></i><span id="heroStreak">0</span> GIORNI</div>
+                    <h1 class="hero-title">LIFE<br>TRACKER</h1>
+                    <p class="hero-subtitle">TRACCIA. MIGLIORA. DOMINA.</p>
+                </div>
+                <!-- Citazione rotante in basso a sinistra -->
+                <div class="hero-quote">
+                    <p id="heroQuote">"La disciplina è il ponte tra obiettivi e risultati."</p>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <span class="hero-stat-value" id="todayProgress">0%</span>
+                        <span class="hero-stat-label">OGGI</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-value" id="weekProgress">0%</span>
+                        <span class="hero-stat-label">SETTIMANA</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-value" id="disciplineScore">0</span>
+                        <span class="hero-stat-label">DISCIPLINA</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- XP Progress Bar (minimale) -->
+            <section class="section xp-section">
+                <div class="xp-bar-minimal">
+                    <div class="xp-bar-fill" id="xpFill" style="width:0%"></div>
+                </div>
+                <div class="xp-text-minimal"><span id="currentXP">0</span>/<span id="nextLevelXP">100</span> XP</div>
+            </section>
+
+            <!-- ELITE: Mood & Water Row -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">COME STAI OGGI?</h2>
+                    <button class="btn-edit-mood" id="editMoodBtn" onclick="EliteFeatures.enableMoodEdit()" style="display: none;">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                </div>
+                <div class="mood-selector" id="moodSelector">
+                    <div class="mood-faces" id="moodFaces">
+                        <button class="mood-btn" data-mood="1" onclick="EliteFeatures.saveMood(1)"><i class="fas fa-face-tired"></i></button>
+                        <button class="mood-btn" data-mood="2" onclick="EliteFeatures.saveMood(2)"><i class="fas fa-face-frown"></i></button>
+                        <button class="mood-btn" data-mood="3" onclick="EliteFeatures.saveMood(3)"><i class="fas fa-face-meh"></i></button>
+                        <button class="mood-btn" data-mood="4" onclick="EliteFeatures.saveMood(4)"><i class="fas fa-face-smile"></i></button>
+                        <button class="mood-btn" data-mood="5" onclick="EliteFeatures.saveMood(5)"><i class="fas fa-face-laugh-beam"></i></button>
+                    </div>
+                    <!-- Selected mood display -->
+                    <div class="mood-selected" id="moodSelected" style="display: none;">
+                        <span class="mood-selected-icon" id="moodSelectedIcon"></span>
+                        <span class="mood-selected-text" id="moodSelectedText"></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="water-tracker-minimal">
+                    <div class="water-info">
+                        <i class="fas fa-droplet"></i>
+                        <span class="water-amount" id="waterAmount">0</span>
+                        <span class="water-unit">/ 2000 ml</span>
+                    </div>
+                    <div class="water-progress">
+                        <div class="water-progress-fill" id="waterProgressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="water-buttons">
+                        <button class="water-btn minus" onclick="EliteFeatures.adjustWater(-1)"><i class="fas fa-minus"></i></button>
+                        <span class="water-glasses-count"><span id="waterGlassesCount">0</span>/8</span>
+                        <button class="water-btn plus" onclick="EliteFeatures.adjustWater(1)"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-header"><h2 class="section-title">OGGI</h2><span class="section-date" id="todayDate"></span></div>
+                <div class="goals-container" id="todayGoals"></div>
+            </section>
+
+            <!-- Priorità del giorno (riordinabili) -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">LE MIE PRIORITÀ</h2>
+                    <button class="btn-text" onclick="openModal('priorityModal')"><i class="fas fa-sliders"></i> GESTISCI</button>
+                </div>
+                <div class="priority-list" id="priorityList"></div>
+            </section>
+
+            <section class="section">
+                <div class="section-header"><h2 class="section-title">AZIONI RAPIDE</h2></div>
+                <div class="quick-actions">
+                    <button class="quick-action" onclick="switchView('diary')">
+                        <div class="quick-action-icon"><i class="fas fa-book"></i></div>
+                        <span>Diario</span>
+                    </button>
+                    <button class="quick-action" onclick="openModal('pomodoroModal')">
+                        <div class="quick-action-icon"><i class="fas fa-clock"></i></div>
+                        <span>Pomodoro</span>
+                    </button>
+                    <button class="quick-action" onclick="openModal('breathingModal')">
+                        <div class="quick-action-icon"><i class="fas fa-wind"></i></div>
+                        <span>Respira</span>
+                    </button>
+                    <button class="quick-action" onclick="switchView('workout')">
+                        <div class="quick-action-icon"><i class="fas fa-dumbbell"></i></div>
+                        <span>Workout</span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-header"><h2 class="section-title">QUESTA SETTIMANA</h2></div>
+                <div class="week-chart" id="weekChart"></div>
+            </section>
+
+            <section class="section">
+                <div class="section-header"><h2 class="section-title">CATEGORIE</h2></div>
+                <div class="categories-grid" id="categoriesGrid"></div>
+            </section>
+        </div>
+
+        <!-- GOALS VIEW -->
+        <div class="view" id="goalsView">
+            <div class="goals-hero-image">
+                <img src="images/goals-hero.jpg" alt="Goals" class="goals-hero-img">
+                <div class="goals-hero-overlay"></div>
+                <div class="goals-hero-content">
+                    <div class="goals-hero-badge">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h1 class="goals-hero-title">I TUOI OBIETTIVI</h1>
+                    <p class="goals-hero-subtitle">La disciplina batte il talento</p>
+                    <div class="goals-hero-stats">
+                        <div class="goals-stat-box">
+                            <span class="goals-stat-value" id="activeGoalsCount">0</span>
+                            <span class="goals-stat-label">Attivi</span>
+                        </div>
+                        <div class="goals-stat-divider"></div>
+                        <div class="goals-stat-box">
+                            <span class="goals-stat-value" id="completedTodayCount">0</span>
+                            <span class="goals-stat-label">Oggi</span>
+                        </div>
+                        <div class="goals-stat-divider"></div>
+                        <div class="goals-stat-box">
+                            <span class="goals-stat-value" id="goalsStreakCount">0</span>
+                            <span class="goals-stat-label">Streak</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="goals-filter-bar">
+                <div class="filter-btns">
+                    <button class="filter-btn active" data-filter="all" onclick="filterGoals('all')">Tutti</button>
+                    <button class="filter-btn" data-filter="weekdays" onclick="filterGoals('weekdays')">Infrasettimanali</button>
+                    <button class="filter-btn" data-filter="weekend" onclick="filterGoals('weekend')">Weekend</button>
+                </div>
+                <button class="add-goal-btn" onclick="openModal('addGoalModal')"><i class="fas fa-plus"></i></button>
+            </div>
+            <div class="goals-list-new" id="allGoalsList"></div>
+        </div>
+
+        <!-- STATS VIEW -->
+        <div class="view" id="statsView">
+            <!-- Hero Header with Video -->
+            <div class="stats-hero-video">
+                <video autoplay muted loop playsinline class="stats-hero-vid">
+                    <source src="https://videos.pexels.com/video-files/4878905/4878905-uhd_3840_2160_24fps.mp4" type="video/mp4">
+                </video>
+                <div class="stats-hero-overlay"></div>
+                <div class="stats-hero-content">
+                    <div class="stats-hero-badge">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h1 class="stats-hero-title">LE TUE STATISTICHE</h1>
+                    <p class="stats-hero-subtitle">I numeri raccontano la tua crescita</p>
+                    <div class="stats-hero-metrics">
+                        <div class="stats-metric-box">
+                            <span class="stats-metric-value" id="statsHeroStreak">0</span>
+                            <span class="stats-metric-label">Streak</span>
+                        </div>
+                        <div class="stats-metric-divider"></div>
+                        <div class="stats-metric-box">
+                            <span class="stats-metric-value" id="statsHeroDiscipline">0%</span>
+                            <span class="stats-metric-label">Disciplina</span>
+                        </div>
+                        <div class="stats-metric-divider"></div>
+                        <div class="stats-metric-box">
+                            <span class="stats-metric-value" id="statsHeroCompleted">0</span>
+                            <span class="stats-metric-label">Completati</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Tabs -->
+            <div class="stats-tabs">
+                <button class="stats-tab active" onclick="switchStatsTab('overview')">
+                    <i class="fas fa-chart-pie"></i> Overview
+                </button>
+                <button class="stats-tab" onclick="switchStatsTab('calendar')">
+                    <i class="fas fa-calendar"></i> Calendario
+                </button>
+                <button class="stats-tab" onclick="switchStatsTab('trends')">
+                    <i class="fas fa-chart-line"></i> Trend
+                </button>
+                <button class="stats-tab" onclick="switchStatsTab('body')">
+                    <i class="fas fa-weight-scale"></i> Corpo
+                </button>
+            </div>
+
+            <!-- OVERVIEW TAB -->
+            <div class="stats-tab-content" id="overviewTab">
+                <!-- Quick Stats Cards -->
+                <section class="section">
+                    <div class="stats-cards-grid">
+                        <div class="stat-card-new">
+                            <div class="stat-card-icon" style="background: rgba(34, 197, 94, 0.2); color: #22C55E;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <span class="stat-card-value" id="statsCardCompleted">0</span>
+                                <span class="stat-card-label">Obiettivi Completati</span>
+                            </div>
+                        </div>
+                        <div class="stat-card-new">
+                            <div class="stat-card-icon" style="background: rgba(250, 84, 0, 0.2); color: var(--nike-orange);">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <span class="stat-card-value" id="statsCardStreak">0</span>
+                                <span class="stat-card-label">Giorni di Streak</span>
+                            </div>
+                        </div>
+                        <div class="stat-card-new">
+                            <div class="stat-card-icon" style="background: rgba(99, 102, 241, 0.2); color: #6366F1;">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <span class="stat-card-value" id="statsCardGoals">0</span>
+                                <span class="stat-card-label">Obiettivi Attivi</span>
+                            </div>
+                        </div>
+                        <div class="stat-card-new">
+                            <div class="stat-card-icon" style="background: rgba(236, 72, 153, 0.2); color: #EC4899;">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="stat-card-info">
+                                <span class="stat-card-value" id="statsCardBestStreak">0</span>
+                                <span class="stat-card-label">Miglior Streak</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Weekly Performance Chart -->
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">PERFORMANCE SETTIMANALE</h2></div>
+                    <div class="weekly-perf-chart">
+                        <div class="weekly-bars" id="weeklyPerfBars"></div>
+                    </div>
+                </section>
+
+                <!-- Discipline Ring -->
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">PUNTEGGIO DISCIPLINA</h2></div>
+                    <div class="discipline-card-new">
+                        <div class="discipline-ring-wrap">
+                            <svg class="discipline-ring-svg" viewBox="0 0 120 120">
+                                <circle class="ring-bg" cx="60" cy="60" r="52" fill="none" stroke-width="8"/>
+                                <circle class="ring-fill" cx="60" cy="60" r="52" fill="none" stroke-width="8" id="disciplineRingFill"/>
+                            </svg>
+                            <div class="discipline-center">
+                                <span class="discipline-percent" id="disciplinePercent">0%</span>
+                            </div>
+                        </div>
+                        <div class="discipline-details">
+                            <div class="discipline-detail">
+                                <span class="detail-dot success"></span>
+                                <span class="detail-label">Completati</span>
+                                <span class="detail-value" id="discCompleted">0</span>
+                            </div>
+                            <div class="discipline-detail">
+                                <span class="detail-dot warning"></span>
+                                <span class="detail-label">Saltati</span>
+                                <span class="detail-value" id="discSkipped">0</span>
+                            </div>
+                            <div class="discipline-detail">
+                                <span class="detail-dot error"></span>
+                                <span class="detail-label">Bloccati</span>
+                                <span class="detail-value" id="discBlocked">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Historical Reports -->
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">REPORT STORICI</h2></div>
+                    <div class="reports-grid">
+                        <div class="report-card-new" onclick="openModal('moodReportModal')">
+                            <div class="report-card-icon mood"><i class="fas fa-face-smile"></i></div>
+                            <span class="report-card-name">Umore</span>
+                            <span class="report-card-value" id="moodAvgPreview">-</span>
+                        </div>
+                        <div class="report-card-new" onclick="openModal('sleepReportModal')">
+                            <div class="report-card-icon sleep"><i class="fas fa-bed"></i></div>
+                            <span class="report-card-name">Sonno</span>
+                            <span class="report-card-value" id="sleepAvgPreview">-</span>
+                        </div>
+                        <div class="report-card-new" onclick="openModal('waterReportModal')">
+                            <div class="report-card-icon water"><i class="fas fa-droplet"></i></div>
+                            <span class="report-card-name">Acqua</span>
+                            <span class="report-card-value" id="waterAvgPreview">-</span>
+                        </div>
+                        <div class="report-card-new" onclick="openModal('workoutReportModal')">
+                            <div class="report-card-icon workout"><i class="fas fa-dumbbell"></i></div>
+                            <span class="report-card-name">Workout</span>
+                            <span class="report-card-value" id="workoutCountPreview">-</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- CALENDAR TAB -->
+            <div class="stats-tab-content" id="calendarTab" style="display: none;">
+                <section class="section">
+                    <div class="calendar-header-new">
+                        <button class="calendar-nav-btn" onclick="navigateCalendar(-1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h2 id="calendarMonthYear">Dicembre 2025</h2>
+                        <button class="calendar-nav-btn" onclick="navigateCalendar(1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="calendar-new">
+                        <div class="calendar-weekdays-new">
+                            <span>L</span><span>M</span><span>M</span><span>G</span><span>V</span><span>S</span><span>D</span>
+                        </div>
+                        <div class="calendar-days" id="calendarGrid"></div>
+                    </div>
+                    <div class="calendar-legend-new">
+                        <div class="legend-item"><span class="legend-dot success"></span>Completato</div>
+                        <div class="legend-item"><span class="legend-dot warning"></span>Parziale</div>
+                        <div class="legend-item"><span class="legend-dot error"></span>Saltato</div>
+                    </div>
+                </section>
+
+                <!-- Day Detail -->
+                <div class="day-detail-card" id="dayDetailCard" style="display: none;">
+                    <div class="day-detail-header">
+                        <h3 id="dayDetailDate">-</h3>
+                        <button class="btn-icon-sm" onclick="closeDayDetail()"><i class="fas fa-xmark"></i></button>
+                    </div>
+                    <div class="day-detail-body" id="dayDetailContent"></div>
+                </div>
+            </div>
+
+            <!-- TRENDS TAB -->
+            <div class="stats-tab-content" id="trendsTab" style="display: none;">
+                <!-- Period Selector -->
+                <section class="section">
+                    <div class="period-selector">
+                        <button class="period-btn active" onclick="setTrendPeriod('week')">7 Giorni</button>
+                        <button class="period-btn" onclick="setTrendPeriod('month')">30 Giorni</button>
+                        <button class="period-btn" onclick="setTrendPeriod('year')">Anno</button>
+                    </div>
+                </section>
+
+                <!-- Trend Chart -->
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">ANDAMENTO COMPLETAMENTI</h2></div>
+                    <div class="trend-chart-container">
+                        <div class="trend-chart" id="trendChart"></div>
+                    </div>
+                </section>
+
+                <!-- Insights -->
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">INSIGHTS</h2></div>
+                    <div class="insights-list" id="insightsList">
+                        <div class="insight-card">
+                            <div class="insight-icon"><i class="fas fa-lightbulb"></i></div>
+                            <div class="insight-text">Completa più obiettivi per sbloccare insights personalizzati</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Comparison -->
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">CONFRONTO</h2></div>
+                    <div class="comparison-cards">
+                        <div class="comparison-card">
+                            <span class="comparison-label">Questa Settimana</span>
+                            <span class="comparison-value" id="thisWeekCompare">0%</span>
+                            <span class="comparison-change positive" id="weekChange">+0%</span>
+                        </div>
+                        <div class="comparison-card">
+                            <span class="comparison-label">Questo Mese</span>
+                            <span class="comparison-value" id="thisMonthCompare">0%</span>
+                            <span class="comparison-change" id="monthChange">+0%</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- BODY TAB -->
+            <div class="stats-tab-content" id="bodyTab" style="display: none;">
+                <!-- Weight Section -->
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">PESO</h2>
+                        <button class="btn-text" onclick="openModal('addWeightModal')"><i class="fas fa-plus"></i> AGGIUNGI</button>
+                    </div>
+                    <div class="body-stats-hero">
+                        <div class="body-stat-main">
+                            <span class="body-stat-value" id="currentWeight">--</span>
+                            <span class="body-stat-unit">kg</span>
+                        </div>
+                        <div class="body-stat-changes">
+                            <div class="body-change-item">
+                                <span class="body-change-label">Inizio</span>
+                                <span class="body-change-value" id="startWeight">--</span>
+                            </div>
+                            <div class="body-change-item">
+                                <span class="body-change-label">Variazione</span>
+                                <span class="body-change-value" id="weightChange">--</span>
+                            </div>
+                            <div class="body-change-item">
+                                <span class="body-change-label">Obiettivo</span>
+                                <span class="body-change-value" id="goalWeight">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="body-chart-container">
+                        <div class="body-chart" id="weightChart"></div>
+                    </div>
+                </section>
+
+                <!-- Measurements Section -->
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">MISURE CORPOREE</h2>
+                        <button class="btn-text" onclick="openModal('measurementsModal')"><i class="fas fa-plus"></i> AGGIUNGI</button>
+                    </div>
+                    <div class="measurements-grid" id="measurementsStatsGrid"></div>
+                </section>
+
+                <!-- Body Progress Chart -->
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">STORICO MISURE</h2>
+                        <select class="measurement-select" id="measurementTypeSelect" onchange="renderMeasurementChart()">
+                            <option value="weight">Peso</option>
+                            <option value="waist">Vita</option>
+                            <option value="chest">Petto</option>
+                            <option value="arms">Braccia</option>
+                            <option value="thighs">Cosce</option>
+                            <option value="hips">Fianchi</option>
+                        </select>
+                    </div>
+                    <div class="body-chart-container">
+                        <div class="body-chart" id="measurementChart"></div>
+                    </div>
+                </section>
+
+                <!-- Progress Summary -->
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">RIEPILOGO PROGRESSI</h2>
+                    </div>
+                    <div class="progress-summary-cards" id="progressSummaryCards"></div>
+                </section>
+            </div>
+        </div>
+
+        <!-- WORKOUT VIEW -->
+        <div class="view" id="workoutView">
+            <!-- Hero Header -->
+            <div class="workout-hero-image">
+                <img src="images/workout-hero.jpg" alt="Workout" class="workout-hero-img">
+                <div class="workout-hero-overlay"></div>
+                <div class="workout-hero-content">
+                    <div class="workout-hero-badge">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h1 class="workout-hero-title">WORKOUT LOG</h1>
+                    <p class="workout-hero-subtitle">Ogni rep ti avvicina al tuo obiettivo</p>
+                    <div class="workout-hero-stats">
+                        <div class="workout-stat-box">
+                            <span class="workout-stat-value" id="totalWorkouts">0</span>
+                            <span class="workout-stat-label">Sessioni</span>
+                        </div>
+                        <div class="workout-stat-divider"></div>
+                        <div class="workout-stat-box">
+                            <span class="workout-stat-value" id="totalWorkoutHours">0</span>
+                            <span class="workout-stat-label">Ore Totali</span>
+                        </div>
+                        <div class="workout-stat-divider"></div>
+                        <div class="workout-stat-box">
+                            <span class="workout-stat-value" id="totalRunKm">0</span>
+                            <span class="workout-stat-label">Km Corsi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workout Tabs -->
+            <div class="workout-tabs">
+                <button class="workout-tab active" onclick="switchWorkoutTab('weights')">
+                    <i class="fas fa-dumbbell"></i> Pesi
+                </button>
+                <button class="workout-tab" onclick="switchWorkoutTab('running')">
+                    <i class="fas fa-running"></i> Corsa
+                </button>
+                <button class="workout-tab" onclick="switchWorkoutTab('session')">
+                    <i class="fas fa-stopwatch"></i> Sessione
+                </button>
+            </div>
+
+            <!-- WEIGHTS TAB -->
+            <div class="workout-tab-content" id="weightsTab">
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">I MIEI ESERCIZI</h2>
+                        <button class="btn-text" onclick="openModal('addExerciseModal')"><i class="fas fa-plus"></i> NUOVO</button>
+                    </div>
+                    <!-- Search Bar -->
+                    <div class="exercise-search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="exerciseSearchInput" placeholder="Cerca esercizio..." oninput="filterExercises()">
+                    </div>
+                    <div class="exercises-grid" id="exercisesGrid"></div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">PROGRESSI PESI</h2></div>
+                    <div class="weight-progress-chart" id="weightProgressChart"></div>
+                </section>
+            </div>
+
+            <!-- SESSION TAB -->
+            <div class="workout-tab-content" id="sessionTab" style="display: none;">
+                <!-- Active Session Banner -->
+                <div class="session-banner" id="sessionBanner" style="display: none;">
+                    <div class="session-timer">
+                        <i class="fas fa-stopwatch"></i>
+                        <span id="sessionTimer">00:00:00</span>
+                    </div>
+                    <div class="session-actions">
+                        <button class="btn btn-danger" onclick="endWorkoutSession()">
+                            <i class="fas fa-stop"></i> Termina
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Start Session -->
+                <section class="section" id="startSessionSection">
+                    <div class="session-start-card">
+                        <div class="session-start-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <h3>Inizia una Sessione</h3>
+                        <p>Traccia tempo, esercizi e progressi</p>
+                        <button class="btn btn-primary btn-full" onclick="startWorkoutSession()">
+                            <i class="fas fa-play"></i> INIZIA SESSIONE
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Session Exercises (shown when session active) -->
+                <section class="section" id="sessionExercisesSection" style="display: none;">
+                    <div class="section-header">
+                        <h2 class="section-title">ESERCIZI SESSIONE</h2>
+                    </div>
+                    <div class="session-search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="sessionSearchInput" placeholder="Cerca e aggiungi esercizio..." oninput="filterSessionExercises()">
+                    </div>
+                    <div class="session-exercise-list" id="sessionExerciseResults"></div>
+                    
+                    <div class="section-header" style="margin-top: var(--space-lg);">
+                        <h2 class="section-title">IN QUESTA SESSIONE</h2>
+                    </div>
+                    <div class="session-selected-exercises" id="sessionSelectedExercises">
+                        <div class="empty-state-sm">
+                            <i class="fas fa-plus-circle"></i>
+                            <p>Aggiungi esercizi dalla ricerca sopra</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Session History -->
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">STORICO SESSIONI</h2></div>
+                    <div class="session-history-list" id="sessionHistoryList">
+                        <div class="empty-state-sm">
+                            <i class="fas fa-history"></i>
+                            <p>Nessuna sessione registrata</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- RUNNING TAB -->
+            <div class="workout-tab-content" id="runningTab" style="display: none;">
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">REGISTRA CORSA</h2>
+                    </div>
+                    <div class="run-form">
+                        <div class="run-input-row">
+                            <div class="run-input-group">
+                                <label>Distanza (km)</label>
+                                <input type="number" id="runDistance" step="0.1" min="0" placeholder="5.0">
+                            </div>
+                            <div class="run-input-group">
+                                <label>Tempo (min)</label>
+                                <input type="number" id="runTime" min="0" placeholder="30">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="saveRun()">
+                            <i class="fas fa-plus"></i> SALVA CORSA
+                        </button>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">STATISTICHE CORSA</h2></div>
+                    <div class="run-stats-grid">
+                        <div class="run-stat-card">
+                            <div class="run-stat-icon"><i class="fas fa-road"></i></div>
+                            <div class="run-stat-value" id="totalDistance">0</div>
+                            <div class="run-stat-label">Km Totali</div>
+                        </div>
+                        <div class="run-stat-card">
+                            <div class="run-stat-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="run-stat-value" id="avgPace">0:00</div>
+                            <div class="run-stat-label">Passo Medio</div>
+                        </div>
+                        <div class="run-stat-card">
+                            <div class="run-stat-icon"><i class="fas fa-trophy"></i></div>
+                            <div class="run-stat-value" id="bestPace">0:00</div>
+                            <div class="run-stat-label">Miglior Passo</div>
+                        </div>
+                        <div class="run-stat-card">
+                            <div class="run-stat-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div class="run-stat-value" id="totalRuns">0</div>
+                            <div class="run-stat-label">Corse Totali</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">PROGRESSI SETTIMANALI</h2></div>
+                    <div class="run-chart-container">
+                        <div class="run-bar-chart" id="runBarChart"></div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">CRONOLOGIA CORSE</h2></div>
+                    <div class="runs-history" id="runsHistory"></div>
+                </section>
+            </div>
+        </div>
+
+        <!-- DIARY VIEW -->
+        <div class="view" id="diaryView">
+            <div class="diary-hero">
+                <div class="diary-hero-content">
+                    <h1 class="diary-title">IL MIO DIARIO</h1>
+                    <p class="diary-subtitle">I tuoi pensieri, le tue riflessioni</p>
+                </div>
+                <button class="diary-add-btn" onclick="openModal('newDiaryEntryModal')">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            
+            <section class="section">
+                <div class="diary-entries" id="diaryEntries">
+                    <div class="empty-state">
+                        <i class="fas fa-book-open"></i>
+                        <p>Nessuna pagina ancora</p>
+                        <button class="btn btn-primary" onclick="openModal('newDiaryEntryModal')">Scrivi la prima pagina</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- SOCIAL VIEW -->
+        <div class="view" id="socialView">
+            <div class="social-page-header">
+                <button class="btn-text" onclick="switchView('profile')"><i class="fas fa-arrow-left"></i> PROFILO</button>
+                <div class="social-page-title">SOCIAL</div>
+                <button class="btn-text" onclick="openModal('newPostModal')"><i class="fas fa-plus"></i> POST</button>
+            </div>
+
+            <div class="social-page-content">
+                <div class="social-stories" id="socialStories"></div>
+                <input type="file" id="newStoryImage" accept="image/*" hidden>
+                <div class="social-feed" id="socialFeed">
+                    <div class="empty-state">
+                        <i class="fas fa-bolt"></i>
+                        <p>Nessun post ancora</p>
+                        <button class="btn btn-secondary" onclick="openModal('newPostModal')">Crea il primo post</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SOCIAL USER VIEW (Instagram-like profile) -->
+        <div class="view" id="socialUserView">
+            <div class="social-page-header">
+                <button class="btn-text" onclick="switchView('social')"><i class="fas fa-arrow-left"></i> SOCIAL</button>
+                <div class="social-page-title" id="socialUserTitle">PROFILO</div>
+                <div style="width: 84px"></div>
+            </div>
+            <div class="social-page-content">
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">CONFRONTO</h2></div>
+                    <div class="social-compare" id="socialCompare"></div>
+                </section>
+                <section class="section">
+                    <div class="section-header"><h2 class="section-title">POST</h2></div>
+                    <div class="social-feed" id="socialUserPosts"></div>
+                </section>
+            </div>
+        </div>
+
+        <!-- PROFILE VIEW -->
+        <div class="view" id="profileView">
+            <!-- Profile Hero with Photo -->
+            <div class="profile-hero">
+                <div class="profile-bg" id="profileBg"></div>
+                <div class="profile-hero-overlay"></div>
+                <div class="profile-hero-content">
+                    <div class="profile-photo-wrapper" onclick="document.getElementById('profilePhotoInput').click()">
+                        <img src="" alt="Profile" class="profile-photo" id="profilePhoto">
+                        <div class="profile-photo-edit"><i class="fas fa-camera"></i></div>
+                    </div>
+                    <input type="file" id="profilePhotoInput" accept="image/*" hidden onchange="saveProfilePhoto(event)">
+                    <h1 class="profile-name" id="profileName" onclick="openModal('editProfileModal')">IL TUO NOME</h1>
+                    <p class="profile-bio" id="profileBio">Tocca per modificare il profilo</p>
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <span class="profile-stat-value" id="profileLevel">1</span>
+                            <span class="profile-stat-label">LIVELLO</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="profile-stat-value" id="profileStreak">0</span>
+                            <span class="profile-stat-label">STREAK</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="profile-stat-value" id="profileBadges">0</span>
+                            <span class="profile-stat-label">BADGE</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="profile-edit-btn" onclick="openModal('editProfileModal')"><i class="fas fa-pen"></i></button>
+                <button class="profile-bg-btn" onclick="document.getElementById('profileBgInput').click()"><i class="fas fa-image"></i></button>
+                <input type="file" id="profileBgInput" accept="image/*" hidden onchange="saveProfileBg(event)">
+            </div>
+
+            <!-- ELITE: Progress Photos (Gallery) -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">FOTO PROGRESSI</h2>
+                    <button class="btn-text" onclick="document.getElementById('photoInput').click()"><i class="fas fa-camera"></i> AGGIUNGI</button>
+                </div>
+                <div class="photos-preview" id="photosPreview">
+                    <div class="photos-preview-grid" id="photosPreviewGrid"></div>
+                    <button class="photos-gallery-btn" id="photosGalleryBtn" onclick="openModal('photoGalleryModal')" style="display:none;">
+                        <i class="fas fa-images"></i> Vedi Galleria (<span id="photosCount">0</span>)
+                    </button>
+                </div>
+                <input type="file" id="photoInput" accept="image/*" multiple hidden onchange="saveProgressPhotos(event)">
+            </section>
+
+            <!-- ELITE: Why I Started -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">PERCHÉ HO INIZIATO</h2>
+                    <button class="btn-text" onclick="openModal('whyModal')"><i class="fas fa-edit"></i></button>
+                </div>
+                <div id="whyStartedDisplay"></div>
+            </section>
+
+            <!-- ELITE: Wins Journal -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">VITTORIE PERSONALI</h2>
+                    <button class="btn-text" onclick="openModal('winsModal')"><i class="fas fa-plus"></i></button>
+                </div>
+                <div id="winsJournal"></div>
+            </section>
+
+            <!-- SOCIAL: Friends & Groups -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">AMICI & COMMUNITY</h2>
+                    <button class="btn-text" onclick="openModal('inviteFriendModal')"><i class="fas fa-user-plus"></i> INVITA</button>
+                </div>
+                
+                <!-- Bottone APRI SOCIAL ben visibile -->
+                <button class="btn btn-primary btn-full" onclick="switchView('social')" style="margin-bottom: var(--space-lg);"><i class="fas fa-bolt"></i> APRI SOCIAL</button>
+                
+                <div class="social-section">
+                    <div class="social-stats-row">
+                        <div class="social-stat-card">
+                            <div class="social-stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="social-stat-info">
+                                <span class="social-stat-value" id="friendsCount">0</span>
+                                <span class="social-stat-label">Amici</span>
+                            </div>
+                        </div>
+                        <div class="social-stat-card">
+                            <div class="social-stat-icon"><i class="fas fa-trophy"></i></div>
+                            <div class="social-stat-info">
+                                <span class="social-stat-value" id="leaderboardRank">-</span>
+                                <span class="social-stat-label">Posizione</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="friends-list" id="friendsList">
+                        <div class="empty-state">
+                            <i class="fas fa-user-group"></i>
+                            <p>Nessun amico ancora</p>
+                            <button class="btn btn-secondary" onclick="openModal('inviteFriendModal')">Invita amici</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">DOCUMENTI</h2>
+                    <button class="btn-text" onclick="openModal('uploadModal')"><i class="fas fa-plus"></i> UPLOAD</button>
+                </div>
+                <div class="documents-list" id="documentsList"></div>
+            </section>
+
+            <section class="section">
+                <div class="section-header"><h2 class="section-title">DATI</h2></div>
+                <div class="settings-group">
+                    <button class="settings-btn" onclick="exportData()"><i class="fas fa-download"></i><span>Esporta Dati</span><i class="fas fa-chevron-right"></i></button>
+                    <button class="settings-btn" onclick="importDataPrompt()"><i class="fas fa-upload"></i><span>Importa Dati</span><i class="fas fa-chevron-right"></i></button>
+                    <button class="settings-btn" onclick="shareData()"><i class="fas fa-share-nodes"></i><span>Condividi</span><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </section>
+
+            <section class="section">
+                <button class="btn btn-danger btn-full" onclick="resetData()"><i class="fas fa-trash"></i> RESET TUTTI I DATI</button>
+            </section>
+
+            <!-- Sync & Logout -->
+            <section class="section" id="accountSection">
+                <div class="section-header"><h2 class="section-title">ACCOUNT</h2></div>
+                <div class="settings-group">
+                    <button class="settings-btn" id="syncButton" onclick="manualSync()"><i class="fas fa-sync"></i><span>Sincronizza Dati</span><i class="fas fa-chevron-right"></i></button>
+                    <button class="settings-btn logout-settings-btn" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Esci dall'Account</span><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <p class="account-email" id="userEmail"></p>
+            </section>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-view="home"><i class="fas fa-home"></i><span>Home</span></button>
+        <button class="nav-item" data-view="goals"><i class="fas fa-bullseye"></i><span>Obiettivi</span></button>
+        <button class="nav-item" data-view="workout"><i class="fas fa-dumbbell"></i><span>Workout</span></button>
+        <button class="nav-item" data-view="stats"><i class="fas fa-chart-simple"></i><span>Stats</span></button>
+        <button class="nav-item" data-view="profile"><i class="fas fa-user"></i><span>Profilo</span></button>
+    </nav>
+
+    <!-- XP POPUP (ELITE) -->
+    <div class="xp-popup" id="xpPopup">+0 XP</div>
+
+    <!-- MODALS -->
+    
+    <!-- Add Exercise Modal -->
+    <div class="modal" id="addExerciseModal">
+        <div class="modal-backdrop" onclick="closeModal('addExerciseModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>NUOVO ESERCIZIO</h2><button class="btn-icon-sm" onclick="closeModal('addExerciseModal')"><i class="fas fa-xmark"></i></button></div>
+            <form id="addExerciseForm" onsubmit="saveNewExercise(event)">
+                <div class="form-group">
+                    <label>NOME ESERCIZIO</label>
+                    <input type="text" id="newExerciseName" placeholder="Es. Panca Piana..." required>
+                </div>
+                <div class="form-group">
+                    <label>GRUPPO MUSCOLARE</label>
+                    <select id="newExerciseMuscle">
+                        <option value="chest">Petto</option>
+                        <option value="back">Schiena</option>
+                        <option value="shoulders">Spalle</option>
+                        <option value="arms">Braccia</option>
+                        <option value="legs">Gambe</option>
+                        <option value="core">Addome</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>PESO INIZIALE (kg)</label>
+                        <input type="number" id="newExerciseWeight" step="0.5" min="0" placeholder="20">
+                    </div>
+                    <div class="form-group">
+                        <label>REPS</label>
+                        <input type="number" id="newExerciseReps" min="1" placeholder="10">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">AGGIUNGI ESERCIZIO</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Exercise Detail Modal -->
+    <div class="modal" id="exerciseDetailModal">
+        <div class="modal-backdrop" onclick="closeModal('exerciseDetailModal')"></div>
+        <div class="modal-sheet modal-sheet-lg">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h2 id="exerciseDetailName">ESERCIZIO</h2>
+                <button class="btn-icon-sm" onclick="closeModal('exerciseDetailModal')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <div class="exercise-detail-content">
+                <div class="exercise-current-stats">
+                    <div class="exercise-current-stat">
+                        <span class="stat-value" id="exerciseCurrentWeight">0</span>
+                        <span class="stat-label">kg attuali</span>
+                    </div>
+                    <div class="exercise-current-stat">
+                        <span class="stat-value" id="exerciseCurrentReps">0</span>
+                        <span class="stat-label">reps</span>
+                    </div>
+                    <div class="exercise-current-stat">
+                        <span class="stat-value" id="exercisePR">0</span>
+                        <span class="stat-label">PR (kg)</span>
+                    </div>
+                </div>
+                
+                <div class="exercise-update-form">
+                    <h3>Aggiorna Peso</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>NUOVO PESO (kg)</label>
+                            <input type="number" id="updateExerciseWeight" step="0.5" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>REPS</label>
+                            <input type="number" id="updateExerciseReps" min="1">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-full" onclick="updateExerciseWeight()">
+                        <i class="fas fa-save"></i> SALVA PROGRESSO
+                    </button>
+                </div>
+                
+                <div class="exercise-history">
+                    <h3>Cronologia Pesi</h3>
+                    <div class="exercise-history-list" id="exerciseHistoryList"></div>
+                </div>
+                
+                <div class="exercise-chart-section">
+                    <h3>Grafico Progressi</h3>
+                    <div class="exercise-mini-chart" id="exerciseMiniChart"></div>
+                </div>
+                
+                <button class="btn btn-danger btn-full" onclick="deleteExercise()">
+                    <i class="fas fa-trash"></i> ELIMINA ESERCIZIO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addGoalModal">
+        <div class="modal-backdrop" onclick="closeModal('addGoalModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>NUOVO OBIETTIVO</h2><button class="btn-icon-sm" onclick="closeModal('addGoalModal')"><i class="fas fa-xmark"></i></button></div>
+            <form id="addGoalForm" onsubmit="saveGoal(event)">
+                <div class="form-group"><label>NOME</label><input type="text" id="goalName" placeholder="Es. Mangiare sano..." required></div>
+                <div class="form-group">
+                    <label>CATEGORIA</label>
+                    <div class="category-selector" id="categorySelector">
+                        <button type="button" class="cat-btn selected" data-cat="health" data-icon="fa-heart-pulse"><i class="fas fa-heart-pulse"></i><span>Salute</span></button>
+                        <button type="button" class="cat-btn" data-cat="fitness" data-icon="fa-dumbbell"><i class="fas fa-dumbbell"></i><span>Fitness</span></button>
+                        <button type="button" class="cat-btn" data-cat="nutrition" data-icon="fa-apple-whole"><i class="fas fa-apple-whole"></i><span>Dieta</span></button>
+                        <button type="button" class="cat-btn" data-cat="mind" data-icon="fa-brain"><i class="fas fa-brain"></i><span>Mente</span></button>
+                        <button type="button" class="cat-btn" data-cat="work" data-icon="fa-briefcase"><i class="fas fa-briefcase"></i><span>Lavoro</span></button>
+                        <button type="button" class="cat-btn" data-cat="learning" data-icon="fa-book"><i class="fas fa-book"></i><span>Studio</span></button>
+                        <button type="button" class="cat-btn" data-cat="finance" data-icon="fa-wallet"><i class="fas fa-wallet"></i><span>Finanze</span></button>
+                        <button type="button" class="cat-btn" data-cat="social" data-icon="fa-users"><i class="fas fa-users"></i><span>Sociale</span></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>COLORE ICONA</label>
+                    <div class="color-selector" id="colorSelector">
+                        <button type="button" class="color-btn selected" data-color="#00D26A" style="background:#00D26A"></button>
+                        <button type="button" class="color-btn" data-color="#FF6B6B" style="background:#FF6B6B"></button>
+                        <button type="button" class="color-btn" data-color="#4ECDC4" style="background:#4ECDC4"></button>
+                        <button type="button" class="color-btn" data-color="#FFE66D" style="background:#FFE66D"></button>
+                        <button type="button" class="color-btn" data-color="#A855F7" style="background:#A855F7"></button>
+                        <button type="button" class="color-btn" data-color="#3B82F6" style="background:#3B82F6"></button>
+                        <button type="button" class="color-btn" data-color="#F97316" style="background:#F97316"></button>
+                        <button type="button" class="color-btn" data-color="#EC4899" style="background:#EC4899"></button>
+                    </div>
+                </div>
+                <div class="form-group"><label>FREQUENZA</label><select id="goalFrequency"><option value="daily">Ogni giorno</option><option value="weekdays">Lun - Ven</option><option value="custom">Giorni specifici</option></select></div>
+                <div class="form-group hidden" id="customDaysGroup">
+                    <label>GIORNI</label>
+                    <div class="days-selector">
+                        <label class="day-btn"><input type="checkbox" value="1"><span>L</span></label>
+                        <label class="day-btn"><input type="checkbox" value="2"><span>M</span></label>
+                        <label class="day-btn"><input type="checkbox" value="3"><span>M</span></label>
+                        <label class="day-btn"><input type="checkbox" value="4"><span>G</span></label>
+                        <label class="day-btn"><input type="checkbox" value="5"><span>V</span></label>
+                        <label class="day-btn"><input type="checkbox" value="6"><span>S</span></label>
+                        <label class="day-btn"><input type="checkbox" value="0"><span>D</span></label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>NOTIFICA</label>
+                    <div class="notification-toggle">
+                        <input type="checkbox" id="goalNotification" class="toggle-input">
+                        <label for="goalNotification" class="toggle-label">
+                            <span class="toggle-text">Ricevi promemoria</span>
+                            <span class="toggle-switch"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group hidden" id="notificationTimeGroup">
+                    <label>ORARIO NOTIFICA</label>
+                    <input type="time" id="goalNotificationTime" value="09:00">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">AGGIUNGI OBIETTIVO</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="checkinModal">
+        <div class="modal-backdrop" onclick="closeModal('checkinModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2 id="checkinGoalName">Check-in</h2><button class="btn-icon-sm" onclick="closeModal('checkinModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="checkin-actions">
+                <button class="checkin-btn success" onclick="markGoal('done')"><i class="fas fa-check"></i><span>FATTO</span></button>
+                <button class="checkin-btn warning" onclick="markGoal('skipped')"><i class="fas fa-forward"></i><span>SALTATO</span></button>
+                <button class="checkin-btn danger" onclick="markGoal('blocked')"><i class="fas fa-ban"></i><span>IMPOSSIBILE</span></button>
+            </div>
+            <div class="form-group"><label>NOTE (OPZIONALE)</label><textarea id="checkinNote" placeholder="Perché?"></textarea></div>
+        </div>
+    </div>
+
+    <!-- New Custom Metric Modal -->
+    <div class="modal" id="newMetricModal">
+        <div class="modal-backdrop" onclick="closeModal('newMetricModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>NUOVA METRICA</h2><button class="btn-icon-sm" onclick="closeModal('newMetricModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="saveNewMetric(event)">
+                <div class="form-group">
+                    <label>NOME METRICA</label>
+                    <input type="text" id="metricName" placeholder="Es. Peso, Circonferenza braccia, Calorie..." required>
+                </div>
+                <div class="form-group">
+                    <label>UNITÀ DI MISURA</label>
+                    <input type="text" id="metricUnit" placeholder="Es. kg, cm, %, kcal, L..." required>
+                </div>
+                <div class="form-group">
+                    <label>TIPO METRICA</label>
+                    <div class="metric-type-selector">
+                        <label class="metric-type-btn selected">
+                            <input type="radio" name="metricType" value="lower_better" checked>
+                            <i class="fas fa-arrow-down"></i>
+                            <span>Meno è meglio</span>
+                            <small>Es. Peso, grasso</small>
+                        </label>
+                        <label class="metric-type-btn">
+                            <input type="radio" name="metricType" value="higher_better">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Più è meglio</span>
+                            <small>Es. Muscoli, forza</small>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>ICONA</label>
+                    <div class="icon-grid" id="metricIconGrid">
+                        <button type="button" class="icon-btn selected" data-icon="fa-weight-scale"><i class="fas fa-weight-scale"></i></button>
+                        <button type="button" class="icon-btn" data-icon="fa-percent"><i class="fas fa-percent"></i></button>
+                        <button type="button" class="icon-btn" data-icon="fa-ruler"><i class="fas fa-ruler"></i></button>
+                        <button type="button" class="icon-btn" data-icon="fa-heart-pulse"><i class="fas fa-heart-pulse"></i></button>
+                        <button type="button" class="icon-btn" data-icon="fa-droplet"><i class="fas fa-droplet"></i></button>
+                        <button type="button" class="icon-btn" data-icon="fa-fire"><i class="fas fa-fire"></i></button>
+                        <button type="button" class="icon-btn" data-icon="fa-bed"><i class="fas fa-bed"></i></button>
+                        <button type="button" class="icon-btn" data-icon="fa-dumbbell"><i class="fas fa-dumbbell"></i></button>
+                        <button type="button" class="icon-btn" data-icon="fa-bolt"><i class="fas fa-bolt"></i></button>
+                        <button type="button" class="icon-btn" data-icon="fa-utensils"><i class="fas fa-utensils"></i></button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">CREA METRICA</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Metric Value Modal -->
+    <div class="modal" id="addMetricValueModal">
+        <div class="modal-backdrop" onclick="closeModal('addMetricValueModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2 id="addMetricTitle">AGGIUNGI VALORE</h2><button class="btn-icon-sm" onclick="closeModal('addMetricValueModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="saveMetricValue(event)">
+                <input type="hidden" id="currentMetricId">
+                <div class="form-group">
+                    <label id="metricValueLabel">VALORE</label>
+                    <input type="number" id="metricValueInput" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>DATA</label>
+                    <input type="date" id="metricValueDate">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">SALVA</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="exerciseModal">
+        <div class="modal-backdrop" onclick="closeModal('exerciseModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>NUOVO ESERCIZIO</h2><button class="btn-icon-sm" onclick="closeModal('exerciseModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="saveExercise(event)">
+                <div class="form-group"><label>ESERCIZIO</label><input type="text" id="exerciseName" placeholder="Es. Panca piana, Squat..." required list="exerciseSuggestions"><datalist id="exerciseSuggestions"></datalist></div>
+                <div class="form-row">
+                    <div class="form-group"><label>PESO (KG)</label><input type="number" id="exerciseWeight" step="0.5" placeholder="80" required></div>
+                    <div class="form-group"><label>REPS</label><input type="number" id="exerciseReps" placeholder="8" required></div>
+                    <div class="form-group"><label>SERIE</label><input type="number" id="exerciseSets" placeholder="4" required></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">SALVA</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="uploadModal">
+        <div class="modal-backdrop" onclick="closeModal('uploadModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>CARICA DOCUMENTO</h2><button class="btn-icon-sm" onclick="closeModal('uploadModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="saveDocument(event)">
+                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-cloud-arrow-up"></i>
+                    <p>Tocca per selezionare un file</p>
+                    <input type="file" id="fileInput" accept=".pdf,.jpg,.png,.jpeg" hidden>
+                </div>
+                <div class="form-group"><label>NOME DOCUMENTO</label><input type="text" id="documentName" placeholder="Es. Piano alimentare..."></div>
+                <button type="submit" class="btn btn-primary btn-full">CARICA</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><i class="fas fa-check-circle" id="toastIcon"></i><span id="toastMessage">Messaggio</span></div>
+
+    <!-- ELITE MODALS -->
+    
+    <!-- SOS Emergency Modal -->
+    <div class="modal" id="sosModal">
+        <div class="modal-backdrop" onclick="closeModal('sosModal')"></div>
+        <div class="modal-sheet modal-fullscreen">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>🆘 EMERGENZA</h2><button class="btn-icon-sm" onclick="closeModal('sosModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="sos-content" id="sosContent"></div>
+        </div>
+    </div>
+
+    <!-- Gratitude Modal -->
+    <div class="modal" id="gratitudeModal">
+        <div class="modal-backdrop" onclick="closeModal('gratitudeModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>GRATITUDINE</h2><button class="btn-icon-sm" onclick="closeModal('gratitudeModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="EliteFeatures.saveGratitude(event)">
+                <p style="color:var(--gray-400);margin-bottom:var(--space-md);font-size:var(--text-sm)">Per cosa sei grato oggi?</p>
+                <div class="form-group"><label>1.</label><input type="text" id="gratitude1" placeholder="Sono grato per..." required></div>
+                <div class="form-group"><label>2.</label><input type="text" id="gratitude2" placeholder="Sono grato per..."></div>
+                <div class="form-group"><label>3.</label><input type="text" id="gratitude3" placeholder="Sono grato per..."></div>
+                <button type="submit" class="btn btn-primary btn-full">SALVA GRATITUDINE</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Journal Modal -->
+    <div class="modal" id="journalModal">
+        <div class="modal-backdrop" onclick="closeModal('journalModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>DIARIO</h2><button class="btn-icon-sm" onclick="closeModal('journalModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="EliteFeatures.saveJournal(event)">
+                <div class="form-group">
+                    <label>COME È ANDATA LA TUA GIORNATA?</label>
+                    <textarea id="journalEntry" rows="6" placeholder="Scrivi i tuoi pensieri..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">SALVA NEL DIARIO</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pomodoro Modal -->
+    <div class="modal" id="pomodoroModal">
+        <div class="modal-backdrop" onclick="closeModal('pomodoroModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>POMODORO TIMER</h2><button class="btn-icon-sm" onclick="closeModal('pomodoroModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="pomodoro-widget">
+                <div class="pomodoro-settings">
+                    <div class="pomodoro-setting">
+                        <label>FOCUS (min)</label>
+                        <div class="setting-adjust">
+                            <button type="button" onclick="adjustPomodoroTime('focus', -5)">-</button>
+                            <span id="pomodoroFocusTime">25</span>
+                            <button type="button" onclick="adjustPomodoroTime('focus', 5)">+</button>
+                        </div>
+                    </div>
+                    <div class="pomodoro-setting">
+                        <label>RIPOSO (min)</label>
+                        <div class="setting-adjust">
+                            <button type="button" onclick="adjustPomodoroTime('break', -1)">-</button>
+                            <span id="pomodoroBreakTime">5</span>
+                            <button type="button" onclick="adjustPomodoroTime('break', 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="pomodoro-display">
+                    <div class="pomodoro-time" id="pomodoroTime">25:00</div>
+                    <div class="pomodoro-type" id="pomodoroType">FOCUS</div>
+                </div>
+                <div class="pomodoro-controls">
+                    <button class="btn btn-secondary" onclick="EliteFeatures.resetPomodoro()"><i class="fas fa-rotate-left"></i></button>
+                    <button class="btn btn-primary" id="pomodoroBtn" onclick="EliteFeatures.togglePomodoro()"><i class="fas fa-play"></i></button>
+                    <button class="btn btn-secondary" onclick="EliteFeatures.skipPomodoro()"><i class="fas fa-forward"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breathing Modal -->
+    <div class="modal" id="breathingModal">
+        <div class="modal-backdrop" onclick="closeModal('breathingModal')"></div>
+        <div class="modal-sheet modal-fullscreen">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>RESPIRA</h2><button class="btn-icon-sm" onclick="closeModal('breathingModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="breathing-modal-content">
+                <div class="breathing-circle" id="breathingCircle">
+                    <span class="breathing-text" id="breathingText">PRONTO</span>
+                </div>
+                <div class="breathing-instruction" id="breathingInstruction">Premi per iniziare</div>
+                <div class="breathing-counter" id="breathingCounter"></div>
+                <button class="btn btn-primary btn-full" id="breathingBtn" onclick="EliteFeatures.startBreathing()">INIZIA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 3 Modal -->
+    <div class="modal" id="top3Modal">
+        <div class="modal-backdrop" onclick="closeModal('top3Modal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>TOP 3 PRIORITÀ</h2><button class="btn-icon-sm" onclick="closeModal('top3Modal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="EliteFeatures.saveTop3(event)">
+                <p style="color:var(--gray-400);margin-bottom:var(--space-md);font-size:var(--text-sm)">Le 3 cose più importanti da fare oggi:</p>
+                <div class="form-group"><label>1. (Obbligatorio)</label><input type="text" id="top3_1" placeholder="La cosa più importante..." required></div>
+                <div class="form-group"><label>2.</label><input type="text" id="top3_2" placeholder="Seconda priorità..."></div>
+                <div class="form-group"><label>3.</label><input type="text" id="top3_3" placeholder="Terza priorità..."></div>
+                <button type="submit" class="btn btn-primary btn-full">IMPOSTA PRIORITÀ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editProfileModal">
+        <div class="modal-backdrop" onclick="closeModal('editProfileModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>MODIFICA PROFILO</h2><button class="btn-icon-sm" onclick="closeModal('editProfileModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="saveProfile(event)">
+                <div class="form-group">
+                    <label>NOME</label>
+                    <input type="text" id="editProfileName" placeholder="Il tuo nome..." required>
+                </div>
+                <div class="form-group">
+                    <label>BIO / MOTTO</label>
+                    <input type="text" id="editProfileBio" placeholder="Il tuo motto motivazionale...">
+                </div>
+                <div class="form-group">
+                    <label>ETÀ</label>
+                    <input type="number" id="editProfileAge" placeholder="25" min="10" max="120">
+                </div>
+                <div class="form-group">
+                    <label>PESO OBIETTIVO (kg)</label>
+                    <input type="number" id="editProfileGoalWeight" placeholder="70" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>OBIETTIVO PRINCIPALE</label>
+                    <select id="editProfileGoal">
+                        <option value="lose">Perdere peso</option>
+                        <option value="gain">Aumentare massa</option>
+                        <option value="maintain">Mantenere forma</option>
+                        <option value="health">Migliorare salute</option>
+                        <option value="performance">Performance atletica</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">SALVA PROFILO</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Invite Friend Modal -->
+    <div class="modal" id="inviteFriendModal">
+        <div class="modal-backdrop" onclick="closeModal('inviteFriendModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>INVITA AMICI</h2><button class="btn-icon-sm" onclick="closeModal('inviteFriendModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="invite-content">
+                <div class="invite-code-section">
+                    <p class="invite-label">IL TUO CODICE INVITO</p>
+                    <div class="invite-code-box">
+                        <span class="invite-code" id="myInviteCode">LIFE-XXXX</span>
+                        <button class="btn-icon" onclick="copyInviteCode()"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+                <div class="invite-divider"><span>OPPURE</span></div>
+                <form onsubmit="addFriendByCode(event)">
+                    <div class="form-group">
+                        <label>INSERISCI CODICE AMICO</label>
+                        <input type="text" id="friendCode" placeholder="LIFE-XXXX" pattern="LIFE-[A-Z0-9]{4}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">AGGIUNGI AMICO</button>
+                </form>
+                <div class="invite-share">
+                    <p>Condividi con i tuoi amici:</p>
+                    <div class="share-buttons">
+                        <button class="share-btn whatsapp" onclick="shareInvite('whatsapp')"><i class="fab fa-whatsapp"></i></button>
+                        <button class="share-btn telegram" onclick="shareInvite('telegram')"><i class="fab fa-telegram"></i></button>
+                        <button class="share-btn copy" onclick="shareInvite('copy')"><i class="fas fa-link"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Post Modal (Friends-only feed) -->
+    <div class="modal" id="newPostModal">
+        <div class="modal-backdrop" onclick="closeModal('newPostModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>NUOVO POST</h2><button class="btn-icon-sm" onclick="closeModal('newPostModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="createSocialPost(event)">
+                <div class="form-group">
+                    <label>TESTO</label>
+                    <textarea id="newPostBody" rows="3" placeholder="Scrivi qualcosa... (opzionale)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>FOTO (opzionale)</label>
+                    <input type="file" id="newPostImage" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">PUBBLICA</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Story Viewer Modal -->
+    <div class="modal" id="storyModal">
+        <div class="modal-backdrop" onclick="closeModal('storyModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>STORIA</h2><button class="btn-icon-sm" onclick="closeModal('storyModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="story-viewer">
+                <img id="storyViewerImage" alt="Story" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Why I Started Modal -->
+    <div class="modal" id="whyModal">
+        <div class="modal-backdrop" onclick="closeModal('whyModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>PERCHÉ HO INIZIATO</h2><button class="btn-icon-sm" onclick="closeModal('whyModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="EliteFeatures.saveWhy(event)">
+                <div class="form-group">
+                    <label>COSA TI HA SPINTO A INIZIARE QUESTO PERCORSO?</label>
+                    <textarea id="whyEntry" rows="4" placeholder="Scrivi la tua motivazione profonda..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">SALVA</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Wins Modal -->
+    <div class="modal" id="winsModal">
+        <div class="modal-backdrop" onclick="closeModal('winsModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>NUOVA VITTORIA</h2><button class="btn-icon-sm" onclick="closeModal('winsModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="EliteFeatures.saveWin(event)">
+                <div class="form-group">
+                    <label>COSA HAI CONQUISTATO?</label>
+                    <input type="text" id="winEntry" placeholder="Ho raggiunto..." required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">AGGIUNGI VITTORIA</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Weight Quick Modal -->
+    <div class="modal" id="addWeightModal">
+        <div class="modal-backdrop" onclick="closeModal('addWeightModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>AGGIUNGI PESO</h2><button class="btn-icon-sm" onclick="closeModal('addWeightModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="saveQuickWeight(event)">
+                <div class="form-group">
+                    <label>PESO (kg)</label>
+                    <input type="number" id="quickWeight" step="0.1" placeholder="75.5" required>
+                </div>
+                <div class="form-group">
+                    <label>DATA</label>
+                    <input type="date" id="quickWeightDate">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">SALVA</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Measurements Modal -->
+    <div class="modal" id="measurementsModal">
+        <div class="modal-backdrop" onclick="closeModal('measurementsModal')"></div>
+        <div class="modal-sheet">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>MISURE CORPO</h2><button class="btn-icon-sm" onclick="closeModal('measurementsModal')"><i class="fas fa-xmark"></i></button></div>
+            <form onsubmit="EliteFeatures.saveMeasurements(event)">
+                <div class="form-row">
+                    <div class="form-group"><label>PESO (kg)</label><input type="number" id="measureWeight" step="0.1" placeholder="75"></div>
+                    <div class="form-group"><label>VITA (cm)</label><input type="number" id="measureWaist" step="0.5" placeholder="80"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>PETTO (cm)</label><input type="number" id="measureChest" step="0.5" placeholder="100"></div>
+                    <div class="form-group"><label>BRACCIA (cm)</label><input type="number" id="measureArms" step="0.5" placeholder="35"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>COSCE (cm)</label><input type="number" id="measureThighs" step="0.5" placeholder="55"></div>
+                    <div class="form-group"><label>FIANCHI (cm)</label><input type="number" id="measureHips" step="0.5" placeholder="95"></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">SALVA MISURE</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mood Report Modal -->
+    <div class="modal" id="moodReportModal">
+        <div class="modal-backdrop" onclick="closeModal('moodReportModal')"></div>
+        <div class="modal-sheet modal-lg">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>📊 REPORT UMORE</h2><button class="btn-icon-sm" onclick="closeModal('moodReportModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="report-content">
+                <div class="report-summary">
+                    <div class="report-stat"><span class="stat-value" id="moodAvg">-</span><span class="stat-label">Media</span></div>
+                    <div class="report-stat"><span class="stat-value" id="moodBest">-</span><span class="stat-label">Giorno Migliore</span></div>
+                    <div class="report-stat"><span class="stat-value" id="moodStreak">0</span><span class="stat-label">Streak Positivo</span></div>
+                </div>
+                <div class="report-chart">
+                    <h4>ULTIMI 14 GIORNI</h4>
+                    <div class="bar-chart" id="moodChart"></div>
+                </div>
+                <div class="report-history" id="moodHistoryList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sleep Report Modal -->
+    <div class="modal" id="sleepReportModal">
+        <div class="modal-backdrop" onclick="closeModal('sleepReportModal')"></div>
+        <div class="modal-sheet modal-lg">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>😴 REPORT SONNO</h2><button class="btn-icon-sm" onclick="closeModal('sleepReportModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="report-content">
+                <div class="report-summary">
+                    <div class="report-stat"><span class="stat-value" id="sleepAvgHours">-</span><span class="stat-label">Media Ore</span></div>
+                    <div class="report-stat"><span class="stat-value" id="sleepAvgQuality">-</span><span class="stat-label">Qualità Media</span></div>
+                    <div class="report-stat"><span class="stat-value" id="sleepBestNight">-</span><span class="stat-label">Notte Migliore</span></div>
+                </div>
+                <div class="report-chart">
+                    <h4>ORE DI SONNO - 14 GIORNI</h4>
+                    <div class="bar-chart" id="sleepChart"></div>
+                </div>
+                <div class="report-history" id="sleepHistoryList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Water Report Modal -->
+    <div class="modal" id="waterReportModal">
+        <div class="modal-backdrop" onclick="closeModal('waterReportModal')"></div>
+        <div class="modal-sheet modal-lg">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>💧 REPORT IDRATAZIONE</h2><button class="btn-icon-sm" onclick="closeModal('waterReportModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="report-content">
+                <div class="report-summary">
+                    <div class="report-stat"><span class="stat-value" id="waterAvg">-</span><span class="stat-label">Media Giornaliera</span></div>
+                    <div class="report-stat"><span class="stat-value" id="waterTotal">-</span><span class="stat-label">Totale Litri</span></div>
+                    <div class="report-stat"><span class="stat-value" id="waterGoalDays">0</span><span class="stat-label">Giorni 100%</span></div>
+                </div>
+                <div class="report-chart">
+                    <h4>BICCHIERI - 14 GIORNI</h4>
+                    <div class="bar-chart" id="waterChart"></div>
+                </div>
+                <div class="report-history" id="waterHistoryList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workout Report Modal -->
+    <div class="modal" id="workoutReportModal">
+        <div class="modal-backdrop" onclick="closeModal('workoutReportModal')"></div>
+        <div class="modal-sheet modal-lg">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>💪 REPORT ALLENAMENTI</h2><button class="btn-icon-sm" onclick="closeModal('workoutReportModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="report-content">
+                <div class="report-summary">
+                    <div class="report-stat"><span class="stat-value" id="workoutTotal">0</span><span class="stat-label">Totale Sessioni</span></div>
+                    <div class="report-stat"><span class="stat-value" id="workoutHours">0h</span><span class="stat-label">Ore Totali</span></div>
+                    <div class="report-stat"><span class="stat-value" id="workoutStreak">0</span><span class="stat-label">Best Streak</span></div>
+                </div>
+                <div class="report-chart">
+                    <h4>SESSIONI PER SETTIMANA</h4>
+                    <div class="bar-chart" id="workoutChart"></div>
+                </div>
+                <div class="report-history" id="workoutHistoryList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Report Modal -->
+    <div class="modal" id="fullReportModal">
+        <div class="modal-backdrop" onclick="closeModal('fullReportModal')"></div>
+        <div class="modal-sheet modal-lg">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>📈 PANORAMICA COMPLETA</h2><button class="btn-icon-sm" onclick="closeModal('fullReportModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="report-content">
+                <div class="full-report-grid" id="fullReportGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level Up Overlay -->
+    <div class="level-up-overlay" id="levelUpOverlay" onclick="EliteFeatures.closeLevelUp()">
+        <div class="level-up-content">
+            <div class="level-up-icon"><i class="fas fa-crown"></i></div>
+            <h2>LEVEL UP!</h2>
+            <div class="level-up-level" id="levelUpLevel">LIVELLO 2</div>
+            <div class="level-up-title" id="levelUpTitle">Novizio</div>
+            <button class="btn btn-primary" onclick="EliteFeatures.closeLevelUp()">FANTASTICO!</button>
+        </div>
+    </div>
+
+    <!-- Badge Earned Overlay -->
+    <div class="badge-earned-overlay" id="badgeEarnedOverlay" onclick="EliteFeatures.closeBadge()">
+        <div class="badge-earned-content">
+            <div class="badge-earned-icon" id="badgeEarnedIcon"><i class="fas fa-medal"></i></div>
+            <h2>NUOVO BADGE!</h2>
+            <div class="badge-earned-name" id="badgeEarnedName">Badge Name</div>
+            <div class="badge-earned-desc" id="badgeEarnedDesc">Description</div>
+            <div class="badge-earned-xp" id="badgeEarnedXP">+50 XP</div>
+            <button class="btn btn-primary" onclick="EliteFeatures.closeBadge()">FANTASTICO!</button>
+        </div>
+    </div>
+
+    <!-- Badges Modal (Full Page) -->
+    <div class="modal" id="badgesModal">
+        <div class="modal-backdrop" onclick="closeModal('badgesModal')"></div>
+        <div class="modal-sheet modal-lg">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>🏆 I MIEI BADGE</h2><button class="btn-icon-sm" onclick="closeModal('badgesModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="badges-modal-content">
+                <div class="badges-level-info">
+                    <div class="level-circle-big">
+                        <span id="badgesModalLevel">1</span>
+                    </div>
+                    <div class="level-details">
+                        <h3 id="badgesModalTitle">PRINCIPIANTE</h3>
+                        <div class="xp-progress-big">
+                            <div class="xp-fill-big" id="badgesModalXpFill"></div>
+                        </div>
+                        <p><span id="badgesModalXp">0</span> / <span id="badgesModalNextXp">100</span> XP</p>
+                    </div>
+                </div>
+                <div class="badges-grid-full" id="badgesGridFull"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Priority Modal -->
+    <div class="modal" id="priorityModal">
+        <div class="modal-backdrop" onclick="closeModal('priorityModal')"></div>
+        <div class="modal-sheet modal-lg">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>GESTISCI PRIORITÀ</h2><button class="btn-icon-sm" onclick="closeModal('priorityModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="priority-modal-content">
+                <p class="priority-hint">Trascina per riordinare. Seleziona gli obiettivi da mostrare.</p>
+                <div class="priority-goals-list" id="priorityGoalsList"></div>
+                <button class="btn btn-primary btn-full" onclick="savePriorities(); closeModal('priorityModal')">SALVA PRIORITÀ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Diary Entry Modal -->
+    <div class="modal" id="newDiaryEntryModal">
+        <div class="modal-backdrop" onclick="closeModal('newDiaryEntryModal')"></div>
+        <div class="modal-sheet modal-fullscreen">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h2>NUOVA PAGINA</h2>
+                <button class="btn-icon-sm" onclick="closeModal('newDiaryEntryModal')"><i class="fas fa-xmark"></i></button>
+            </div>
+            <form onsubmit="saveDiaryEntry(event)" class="diary-form">
+                <div class="diary-meta">
+                    <input type="date" id="diaryDate" required>
+                    <input type="time" id="diaryTime" required>
+                </div>
+                <input type="text" id="diaryTitle" placeholder="Titolo..." class="diary-title-input">
+                <textarea id="diaryContent" placeholder="Scrivi i tuoi pensieri..." rows="10" required></textarea>
+                <div class="diary-attachments">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('diaryImageInput').click()">
+                        <i class="fas fa-image"></i> Aggiungi Foto
+                    </button>
+                    <input type="file" id="diaryImageInput" accept="image/*" multiple hidden onchange="previewDiaryImages(event)">
+                    <div class="diary-images-preview" id="diaryImagesPreview"></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">SALVA PAGINA</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Diary Entry Modal -->
+    <div class="modal" id="viewDiaryEntryModal">
+        <div class="modal-backdrop" onclick="closeModal('viewDiaryEntryModal')"></div>
+        <div class="modal-sheet modal-fullscreen">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h2 id="viewDiaryTitle">Titolo</h2>
+                <div class="modal-header-actions">
+                    <button class="btn-icon-sm" onclick="deleteDiaryEntry()"><i class="fas fa-trash"></i></button>
+                    <button class="btn-icon-sm" onclick="closeModal('viewDiaryEntryModal')"><i class="fas fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="diary-view-content">
+                <div class="diary-view-meta" id="viewDiaryMeta"></div>
+                <div class="diary-view-text" id="viewDiaryContent"></div>
+                <div class="diary-view-images" id="viewDiaryImages"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTH MODAL -->
+    <div class="modal" id="authModal">
+        <div class="modal-content modal-md">
+            <div class="modal-handle"></div>
+            <div class="modal-header">
+                <h2>ACCOUNT</h2>
+                <button class="btn-icon-sm" onclick="closeAuthModal()"><i class="fas fa-xmark"></i></button>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">ACCEDI</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">REGISTRATI</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">EMAIL</label>
+                    <input type="email" id="loginEmail" class="input" placeholder="La tua email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">PASSWORD</label>
+                    <input type="password" id="loginPassword" class="input" placeholder="La tua password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">ACCEDI</button>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="registerForm" onsubmit="handleRegister(event)" style="display:none;">
+                <div class="form-group">
+                    <label class="form-label">NOME</label>
+                    <input type="text" id="registerName" class="input" placeholder="Il tuo nome" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">EMAIL</label>
+                    <input type="email" id="registerEmail" class="input" placeholder="La tua email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">PASSWORD</label>
+                    <input type="password" id="registerPassword" class="input" placeholder="Min. 6 caratteri" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CONFERMA PASSWORD</label>
+                    <input type="password" id="registerConfirmPassword" class="input" placeholder="Ripeti password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">REGISTRATI</button>
+            </form>
+            
+            <p class="auth-info">
+                <i class="fas fa-cloud"></i> I tuoi dati verranno sincronizzati su tutti i dispositivi
+            </p>
+        </div>
+    </div>
+
+    <!-- Photo Gallery Modal -->
+    <div class="modal" id="photoGalleryModal">
+        <div class="modal-backdrop" onclick="closeModal('photoGalleryModal')"></div>
+        <div class="modal-sheet modal-lg">
+            <div class="modal-handle"></div>
+            <div class="modal-header"><h2>📸 GALLERIA PROGRESSI</h2><button class="btn-icon-sm" onclick="closeModal('photoGalleryModal')"><i class="fas fa-xmark"></i></button></div>
+            <div class="photo-gallery-content" id="photoGalleryContent"></div>
+        </div>
+    </div>
+
+    <input type="file" id="importInput" accept=".json" hidden>
+
+    <script src="js/app.js"></script>
+    <script src="js/elite-features.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/social.js"></script>
+    <script>
+        // Initialize Elite Features after main app
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof EliteFeatures !== 'undefined') {
+                    EliteFeatures.init();
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

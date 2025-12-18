@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>LIFE TRACKER - Benvenuto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .video-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.9) 100%);
+            z-index: 1;
+        }
+
+        .landing-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px 24px;
+            padding-bottom: max(40px, env(safe-area-inset-bottom));
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #FA5400 0%, #FF7A00 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            box-shadow: 0 10px 40px rgba(250, 84, 0, 0.4);
+        }
+
+        .logo-icon i { font-size: 36px; color: #fff; }
+
+        .landing-title {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .landing-subtitle {
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+            max-width: 280px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .buttons-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #FA5400;
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(250, 84, 0, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: #FF7A00;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .btn-skip {
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .feature { text-align: center; }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+        }
+
+        .feature-icon i { font-size: 20px; color: #FA5400; }
+
+        .feature-text {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .auth-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #111;
+            border-radius: 24px 24px 0 0;
+            padding: 32px 24px;
+            padding-bottom: max(32px, env(safe-area-inset-bottom));
+            z-index: 10;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            visibility: hidden;
+        }
+
+        .auth-panel.active {
+            transform: translateY(0);
+            visibility: visible;
+        }
+
+        .auth-panel-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 9;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+        }
+
+        .auth-panel-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .auth-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin: 0 auto 24px;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FA5400;
+            background: rgba(255,255,255,0.12);
+        }
+
+        .form-input::placeholder { color: rgba(255,255,255,0.3); }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 24px;
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+        }
+
+        .auth-switch a {
+            color: #FA5400;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .error-msg, .success-msg {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-msg {
+            background: rgba(255, 59, 48, 0.15);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+            color: #FF6B6B;
+        }
+
+        .success-msg {
+            background: rgba(0, 210, 106, 0.15);
+            border: 1px solid rgba(0, 210, 106, 0.3);
+            color: #00D26A;
+        }
+
+        .error-msg.show, .success-msg.show { display: block; }
+
+        .btn.loading { opacity: 0.7; pointer-events: none; }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (min-width: 600px) {
+            .landing-container { max-width: 420px; margin: 0 auto; }
+            .auth-panel {
+                max-width: 420px;
+                left: 50%;
+                transform: translateX(-50%) translateY(100%);
+            }
+            .auth-panel.active { transform: translateX(-50%) translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <video class="video-bg" autoplay muted loop playsinline>
+        <source src="https://videos.pexels.com/video-files/4761432/4761432-uhd_2160_4096_25fps.mp4" type="video/mp4">
+    </video>
+    <div class="overlay"></div>
+
+    <div class="landing-container">
+        <div class="logo-section">
+            <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+            <h1 class="landing-title">LIFE<br>TRACKER</h1>
+            <p class="landing-subtitle">Monitora i tuoi obiettivi. Raggiungi il tuo potenziale.</p>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
+                <span class="feature-text">Obiettivi</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"><i class="fas fa-dumbbell"></i></div>
+                <span class="feature-text">Workout</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon"><i class="fas fa-cloud"></i></div>
+                <span class="feature-text">Cloud Sync</span>
+            </div>
+        </div>
+
+        <div class="buttons-section">
+            <button class="btn btn-primary" id="btnRegister"><i class="fas fa-user-plus"></i> INIZIA ORA</button>
+            <button class="btn btn-secondary" id="btnLogin"><i class="fas fa-sign-in-alt"></i> HO GIÀ UN ACCOUNT</button>
+            <button class="btn btn-skip" id="btnSkip">Continua senza account</button>
+        </div>
+    </div>
+
+    <div class="auth-panel-backdrop" id="loginBackdrop"></div>
+    <div class="auth-panel" id="loginPanel">
+        <div class="auth-handle"></div>
+        <h2 class="auth-title">Bentornato</h2>
+        <p class="auth-subtitle">Accedi per sincronizzare i tuoi dati</p>
+        <div class="error-msg" id="loginError"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="loginEmail" placeholder="La tua email" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="loginPassword" placeholder="La tua password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="loginBtn">ACCEDI</button>
+        </form>
+        <p class="auth-switch">Non hai un account? <a href="#" id="switchToRegister">Registrati</a></p>
+    </div>
+
+    <div class="auth-panel-backdrop" id="registerBackdrop"></div>
+    <div class="auth-panel" id="registerPanel">
+        <div class="auth-handle"></div>
+        <h2 class="auth-title">Crea Account</h2>
+        <p class="auth-subtitle">Inizia il tuo percorso di crescita</p>
+        <div class="error-msg" id="registerError"></div>
+        <div class="success-msg" id="registerSuccess"></div>
+        <form id="registerForm">
+            <div class="form-group">
+                <label class="form-label">Nome</label>
+                <input type="text" class="form-input" id="registerName" placeholder="Il tuo nome" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="registerEmail" placeholder="La tua email" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-input" id="registerPassword" placeholder="Min. 6 caratteri" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Conferma Password</label>
+                <input type="password" class="form-input" id="registerConfirm" placeholder="Ripeti password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="registerBtn">REGISTRATI</button>
+        </form>
+        <p class="auth-switch">Hai già un account? <a href="#" id="switchToLogin">Accedi</a></p>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://lmrrqvggziaecilswumm.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtcnJxdmdnemlhZWNpbHN3dW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMTA1MDcsImV4cCI6MjA4MTU4NjUwN30.N9K-gTnMme0zcvFiQbVQ1YdJIF69CFA_75Vmh5z6G4s';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Handle email confirmation / magic-link callbacks
+        (async function() {
+            try {
+                const url = new URL(window.location.href);
+                const code = url.searchParams.get('code');
+                const tokenHash = url.searchParams.get('token_hash');
+                const type = url.searchParams.get('type');
+
+                // New Supabase email links often provide `code` (PKCE)
+                if (code) {
+                    const { error } = await supabaseClient.auth.exchangeCodeForSession(window.location.href);
+                    if (error) throw error;
+                    window.location.replace('index.html');
+                    return;
+                }
+
+                // Some templates use token_hash/type
+                if (tokenHash && type) {
+                    const { error } = await supabaseClient.auth.verifyOtp({
+                        type,
+                        token_hash: tokenHash
+                    });
+                    if (error) throw error;
+                    window.location.replace('index.html');
+                    return;
+                }
+            } catch (e) {
+                console.warn('Auth callback handling error:', e);
+            }
+
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) window.location.href = 'index.html';
+        })();
+
+        function showPanel(type) {
+            document.getElementById(type + 'Panel').classList.add('active');
+            document.getElementById(type + 'Backdrop').classList.add('active');
+        }
+
+        function hidePanel(type) {
+            document.getElementById(type + 'Panel').classList.remove('active');
+            document.getElementById(type + 'Backdrop').classList.remove('active');
+        }
+
+        document.getElementById('btnRegister').onclick = () => showPanel('register');
+        document.getElementById('btnLogin').onclick = () => showPanel('login');
+        document.getElementById('btnSkip').onclick = () => {
+            localStorage.setItem('lt_skip_login', 'true');
+            window.location.href = 'index.html';
+        };
+
+        document.getElementById('loginBackdrop').onclick = () => hidePanel('login');
+        document.getElementById('registerBackdrop').onclick = () => hidePanel('register');
+
+        document.getElementById('switchToRegister').onclick = (e) => {
+            e.preventDefault();
+            hidePanel('login');
+            setTimeout(() => showPanel('register'), 200);
+        };
+
+        document.getElementById('switchToLogin').onclick = (e) => {
+            e.preventDefault();
+            hidePanel('register');
+            setTimeout(() => showPanel('login'), 200);
+        };
+
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginBtn');
+            const errorEl = document.getElementById('loginError');
+
+            btn.classList.add('loading');
+            btn.innerHTML = '<div class="spinner"></div>';
+            errorEl.classList.remove('show');
+
+            try {
+                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                window.location.href = 'index.html';
+            } catch (error) {
+                errorEl.textContent = error.message === 'Invalid login credentials' ? 'Email o password errati' : error.message;
+                errorEl.classList.add('show');
+                btn.classList.remove('loading');
+                btn.textContent = 'ACCEDI';
+            }
+        };
+
+        document.getElementById('registerForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+            const btn = document.getElementById('registerBtn');
+            const errorEl = document.getElementById('registerError');
+            const successEl = document.getElementById('registerSuccess');
+
+            errorEl.classList.remove('show');
+            successEl.classList.remove('show');
+
+            if (password !== confirm) {
+                errorEl.textContent = 'Le password non coincidono';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            if (password.length < 6) {
+                errorEl.textContent = 'La password deve avere almeno 6 caratteri';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            btn.classList.add('loading');
+            btn.innerHTML = '<div class="spinner"></div>';
+
+            try {
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { name },
+                        emailRedirectTo: `${window.location.origin}/login.html`
+                    }
+                });
+
+                if (error) throw error;
+
+                if (data.user && !data.session) {
+                    successEl.textContent = 'Controlla la tua email per confermare la registrazione!';
+                    successEl.classList.add('show');
+                    btn.classList.remove('loading');
+                    btn.textContent = 'REGISTRATI';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                errorEl.textContent = error.message;
+                errorEl.classList.add('show');
+                btn.classList.remove('loading');
+                btn.textContent = 'REGISTRATI';
+            }
+        };
+    </script>
+</body>
+</html>
