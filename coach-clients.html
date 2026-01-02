@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GR Perform - Gestione Clienti</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E63946">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,6 +19,7 @@
         
         :root {
             --red: #E63946;
+            --red-hover: #FF4D5A;
             --black: #000;
             --gray-900: #0A0A0A;
             --gray-800: #111;
@@ -18,18 +27,50 @@
             --gray-600: #222;
             --gray-400: #888;
             --gray-500: #666;
+            --gray-300: #AAA;
             --white: #FFF;
             --green: #00D26A;
             --yellow: #FFB800;
             --blue: #2196F3;
+            
+            /* Nike-style timing functions */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+            --transition-fast: 0.2s var(--ease-out-expo);
+            --transition-medium: 0.4s var(--ease-out-expo);
+            --transition-slow: 0.6s var(--ease-out-expo);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--black);
             color: var(--white);
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Nike-style smooth scrolling */
+        * {
+            scroll-behavior: smooth;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--gray-600);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-500);
         }
 
         /* SIDEBAR */
@@ -1208,7 +1249,7 @@
         /* SPORT CARDS LANDING PAGE */
         .sports-landing {
             margin-left: 72px;
-            padding: 60px 40px;
+            padding: 40px 40px 60px;
             height: 100vh;
             overflow-y: auto;
             display: flex;
@@ -1216,17 +1257,87 @@
             align-items: center;
         }
         
+        .landing-hero {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            min-height: 200px;
+            height: 25vh;
+            max-height: 300px;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 32px;
+            flex-shrink: 0;
+        }
+        
+        .landing-hero img,
+        .landing-hero video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 30%;
+            filter: brightness(0.5);
+        }
+        
+        .landing-hero-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.8) 100%);
+        }
+        
+        .landing-hero-title {
+            font-size: 72px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -4px;
+            line-height: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .landing-hero-title span {
+            color: var(--red);
+            display: block;
+            font-size: 1.2em;
+        }
+        
+        .landing-hero-quote {
+            font-size: 18px;
+            font-weight: 400;
+            font-style: normal;
+            color: rgba(255,255,255,0.7);
+            max-width: 500px;
+            line-height: 1.5;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .landing-hero-quote::before {
+            display: none;
+        }
+        
+        .landing-hero-quote::after {
+            display: none;
+        }
+
         .landing-header {
-            margin-bottom: 40px;
+            margin-bottom: 24px;
             text-align: center;
             max-width: 900px;
             width: 100%;
         }
         
         .landing-title {
-            font-size: 36px;
-            font-weight: 900;
+            font-size: 28px;
+            font-weight: 800;
             margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
         }
         
         .landing-subtitle {
@@ -1238,39 +1349,152 @@
             margin-top: 8px;
             font-size: 13px;
         }
-        
-        .sports-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-            max-width: 800px;
+
+        /* CAROUSEL SECTION STILE NIKE */
+        .carousel-section {
             width: 100%;
+            max-width: 1400px;
+            margin-bottom: 60px;
         }
         
+        .carousel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 0 4px;
+        }
+        
+        .carousel-title {
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+        
+        .carousel-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .carousel-arrows {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .carousel-arrow {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .carousel-arrow:hover {
+            background: var(--gray-700);
+            border-color: var(--gray-500);
+        }
+        
+        .carousel-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .carousel-arrow i {
+            font-size: 16px;
+        }
+        
+        .carousel-track-wrapper {
+            position: relative;
+            overflow-x: auto;
+            overflow-y: hidden;
+            border-radius: 0;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .carousel-track-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .carousel-track {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.4s ease;
+            cursor: grab;
+        }
+        
+        .carousel-track:active {
+            cursor: grabbing;
+        }
+        
+        .carousel-progress {
+            margin-top: 20px;
+            height: 3px;
+            background: var(--gray-700);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .carousel-progress-bar {
+            height: 100%;
+            background: var(--white);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        /* SPORT CARD NEL CAROUSEL - NIKE STYLE */
         .sport-big-card {
             position: relative;
-            aspect-ratio: 1;
-            border-radius: 24px;
+            min-width: 320px;
+            max-width: 320px;
+            width: 320px;
+            height: 400px;
+            border-radius: 0;
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.3s ease;
+            flex-shrink: 0;
+            scroll-snap-align: start;
         }
         
-        .sport-big-card:hover {
-            transform: scale(1.02);
+        .sport-big-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.95) 100%);
+            z-index: 1;
+            transition: opacity var(--transition-medium);
+        }
+        
+        .sport-big-card:hover::before {
+            opacity: 0.8;
         }
         
         .sport-big-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform var(--transition-slow);
+        }
+        
+        .sport-big-card:hover img {
+            transform: scale(1.08);
         }
         
         .sport-big-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%);
+            display: none;
         }
         
         .sport-card-content {
@@ -1278,66 +1502,123 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 24px;
+            padding: 32px;
             z-index: 2;
+            transform: translateY(0);
+            transition: transform var(--transition-medium);
+        }
+        
+        .sport-big-card:hover .sport-card-content {
+            transform: translateY(-8px);
         }
         
         .sport-card-title {
             font-size: 28px;
-            font-weight: 800;
+            font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+            line-height: 1;
         }
         
         .sport-card-count {
-            font-size: 16px;
-            color: var(--gray-400);
+            font-size: 14px;
+            color: var(--gray-300);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .sport-card-count span {
-            color: var(--red);
-            font-weight: 700;
+            color: var(--white);
+            font-weight: 800;
+        }
+        
+        /* CTA Arrow on hover */
+        .sport-card-content::after {
+            content: '→';
+            position: absolute;
+            right: 32px;
+            bottom: 32px;
+            font-size: 24px;
+            font-weight: 300;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all var(--transition-medium);
+        }
+        
+        .sport-big-card:hover .sport-card-content::after {
+            opacity: 1;
+            transform: translateX(0);
         }
 
-        /* ATHLETES LIST VIEW */
+        /* ATHLETES LIST VIEW - PREMIUM DESIGN */
         .athletes-view {
             display: none;
             margin-left: 72px;
             height: 100vh;
             flex-direction: column;
             overflow: hidden;
+            background: var(--black);
         }
         
         .athletes-view.active {
             display: flex;
         }
         
-        .athletes-header {
-            padding: 24px 32px;
-            background: var(--gray-900);
-            border-bottom: 1px solid var(--gray-700);
+        /* Hero Header con immagine sport */
+        .athletes-hero-header {
+            position: relative;
+            min-height: 260px;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .athletes-hero-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.6);
+        }
+        
+        .athletes-hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%);
+        }
+        
+        .athletes-hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 40px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.7) 100%);
         }
         
         .athletes-header-top {
             display: flex;
             align-items: center;
             gap: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
         
         .back-btn {
             width: 44px;
             height: 44px;
-            border-radius: 12px;
+            border-radius: 0;
             background: var(--gray-800);
+            backdrop-filter: blur(10px);
             border: none;
             color: var(--white);
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all var(--transition-fast);
         }
         
         .back-btn:hover {
@@ -1345,86 +1626,176 @@
         }
         
         .athletes-title {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 48px;
+            font-weight: 900;
             text-transform: uppercase;
+            letter-spacing: -2px;
+            line-height: 1;
+            color: var(--white);
         }
         
         .athletes-count {
             background: var(--red);
+            color: var(--white);
             padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
+            font-size: 11px;
+            font-weight: 800;
             margin-left: auto;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Search & Filter Bar - NIKE STYLE */
+        .athletes-filter-bar {
+            display: flex;
+            gap: 1px;
+            padding: 0;
+            background: var(--gray-800);
+            border-bottom: 1px solid var(--gray-800);
         }
         
         .athletes-search {
+            flex: 1;
             position: relative;
+            background: var(--black);
         }
         
         .athletes-search input {
             width: 100%;
-            padding: 14px 20px 14px 50px;
-            background: var(--gray-800);
-            border: 2px solid var(--gray-600);
-            border-radius: 14px;
+            padding: 18px 24px 18px 52px;
+            background: transparent;
+            border: none;
             color: var(--white);
-            font-size: 15px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background var(--transition-fast);
         }
         
         .athletes-search input:focus {
             outline: none;
-            border-color: var(--red);
+            background: var(--gray-900);
+        }
+        
+        .athletes-search input::placeholder {
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 11px;
         }
         
         .athletes-search i {
             position: absolute;
-            left: 18px;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray-400);
+            color: var(--gray-500);
+            font-size: 14px;
         }
         
+        .filter-btn {
+            padding: 18px 24px;
+            background: var(--black);
+            border: none;
+            color: var(--gray-500);
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all var(--transition-fast);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .filter-btn:hover {
+            color: var(--white);
+            background: var(--gray-900);
+        }
+        
+        .filter-btn.active {
+            background: var(--red);
+            color: var(--white);
+        }
+        
+        .athletes-filter-buttons {
+            display: flex;
+            gap: 1px;
+        }
+        
+        /* Athletes Grid - NIKE STYLE */
         .athletes-list {
             flex: 1;
             overflow-y: auto;
-            padding: 24px 32px;
+            padding: 1px;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 1px;
+            background: var(--gray-800);
             align-content: start;
         }
         
+        /* Premium Athlete Card - NIKE STYLE */
         .athlete-card {
-            background: var(--gray-800);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
+            background: var(--black);
+            border-radius: 0;
+            padding: 0;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid transparent;
+            border: none;
+            overflow: hidden;
+            position: relative;
+            transition: background var(--transition-fast);
+        }
+        
+        .athlete-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(230,57,70,0.08) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity var(--transition-medium);
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .athlete-card:hover::before {
+            opacity: 1;
         }
         
         .athlete-card:hover {
-            border-color: var(--gray-500);
-            background: var(--gray-700);
+            background: var(--gray-900);
+        }
+        
+        .athlete-card:active {
+            transform: scale(0.98);
+        }
+        
+        .athlete-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 24px;
+            position: relative;
+            z-index: 2;
         }
         
         .athlete-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--red), #FF6B6B);
+            width: 52px;
+            height: 52px;
+            border-radius: 0;
+            background: var(--red);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
+            font-weight: 900;
             font-size: 18px;
             flex-shrink: 0;
             overflow: hidden;
+            transition: transform var(--transition-medium);
+        }
+        
+        .athlete-card:hover .athlete-avatar {
+            transform: scale(1.08);
         }
         
         .athlete-avatar img {
@@ -1436,35 +1807,166 @@
         
         .athlete-info {
             flex: 1;
+            min-width: 0;
         }
         
         .athlete-name {
-            font-weight: 700;
+            font-weight: 800;
             font-size: 16px;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+            letter-spacing: -0.3px;
         }
         
         .athlete-meta {
-            font-size: 13px;
+            font-size: 12px;
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .athlete-badge {
+            background: var(--green);
+            color: var(--black);
+            font-size: 9px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .athlete-badge.warning {
+            background: var(--yellow);
+        }
+        
+        .athlete-badge.danger {
+            background: var(--red);
+            color: var(--white);
+        }
+        
+        .athlete-badge.new {
+            background: var(--gray-600);
+            color: var(--white);
+        }
+        
+        /* Stats Row - NIKE STYLE */
+        .athlete-stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: rgba(255,255,255,0.03);
+            position: relative;
+            z-index: 2;
+            border-top: 1px solid var(--gray-800);
+        }
+        
+        .athlete-stat-item {
+            padding: 16px 12px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .athlete-stat-item::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 28px;
+            background: var(--gray-800);
+        }
+        
+        .athlete-stat-item:last-child::after {
+            display: none;
+        }
+        
+        .athlete-stat-value {
+            font-size: 22px;
+            font-weight: 900;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+        
+        .athlete-stat-value.good {
+            color: var(--green);
+        }
+        
+        .athlete-stat-value.warning {
+            color: var(--yellow);
+        }
+        
+        .athlete-stat-value.danger {
+            color: var(--red);
+        }
+        
+        .athlete-stat-value.neutral {
             color: var(--gray-400);
         }
         
-        .athlete-arrow {
+        .athlete-stat-label {
+            font-size: 11px;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .trend-up {
+            color: var(--green);
+        }
+        
+        .trend-down {
+            color: var(--red);
+        }
+        
+        .trend-stable {
+            color: var(--gray-400);
+        }
+        
+        /* Empty State */
+        .athletes-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
             color: var(--gray-500);
+        }
+        
+        .athletes-empty i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .athletes-empty h3 {
             font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--gray-400);
         }
 
-        /* DETAIL VIEW */
+        /* DETAIL VIEW - NIKE STYLE */
         .detail-view {
-            display: none;
-            margin-left: 72px;
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: calc(100% - 72px);
             height: 100vh;
+            display: none;
             flex-direction: column;
             overflow: hidden;
+            background: var(--black);
+            transition: right var(--transition-medium);
+            z-index: 100;
         }
         
         .detail-view.active {
             display: flex;
+            right: 0;
         }
         
         .detail-content {
@@ -1473,13 +1975,46 @@
             background: var(--black);
         }
         
+        /* FLOATING ACTION BUTTON */
+        .fab-generate {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red), #FF4D5A);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(230,57,70,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 110;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fabPulse 2s infinite;
+        }
+        
+        .fab-generate:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 40px rgba(230,57,70,0.6);
+        }
+        
+        @keyframes fabPulse {
+            0%, 100% { box-shadow: 0 8px 32px rgba(230,57,70,0.5); }
+            50% { box-shadow: 0 8px 48px rgba(230,57,70,0.7); }
+        }
+        
         /* NIKE STYLE ATHLETE PROFILE */
         .athlete-hero {
             position: relative;
-            padding: 32px 24px;
+            padding: 80px 24px 100px;
             background: linear-gradient(180deg, var(--gray-800) 0%, var(--black) 100%);
             text-align: center;
             overflow: hidden;
+            min-height: 320px;
         }
 
         .athlete-hero-bg {
@@ -1488,8 +2023,14 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            opacity: 0.32;
-            transform: scale(1.04);
+            opacity: 0.5;
+            transform: scale(1.1);
+            animation: heroZoom 20s ease-in-out infinite alternate;
+        }
+        
+        @keyframes heroZoom {
+            0% { transform: scale(1.1); }
+            100% { transform: scale(1.2); }
         }
 
         .athlete-hero-bg::after {
@@ -1497,15 +2038,54 @@
             position: absolute;
             inset: 0;
             background: linear-gradient(180deg,
-                rgba(0,0,0,0.10) 0%,
-                rgba(0,0,0,0.55) 55%,
-                rgba(0,0,0,0.98) 100%
+                rgba(0,0,0,0.20) 0%,
+                rgba(0,0,0,0.50) 40%,
+                rgba(0,0,0,0.95) 100%
             );
+        }
+        
+        /* STATUS BADGE */
+        .athlete-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.5s ease-out 0.2s both;
+        }
+        
+        .athlete-status-badge.status-good {
+            background: rgba(0, 200, 83, 0.2);
+            color: var(--green);
+            border: 1px solid rgba(0, 200, 83, 0.3);
+        }
+        
+        .athlete-status-badge.status-warning {
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+        
+        .athlete-status-badge.status-rest {
+            background: rgba(100, 100, 100, 0.2);
+            color: var(--gray-400);
+            border: 1px solid rgba(100, 100, 100, 0.3);
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .athlete-hero-avatar,
         .athlete-hero-name,
-        .athlete-hero-meta {
+        .athlete-hero-meta,
+        .athlete-status-badge {
             position: relative;
             z-index: 1;
         }
@@ -1513,16 +2093,16 @@
         .athlete-hero-avatar {
             width: 100px;
             height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--red) 0%, #FF4D5A 100%);
+            border-radius: 0;
+            background: var(--red);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 900;
-            font-size: 32px;
-            margin: 0 auto 16px;
+            font-size: 36px;
+            margin: 0 auto 24px;
             overflow: hidden;
-            border: 3px solid var(--gray-700);
+            animation: fadeInUp 0.5s var(--ease-out-expo) both;
         }
         
         .athlete-hero-avatar img {
@@ -1533,73 +2113,250 @@
         }
         
         .athlete-hero-name {
-            font-size: 28px;
+            font-size: 42px;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: -0.5px;
-            margin-bottom: 6px;
+            letter-spacing: -2px;
+            margin-bottom: 8px;
+            animation: fadeInUp 0.5s var(--ease-out-expo) 0.1s both;
         }
         
         .athlete-hero-meta {
-            color: var(--gray-400);
-            font-size: 14px;
+            color: var(--gray-300);
+            font-size: 13px;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: fadeInUp 0.5s var(--ease-out-expo) 0.15s both;
         }
         
         .athlete-stats-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             background: var(--gray-900);
-            border-radius: 16px;
-            margin: -20px 16px 0;
+            margin: -40px 0 0;
             position: relative;
             z-index: 2;
             overflow: hidden;
+            animation: fadeInUp 0.5s var(--ease-out-expo) 0.3s both;
         }
         
         .athlete-stat {
-            padding: 20px 12px;
+            padding: 28px 12px;
             text-align: center;
-            border-right: 1px solid var(--gray-700);
+            position: relative;
+        }
+        
+        .athlete-stat::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 40px;
+            background: var(--gray-700);
+        }
+        
+        .athlete-stat:last-child::after {
+            display: none;
+        }
+        
+        .athlete-stat:hover {
+            position: relative;
         }
         
         .athlete-stat:last-child {
             border-right: none;
         }
         
+        .athlete-stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 0;
+            background: transparent;
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 18px;
+        }
+        
         .athlete-stat-value {
-            font-size: 24px;
+            font-size: 32px;
             font-weight: 900;
             color: var(--white);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            letter-spacing: -1px;
         }
         
         .athlete-stat-label {
             font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--gray-400);
+            letter-spacing: 1.5px;
+            color: var(--gray-500);
             font-weight: 600;
         }
         
+        /* QUICK INSIGHTS - NIKE STYLE */
+        .quick-insights {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--gray-700);
+            animation: fadeInUp 0.5s var(--ease-out-expo) 0.4s both;
+        }
+        
+        .insight-card {
+            background: var(--gray-900);
+            padding: 24px;
+        }
+        
+        .insight-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--gray-500);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .insight-label i {
+            color: var(--red);
+            font-size: 12px;
+        }
+        
+        .insight-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: -0.3px;
+        }
+        
+        .insight-sub {
+            font-size: 11px;
+            color: var(--gray-500);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* MINI TIMELINE - NIKE STYLE */
+        .mini-timeline {
+            padding: 24px;
+            background: var(--gray-900);
+            animation: fadeInUp 0.5s var(--ease-out-expo) 0.5s both;
+        }
+        
+        .mini-timeline-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--gray-500);
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .mini-timeline-title i {
+            color: var(--red);
+        }
+        
+        .timeline-items {
+            display: flex;
+            gap: 2px;
+            overflow-x: auto;
+        }
+        
+        .timeline-item {
+            flex-shrink: 0;
+            width: 80px;
+            background: var(--gray-800);
+            padding: 16px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        
+        .timeline-item:hover {
+            background: var(--gray-700);
+        }
+        
+        .timeline-item.today {
+            border-color: var(--green);
+            background: rgba(0,200,83,0.1);
+        }
+        
+        .timeline-item.completed {
+            border-color: var(--green);
+        }
+        
+        .timeline-item.completed .timeline-type {
+            color: var(--green);
+            font-size: 14px;
+        }
+        
+        .timeline-pending {
+            color: var(--gray-500) !important;
+        }
+        
+        .timeline-day {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: 4px;
+        }
+        
+        .timeline-date {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 4px;
+        }
+        
+        .timeline-type {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--red);
+            font-weight: 600;
+        }
+        
+        .timeline-empty {
+            color: var(--gray-500);
+            font-size: 12px;
+        }
+        
+        /* CTA BUTTONS - NIKE STYLE */
         .athlete-cta {
             display: flex;
-            gap: 12px;
-            padding: 24px 16px;
+            gap: 2px;
+            padding: 24px;
+            background: var(--black);
+            animation: fadeInUp 0.5s var(--ease-out-expo) 0.6s both;
         }
         
         .athlete-cta-btn {
             flex: 1;
-            padding: 16px;
-            border-radius: 14px;
+            padding: 20px;
+            border-radius: 0;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all var(--transition-fast);
+            border: none;
         }
         
         .athlete-cta-btn.primary {
@@ -1608,20 +2365,27 @@
         }
         
         .athlete-cta-btn.primary:hover {
-            background: #FF4D5A;
-            transform: scale(1.02);
+            background: var(--red-hover);
+        }
+        
+        .athlete-cta-btn.primary:active {
+            transform: scale(0.98);
         }
         
         .athlete-cta-btn.secondary {
             background: var(--gray-800);
             color: white;
-            border: 1px solid var(--gray-600);
         }
         
+        .athlete-cta-btn.secondary:hover {
+            background: var(--gray-700);
+        }
+        
+        /* TABS - NIKE STYLE */
         .athlete-tabs {
             display: flex;
-            padding: 0 16px;
-            gap: 8px;
+            padding: 0;
+            gap: 0;
             border-bottom: 1px solid var(--gray-800);
             overflow-x: auto;
             position: sticky;
@@ -1631,39 +2395,42 @@
         }
         
         .athlete-tab {
-            padding: 16px 20px;
-            font-size: 13px;
+            padding: 20px 24px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--gray-400);
+            letter-spacing: 1.5px;
+            color: var(--gray-500);
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition-fast);
             white-space: nowrap;
+        }
+        
+        .athlete-tab:hover {
+            color: var(--gray-300);
         }
         
         .athlete-tab.active {
             color: var(--white);
-            border-bottom-color: var(--red);
+            border-bottom-color: var(--white);
         }
         
         .athlete-tab-content {
-            padding: 20px 16px;
+            padding: 0;
         }
         
         .profile-section {
             background: var(--gray-900);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
+            padding: 24px;
+            margin-bottom: 1px;
         }
         
         .profile-section-title {
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--gray-400);
+            letter-spacing: 1.5px;
+            color: var(--gray-500);
             font-weight: 700;
             margin-bottom: 16px;
             display: flex;
@@ -1700,6 +2467,11 @@
             font-weight: 600;
             color: var(--white);
         }
+
+        .profile-item-value.success { color: #22c55e; }
+        .profile-item-value.good { color: #3b82f6; }
+        .profile-item-value.neutral { color: var(--white); }
+        .profile-item-value.warning { color: #f59e0b; }
 
         /* Hide old main-container by default */
         .main-container {
@@ -1750,74 +2522,213 @@
             .sports-landing {
                 margin-left: 0;
                 margin-bottom: 70px;
-                padding: 20px;
-                height: calc(100vh - var(--mobile-bottom-nav));
-                height: calc(100dvh - var(--mobile-bottom-nav));
+                padding: 16px 0;
+                height: auto;
+                min-height: calc(100vh - 70px);
+                overflow-y: auto;
             }
             
             .landing-header {
-                margin-bottom: 24px;
+                margin-bottom: 16px;
+                padding: 0 16px;
             }
             
             .landing-title {
-                font-size: 24px;
+                font-size: 20px;
             }
-            
-            .sports-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-            
-            .sport-card-content {
-                padding: 16px;
-            }
-            
-            .sport-card-title {
-                font-size: 18px;
-            }
-            
-            .sport-card-count {
-                font-size: 13px;
-            }
-            
+
             .athletes-view {
                 margin-left: 0;
                 margin-bottom: 70px;
-                height: calc(100vh - var(--mobile-bottom-nav));
-                height: calc(100dvh - var(--mobile-bottom-nav));
+                height: auto;
+                min-height: calc(100vh - 70px);
             }
             
-            .athletes-header {
-                padding: 16px 20px;
+            .athletes-hero-header {
+                min-height: 180px;
+            }
+            
+            .athletes-hero-content {
+                padding: 20px 16px;
             }
             
             .athletes-title {
-                font-size: 18px;
+                font-size: 28px;
+            }
+            
+            .athletes-filter-bar {
+                padding: 16px;
+                gap: 10px;
+                flex-direction: column;
+            }
+            
+            .athletes-search {
+                width: 100%;
+                margin-bottom: 0;
+            }
+            
+            .athletes-search input {
+                padding: 12px 16px 12px 44px;
+                font-size: 14px;
+            }
+            
+            .athletes-search i {
+                left: 14px;
+            }
+            
+            .athletes-filter-buttons {
+                display: flex;
+                gap: 10px;
+                width: 100%;
+            }
+            
+            .filter-btn {
+                flex: 1;
+                justify-content: center;
+                padding: 12px 10px;
+                font-size: 13px;
+                gap: 6px;
+                border-radius: 12px;
+            }
+            
+            .filter-btn i {
+                font-size: 14px;
             }
             
             .athletes-list {
-                padding: 16px 20px;
+                padding: 16px;
                 grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .athlete-card {
+                border-radius: 16px;
+            }
+            
+            .athlete-card-header {
+                padding: 16px;
+            }
+            
+            .athlete-avatar {
+                width: 52px;
+                height: 52px;
+                border-radius: 12px;
+                font-size: 18px;
+            }
+            
+            .athlete-name {
+                font-size: 16px;
+            }
+            
+            .athlete-stat-item {
+                padding: 12px 8px;
+            }
+            
+            .athlete-stat-value {
+                font-size: 16px;
+            }
+            
+            .athlete-stat-label {
+                font-size: 10px;
             }
             
             .detail-view {
+                width: 100%;
                 margin-left: 0;
                 margin-bottom: 70px;
-                height: calc(100vh - var(--mobile-bottom-nav));
-                height: calc(100dvh - var(--mobile-bottom-nav));
+                height: calc(100vh - 70px);
+            }
+            
+            .fab-generate {
+                bottom: 90px;
+                right: 16px;
+                width: 56px;
+                height: 56px;
+                font-size: 20px;
+            }
+            
+            .athlete-hero {
+                padding: 60px 20px 80px;
+                min-height: 280px;
+            }
+            
+            .athlete-hero-avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 32px;
+            }
+            
+            .athlete-hero-name {
+                font-size: 26px;
+            }
+            
+            .athlete-stats-bar {
+                margin: -30px 16px 0;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .athlete-stat {
+                padding: 16px 10px;
+            }
+            
+            .athlete-stat:nth-child(2) {
+                border-right: none;
+            }
+            
+            .athlete-stat:nth-child(3),
+            .athlete-stat:nth-child(4) {
+                border-top: 1px solid var(--gray-700);
+            }
+            
+            .athlete-stat-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+                margin-bottom: 6px;
+            }
+            
+            .athlete-stat-value {
+                font-size: 22px;
+            }
+            
+            .quick-insights {
+                padding: 16px;
+                gap: 10px;
+            }
+            
+            .insight-card {
+                padding: 14px;
+            }
+            
+            .insight-value {
+                font-size: 14px;
+            }
+            
+            .mini-timeline {
+                padding: 0 16px 16px;
+            }
+            
+            .timeline-item {
+                width: 80px;
+                padding: 10px;
+            }
+            
+            .timeline-date {
+                font-size: 16px;
+            }
+            
+            .athlete-cta {
+                padding: 0 16px 20px;
+                flex-direction: column;
+            }
+            
+            .athlete-cta-btn {
+                padding: 16px;
             }
 
             /* Ensure the fixed bottom nav never covers the end of scrollable content */
             .detail-content {
                 padding-bottom: calc(var(--mobile-bottom-nav) + env(safe-area-inset-bottom) + 16px);
-            }
-            
-            .athletes-header {
-                padding: 12px 16px;
-            }
-            
-            .athletes-header-top {
-                margin-bottom: 12px;
             }
             
             .back-btn {
@@ -1893,11 +2804,74 @@
         }
 
         @media (max-width: 480px) {
-            .sport-card-title {
+            .landing-hero {
+                height: 180px;
+                margin-bottom: 24px;
+                border-radius: 0;
+            }
+            
+            .landing-hero-title {
+                font-size: 28px;
+            }
+            
+            .landing-hero-quote {
+                font-size: 12px;
+                max-width: 90%;
+            }
+            
+            .landing-hero-quote::before,
+            .landing-hero-quote::after {
+                font-size: 20px;
+                vertical-align: -6px;
+            }
+            
+            .carousel-section {
+                margin-bottom: 32px;
+            }
+            
+            .carousel-header {
+                padding: 0 16px;
+                margin-bottom: 12px;
+            }
+            
+            .carousel-title {
                 font-size: 16px;
             }
+            
+            .carousel-arrows {
+                display: none;
+            }
+            
+            .carousel-track-wrapper {
+                padding-left: 16px;
+            }
+            
+            .carousel-track {
+                gap: 12px;
+                padding-right: 16px;
+            }
+            
+            .sport-big-card {
+                min-width: 240px;
+                max-width: 240px;
+                width: 240px;
+                height: 300px;
+            }
+            
+            .sport-card-content {
+                padding: 16px;
+            }
+            
+            .sport-card-title {
+                font-size: 18px;
+            }
+            
             .sport-card-count {
-                font-size: 12px;
+                font-size: 13px;
+            }
+            
+            .carousel-progress {
+                margin: 12px 16px 0;
             }
             
             .athlete-stats-bar {
@@ -2010,6 +2984,230 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
+        /* ========== COACH GOALS STYLES ========== */
+        .profile-section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .add-goal-btn {
+            background: var(--red);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: var(--white);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .add-goal-btn:hover {
+            background: var(--red-hover);
+        }
+
+        .coach-goal-card {
+            background: var(--gray-800);
+            border: 1px solid var(--gray-700);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .coach-goal-card.completed {
+            background: rgba(0, 210, 106, 0.1);
+            border-color: rgba(0, 210, 106, 0.3);
+        }
+
+        .coach-goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .coach-goal-title {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .coach-goal-type {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(230, 57, 70, 0.2);
+            color: var(--red);
+            text-transform: uppercase;
+        }
+
+        .coach-goal-progress {
+            height: 8px;
+            background: var(--gray-700);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .coach-goal-progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--red) 0%, var(--green) 100%);
+            transition: width 0.5s ease;
+        }
+
+        .coach-goal-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .coach-goal-current {
+            font-weight: 700;
+        }
+
+        .coach-goal-target {
+            color: var(--gray-400);
+        }
+
+        .coach-goal-deadline {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        .coach-goal-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .coach-goal-action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: none;
+            background: var(--gray-700);
+            color: var(--gray-400);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .coach-goal-action-btn:hover {
+            background: var(--gray-600);
+            color: var(--white);
+        }
+
+        .coach-goal-action-btn.delete:hover {
+            background: rgba(230, 57, 70, 0.3);
+            color: var(--red);
+        }
+
+        .empty-goals-coach {
+            text-align: center;
+            padding: 32px;
+            color: var(--gray-500);
+        }
+
+        .empty-goals-coach i {
+            font-size: 32px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .empty-goals-coach p {
+            font-size: 13px;
+        }
+
+        /* Goal Modal */
+        .goal-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .goal-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .goal-modal {
+            background: var(--gray-900);
+            border: 1px solid var(--gray-700);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .goal-modal-overlay.active .goal-modal {
+            transform: translateY(0);
+        }
+
+        .goal-modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-700);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .goal-modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .goal-modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--gray-700);
+            color: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .goal-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
     </style>
 </head>
 <body>
@@ -2019,65 +3217,176 @@
         </a>
         <a href="coach-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i></a>
         <a href="coach-clients.html" class="nav-item active"><i class="fas fa-users"></i></a>
-        <a href="coach-generate.html" class="nav-item"><i class="fas fa-bolt"></i></a>
+        <a href="coach-atlas.html" class="nav-item" title="ATLAS AI"><i class="fas fa-brain"></i></a>
         <div class="nav-spacer"></div>
         <a href="#" onclick="coachLogout(event)" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
     </nav>
 
     <!-- SPORTS LANDING PAGE -->
     <div class="sports-landing" id="sports-landing">
+        <!-- HERO HEADER EPICO -->
+        <div class="landing-hero">
+            <video autoplay muted loop playsinline>
+                <source src="assets/hero-video.mp4" type="video/mp4">
+            </video>
+            <div class="landing-hero-content">
+                <h1 class="landing-hero-title">I Tuoi <span>Campioni</span></h1>
+                <p class="landing-hero-quote">La grandezza non è data dal talento, ma dalla costante ricerca dell'eccellenza</p>
+            </div>
+        </div>
+        
         <div class="landing-header">
-            <h1 class="landing-title">I Tuoi Atleti</h1>
-            <p class="landing-subtitle">Seleziona uno sport per visualizzare i tuoi clienti</p>
             <p class="landing-subtitle landing-status" id="load-status">Caricamento atleti...</p>
         </div>
-        <div class="sports-grid">
-            <div class="sport-big-card" onclick="openSportView('calcio')">
-                <img src="assets/sport-calcio.jpg" alt="Calcio" onerror="this.onerror=null; this.src='assets/pexels-gabin-cobret-430175667-32948745.jpg';">
-                <div class="sport-card-content">
-                    <div class="sport-card-title">Calcio</div>
-                    <div class="sport-card-count"><span id="count-calcio">0</span> atleti</div>
+
+        <!-- CAROUSEL: SPORT DI SQUADRA -->
+        <div class="carousel-section" id="carousel-squadra">
+            <div class="carousel-header">
+                <h3 class="carousel-title">Sport di Squadra</h3>
+                <div class="carousel-controls">
+                    <div class="carousel-arrows">
+                        <button class="carousel-arrow" onclick="scrollCarousel('squadra', -1)" id="arrow-left-squadra">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="carousel-arrow" onclick="scrollCarousel('squadra', 1)" id="arrow-right-squadra">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="sport-big-card" onclick="openSportView('basket')">
-                <img src="assets/sport-basket.jpg" alt="Basket" onerror="this.onerror=null; this.src='assets/pexels-gasparzaldo-13464777.jpg';">
-                <div class="sport-card-content">
-                    <div class="sport-card-title">Basket</div>
-                    <div class="sport-card-count"><span id="count-basket">0</span> atleti</div>
+            <div class="carousel-track-wrapper">
+                <div class="carousel-track" id="track-squadra">
+                    <div class="sport-big-card" onclick="openSportView('calcio')">
+                        <img src="assets/pexels-daniel-quiroz-251119734-13201301.jpg" alt="Calcio" onerror="this.onerror=null; this.src='assets/pexels-gabin-cobret-430175667-32948745.jpg';">
+                        <div class="sport-card-content">
+                            <div class="sport-card-title">Calcio</div>
+                            <div class="sport-card-count"><span id="count-calcio">0</span> atleti</div>
+                        </div>
+                    </div>
+                    <div class="sport-big-card" onclick="openSportView('basket')">
+                        <img src="assets/pexels-cottonbro-5275003.jpg" alt="Basket" onerror="this.onerror=null; this.src='assets/pexels-gasparzaldo-13464777.jpg';">
+                        <div class="sport-card-content">
+                            <div class="sport-card-title">Basket</div>
+                            <div class="sport-card-count"><span id="count-basket">0</span> atleti</div>
+                        </div>
+                    </div>
+                    <div class="sport-big-card" onclick="openSportView('volley')">
+                        <img src="assets/pexels-ocaradafoto-13059820.jpg" alt="Volley" onerror="this.onerror=null; this.src='assets/pexels-cottonbro-5741289.jpg';">
+                        <div class="sport-card-content">
+                            <div class="sport-card-title">Volley</div>
+                            <div class="sport-card-count"><span id="count-volley">0</span> atleti</div>
+                        </div>
+                    </div>
+                    <div class="sport-big-card" onclick="openSportView('rugby')">
+                        <img src="assets/pexels-olliecraig1-19082795.jpg" alt="Rugby" onerror="this.onerror=null; this.src='assets/pexels-cottonbro-5741289.jpg';">
+                        <div class="sport-card-content">
+                            <div class="sport-card-title">Rugby</div>
+                            <div class="sport-card-count"><span id="count-rugby">0</span> atleti</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="sport-big-card" onclick="openSportView('boxe')">
-                <img src="assets/sport-boxe.jpg" alt="Boxe" onerror="this.onerror=null; this.src='assets/pexels-dany-lovehill-10341870.jpg';">
-                <div class="sport-card-content">
-                    <div class="sport-card-title">Boxe</div>
-                    <div class="sport-card-count"><span id="count-boxe">0</span> atleti</div>
+            <div class="carousel-progress">
+                <div class="carousel-progress-bar" id="progress-squadra" style="width: 50%"></div>
+            </div>
+        </div>
+
+        <!-- CAROUSEL: SPORT INDIVIDUALI -->
+        <div class="carousel-section" id="carousel-individuali">
+            <div class="carousel-header">
+                <h3 class="carousel-title">Sport Individuali</h3>
+                <div class="carousel-controls">
+                    <div class="carousel-arrows">
+                        <button class="carousel-arrow" onclick="scrollCarousel('individuali', -1)" id="arrow-left-individuali">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="carousel-arrow" onclick="scrollCarousel('individuali', 1)" id="arrow-right-individuali">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="sport-big-card" onclick="openSportView('palestra')">
-                <img src="assets/sport-palestra.jpg" alt="Palestra" onerror="this.onerror=null; this.src='assets/pexels-cottonbro-5741289.jpg';">
-                <div class="sport-card-content">
-                    <div class="sport-card-title">Palestra</div>
-                    <div class="sport-card-count"><span id="count-palestra">0</span> atleti</div>
+            <div class="carousel-track-wrapper">
+                <div class="carousel-track" id="track-individuali">
+                    <div class="sport-big-card" onclick="openSportView('boxe')">
+                        <img src="assets/sport-boxe.jpg" alt="Boxe" onerror="this.onerror=null; this.src='assets/pexels-dany-lovehill-10341870.jpg';">
+                        <div class="sport-card-content">
+                            <div class="sport-card-title">Boxe</div>
+                            <div class="sport-card-count"><span id="count-boxe">0</span> atleti</div>
+                        </div>
+                    </div>
+                    <div class="sport-big-card" onclick="openSportView('palestra')">
+                        <img src="assets/pexels-airamdphoto-13106582.jpg" alt="Palestra" onerror="this.onerror=null; this.src='assets/pexels-cottonbro-5741289.jpg';">
+                        <div class="sport-card-content">
+                            <div class="sport-card-title">Palestra</div>
+                            <div class="sport-card-count"><span id="count-palestra">0</span> atleti</div>
+                        </div>
+                    </div>
+                    <div class="sport-big-card" onclick="openSportView('running')">
+                        <img src="assets/pexels-waldirevora-10078261.jpg" alt="Running" onerror="this.onerror=null; this.src='assets/pexels-cottonbro-5741289.jpg';">
+                        <div class="sport-card-content">
+                            <div class="sport-card-title">Running</div>
+                            <div class="sport-card-count"><span id="count-running">0</span> atleti</div>
+                        </div>
+                    </div>
+                    <div class="sport-big-card" onclick="openSportView('nuoto')">
+                        <img src="assets/pexels-kindelmedia-8688531.jpg" alt="Nuoto" onerror="this.onerror=null; this.src='assets/pexels-cottonbro-5741289.jpg';">
+                        <div class="sport-card-content">
+                            <div class="sport-card-title">Nuoto</div>
+                            <div class="sport-card-count"><span id="count-nuoto">0</span> atleti</div>
+                        </div>
+                    </div>
+                    <div class="sport-big-card" onclick="openSportView('ciclismo')">
+                        <img src="assets/pexels-gato-joseph-52379704-26726131.jpg" alt="Ciclismo" onerror="this.onerror=null; this.src='assets/pexels-cottonbro-5741289.jpg';">
+                        <div class="sport-card-content">
+                            <div class="sport-card-title">Ciclismo</div>
+                            <div class="sport-card-count"><span id="count-ciclismo">0</span> atleti</div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="carousel-progress">
+                <div class="carousel-progress-bar" id="progress-individuali" style="width: 40%"></div>
             </div>
         </div>
     </div>
 
     <!-- ATHLETES LIST VIEW -->
     <div class="athletes-view" id="athletes-view">
-        <div class="athletes-header">
-            <div class="athletes-header-top">
-                <button class="back-btn" onclick="backToSports()">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h1 class="athletes-title" id="athletes-title">Calcio</h1>
-                <div class="athletes-count" id="athletes-count">0</div>
-            </div>
-            <div class="athletes-search">
-                <i class="fas fa-search"></i>
-                <input type="text" id="athletes-search-input" placeholder="Cerca atleta...">
+        <!-- Hero Header con immagine sport -->
+        <div class="athletes-hero-header">
+            <div class="athletes-hero-bg" id="athletes-hero-bg"></div>
+            <div class="athletes-hero-overlay"></div>
+            <div class="athletes-hero-content">
+                <div class="athletes-header-top">
+                    <button class="back-btn" onclick="backToSports()">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h1 class="athletes-title" id="athletes-title">Calcio</h1>
+                    <div class="athletes-count" id="athletes-count">0</div>
+                </div>
             </div>
         </div>
+        
+        <!-- Search & Filter Bar -->
+        <div class="athletes-filter-bar">
+            <div class="athletes-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="athletes-search-input" placeholder="Cerca atleta per nome..." oninput="filterAthletes()">
+            </div>
+            <div class="athletes-filter-buttons">
+                <button class="filter-btn" id="filter-today" onclick="toggleFilter('today')">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>Oggi</span>
+                </button>
+                <button class="filter-btn" id="filter-attention" onclick="toggleFilter('attention')">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Attenzione</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Athletes Grid -->
         <div class="athletes-list" id="athletes-list">
             <!-- Loaded dynamically -->
         </div>
@@ -2119,6 +3428,7 @@
         </div>
     </div>
 
+    <script src="js/atlas-error-handler.js"></script>
     <script src="js/supabase-client.js"></script>
     <script>
         // Auth check
@@ -2133,6 +3443,66 @@
             localStorage.removeItem('gr_coach_name');
             window.location.replace('coach-login.html');
         }
+
+        // ============ CAROUSEL NIKE-STYLE ============
+        function initCarousels() {
+            ['squadra', 'individuali'].forEach(id => {
+                const wrapper = document.querySelector(`#carousel-${id} .carousel-track-wrapper`);
+                
+                if (wrapper) {
+                    // Update progress on scroll
+                    wrapper.addEventListener('scroll', () => {
+                        updateCarouselProgress(id, wrapper);
+                        updateCarouselArrows(id, wrapper);
+                    });
+                    
+                    // Initial state
+                    updateCarouselProgress(id, wrapper);
+                    updateCarouselArrows(id, wrapper);
+                }
+            });
+        }
+
+        function scrollCarousel(id, direction) {
+            const wrapper = document.querySelector(`#carousel-${id} .carousel-track-wrapper`);
+            if (!wrapper) return;
+            
+            const cardWidth = 340; // card width + gap
+            wrapper.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
+        }
+
+        function updateCarouselProgress(id, wrapper) {
+            const progressBar = document.getElementById(`progress-${id}`);
+            if (!progressBar || !wrapper) return;
+            
+            const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+            if (maxScroll <= 0) {
+                progressBar.style.width = '100%';
+                return;
+            }
+            
+            const percentage = ((wrapper.scrollLeft / maxScroll) * 70) + 15;
+            progressBar.style.width = `${Math.min(100, percentage)}%`;
+        }
+
+        function updateCarouselArrows(id, wrapper) {
+            const leftArrow = document.getElementById(`arrow-left-${id}`);
+            const rightArrow = document.getElementById(`arrow-right-${id}`);
+            
+            if (!wrapper) return;
+            
+            const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+            
+            if (leftArrow) leftArrow.disabled = wrapper.scrollLeft <= 5;
+            if (rightArrow) rightArrow.disabled = wrapper.scrollLeft >= maxScroll - 5;
+        }
+
+        // Init on load
+        window.addEventListener('load', () => {
+            setTimeout(initCarousels, 100);
+        });
+        window.addEventListener('resize', initCarousels);
+        // ============ END CAROUSEL ============
 
         let allAthletes = [];
         let selectedAthlete = null;
@@ -2264,6 +3634,8 @@
             el.style.color = isError ? 'var(--red)' : 'var(--gray-400)';
         }
 
+        let workoutsByAthleteId = {};
+
         async function loadAthletes() {
             try {
                 setLoadStatus('Caricamento atleti...');
@@ -2285,6 +3657,69 @@
                 } catch (e) {
                     sportSpecificByAthleteId = {};
                 }
+                
+                // Prefetch workout data for compliance calculations
+                try {
+                    // Load ALL workouts (not filtered by date - use created_at like workout tab)
+                    const workoutRows = await supabase.fetch('workouts', `?select=*`);
+                    console.log('Raw workouts loaded:', workoutRows?.length || 0, 'workouts');
+                    if (workoutRows?.length > 0) {
+                        console.log('Sample workout:', JSON.stringify(workoutRows[0], null, 2));
+                    }
+                    
+                    workoutsByAthleteId = {};
+                    (Array.isArray(workoutRows) ? workoutRows : []).forEach(w => {
+                        if (w?.athlete_id) {
+                            if (!workoutsByAthleteId[w.athlete_id]) {
+                                workoutsByAthleteId[w.athlete_id] = [];
+                            }
+                            workoutsByAthleteId[w.athlete_id].push(w);
+                        }
+                    });
+                    
+                    console.log('Prefetched workouts for', Object.keys(workoutsByAthleteId).length, 'athletes');
+                    
+                    // Enrich athletes with calculated metrics
+                    allAthletes = allAthletes.map(a => {
+                        const workouts = workoutsByAthleteId[a.id] || [];
+                        // Check for completed: status === 'completed' OR completed_at exists OR completed === true
+                        const completed = workouts.filter(w => 
+                            w.status === 'completed' || 
+                            w.completed_at || 
+                            w.completed === true
+                        );
+                        const total = workouts.length;
+                        
+                        if (workouts.length > 0) {
+                            console.log(`Athlete ${a.first_name}: ${total} workouts, ${completed.length} completed`);
+                        }
+                        
+                        // Last workout date (from most recent completed)
+                        let lastWorkoutDate = null;
+                        if (completed.length > 0) {
+                            const sorted = completed.sort((x, y) => {
+                                const dateA = new Date(x.completed_at || x.created_at);
+                                const dateB = new Date(y.completed_at || y.created_at);
+                                return dateB - dateA;
+                            });
+                            lastWorkoutDate = new Date(sorted[0].completed_at || sorted[0].created_at);
+                        }
+                        
+                        // Compliance rate (completed / total)
+                        const complianceRate = total > 0 ? Math.round((completed.length / total) * 100) : 0;
+                        
+                        return {
+                            ...a,
+                            last_workout_date: lastWorkoutDate,
+                            compliance_rate: complianceRate,
+                            total_workouts: total,
+                            completed_workouts: completed.length
+                        };
+                    });
+                } catch (e) {
+                    console.log('Could not load workout data for metrics:', e);
+                    workoutsByAthleteId = {};
+                }
 
                 updateSportCounts();
                 if (allAthletes.length === 0) {
@@ -2305,13 +3740,21 @@
                 calcio: 0,
                 basket: 0,
                 boxe: 0,
-                palestra: 0
+                palestra: 0,
+                volley: 0,
+                rugby: 0,
+                running: 0,
+                nuoto: 0,
+                ciclismo: 0
             };
             
             allAthletes.forEach(a => {
                 const sport = normalizeSport(a.sport);
-                const bucket = sportCounts.hasOwnProperty(sport) ? sport : 'palestra';
-                sportCounts[bucket]++;
+                if (sportCounts.hasOwnProperty(sport)) {
+                    sportCounts[sport]++;
+                } else {
+                    sportCounts['palestra']++;
+                }
             });
             
             Object.keys(sportCounts).forEach(sport => {
@@ -2320,22 +3763,149 @@
             });
         }
         
+        // Sport background images mapping
+        const sportBackgrounds = {
+            calcio: 'assets/pexels-daniel-quiroz-251119734-13201301.jpg',
+            basket: 'assets/pexels-cottonbro-5275003.jpg',
+            boxe: 'assets/sport-boxe.jpg',
+            palestra: 'assets/pexels-airamdphoto-13106582.jpg',
+            volley: 'assets/pexels-ocaradafoto-13059820.jpg',
+            rugby: 'assets/pexels-olliecraig1-19082795.jpg',
+            running: 'assets/pexels-waldirevora-10078261.jpg',
+            nuoto: 'assets/pexels-kindelmedia-8688531.jpg',
+            ciclismo: 'assets/pexels-gato-joseph-52379704-26726131.jpg'
+        };
+        
+        let activeFilters = { today: false, attention: false };
+        let currentFilteredAthletes = [];
+        
         function openSportView(sport) {
             currentSport = normalizeSport(sport);
-            const sportNames = {calcio: 'Calcio', basket: 'Basket', boxe: 'Boxe', palestra: 'Palestra'};
+            const sportNames = {
+                calcio: 'Calcio', 
+                basket: 'Basket', 
+                boxe: 'Boxe', 
+                palestra: 'Palestra',
+                volley: 'Volley',
+                rugby: 'Rugby',
+                running: 'Running',
+                nuoto: 'Nuoto',
+                ciclismo: 'Ciclismo'
+            };
             
             // Hide landing, show athletes view
             document.getElementById('sports-landing').style.display = 'none';
             document.getElementById('athletes-view').classList.add('active');
             
+            // Update hero background
+            const bgUrl = sportBackgrounds[currentSport] || 'assets/pexels-cottonbro-5741289.jpg';
+            document.getElementById('athletes-hero-bg').style.backgroundImage = `url('${bgUrl}')`;
+            
             // Update title
-            document.getElementById('athletes-title').textContent = sportNames[sport] || sport;
+            document.getElementById('athletes-title').textContent = sportNames[sport] || sport.charAt(0).toUpperCase() + sport.slice(1);
+            
+            // Reset filters
+            activeFilters = { today: false, attention: false };
+            document.getElementById('filter-today')?.classList.remove('active');
+            document.getElementById('filter-attention')?.classList.remove('active');
+            document.getElementById('athletes-search-input').value = '';
             
             // Filter and render athletes
-            const filtered = allAthletes.filter(a => normalizeSport(a.sport) === currentSport);
+            currentFilteredAthletes = allAthletes.filter(a => normalizeSport(a.sport) === currentSport);
             
+            document.getElementById('athletes-count').textContent = currentFilteredAthletes.length;
+            renderAthletesList(currentFilteredAthletes);
+        }
+        
+        function toggleFilter(filterType) {
+            activeFilters[filterType] = !activeFilters[filterType];
+            document.getElementById(`filter-${filterType}`)?.classList.toggle('active', activeFilters[filterType]);
+            filterAthletes();
+        }
+        
+        function filterAthletes() {
+            const searchTerm = document.getElementById('athletes-search-input')?.value.toLowerCase() || '';
+            
+            let filtered = allAthletes.filter(a => normalizeSport(a.sport) === currentSport);
+            
+            // Search filter
+            if (searchTerm) {
+                filtered = filtered.filter(a => 
+                    `${a.first_name} ${a.last_name}`.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Today filter - has workout today
+            if (activeFilters.today) {
+                filtered = filtered.filter(a => hasWorkoutToday(a));
+            }
+            
+            // Attention filter - low compliance or not trained recently
+            if (activeFilters.attention) {
+                filtered = filtered.filter(a => needsAttention(a));
+            }
+            
+            currentFilteredAthletes = filtered;
             document.getElementById('athletes-count').textContent = filtered.length;
             renderAthletesList(filtered);
+        }
+        
+        function hasWorkoutToday(athlete) {
+            // Check if athlete has workout scheduled today (real data)
+            const today = new Date().toISOString().split('T')[0];
+            return athlete.next_workout === today;
+        }
+        
+        function needsAttention(athlete) {
+            // Check if athlete needs attention (low compliance or not trained recently)
+            const compliance = getAthleteCompliance(athlete);
+            const daysSinceWorkout = getDaysSinceLastWorkout(athlete);
+            return compliance < 70 || daysSinceWorkout > 5;
+        }
+        
+        function getAthleteCompliance(athlete) {
+            // Calculate real compliance from workout data
+            // compliance_rate is stored in athletes table, or calculate from completed/assigned
+            if (athlete.compliance_rate !== undefined && athlete.compliance_rate !== null) {
+                return Math.round(athlete.compliance_rate);
+            }
+            // Fallback: calculate from workouts completed vs weeks active
+            if (athlete.workouts_completed && athlete.created_at) {
+                const weeksActive = Math.max(1, Math.floor((Date.now() - new Date(athlete.created_at)) / (7 * 24 * 60 * 60 * 1000)));
+                const expectedWorkouts = weeksActive * 3; // assume 3 workouts/week target
+                return Math.min(100, Math.round((athlete.workouts_completed / expectedWorkouts) * 100));
+            }
+            return 0; // No data
+        }
+        
+        function getDaysSinceLastWorkout(athlete) {
+            // Get days since last workout from real data
+            if (athlete.last_workout_date) {
+                const lastDate = new Date(athlete.last_workout_date);
+                const today = new Date();
+                const diffTime = today - lastDate;
+                return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            }
+            // Fallback: check last_activity or created_at
+            if (athlete.last_activity) {
+                const lastDate = new Date(athlete.last_activity);
+                const today = new Date();
+                return Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+            }
+            return 999; // Never trained
+        }
+        
+        function getAthleteTrend(athlete) {
+            // Get performance trend from real data
+            // Check if there's a trend field, or calculate from recent performance
+            if (athlete.performance_trend) {
+                return athlete.performance_trend;
+            }
+            // Fallback: compare recent compliance to historical
+            const compliance = getAthleteCompliance(athlete);
+            if (compliance >= 80) return 'up';
+            if (compliance >= 50) return 'stable';
+            return 'down';
         }
         
         function renderAthletesList(athletes) {
@@ -2343,9 +3913,10 @@
             
             if (athletes.length === 0) {
                 container.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align:center; padding:60px 20px; color:var(--gray-500);">
-                        <i class="fas fa-user-slash" style="font-size:48px;margin-bottom:16px;opacity:0.3;display:block;"></i>
-                        <p>Nessun atleta in questa categoria</p>
+                    <div class="athletes-empty">
+                        <i class="fas fa-user-slash"></i>
+                        <h3>Nessun atleta trovato</h3>
+                        <p>Prova a modificare i filtri o la ricerca</p>
                     </div>
                 `;
                 return;
@@ -2353,35 +3924,89 @@
             
             container.innerHTML = athletes.map(a => {
                 const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
-                const goalLabel = getAthletePrimaryGoalLabel(a) || (a.package_type || 'Performance');
+                const compliance = getAthleteCompliance(a);
+                const daysSince = getDaysSinceLastWorkout(a);
+                const trend = getAthleteTrend(a);
+                const hasToday = hasWorkoutToday(a);
+                const age = a.birth_date ? calculateAge(a.birth_date) : null;
+                
+                // Determine status classes
+                const complianceClass = compliance >= 80 ? 'good' : compliance >= 60 ? 'warning' : 'danger';
+                const daysClass = (a.total_workouts === 0 || daysSince > 99) ? 'neutral' : daysSince <= 2 ? 'good' : daysSince <= 4 ? 'warning' : 'danger';
+                const trendIcon = trend === 'up' ? 'fa-arrow-trend-up' : trend === 'down' ? 'fa-arrow-trend-down' : 'fa-minus';
+                const trendClass = trend === 'up' ? 'trend-up' : trend === 'down' ? 'trend-down' : 'trend-stable';
+                
+                // Badge logic
+                let badge = '';
+                if (a.total_workouts === 0) {
+                    badge = '<span class="athlete-badge new">Nuovo</span>';
+                } else if (hasToday) {
+                    badge = '<span class="athlete-badge">Oggi</span>';
+                } else if (daysSince > 7 && daysSince < 999) {
+                    badge = '<span class="athlete-badge danger">Inattivo</span>';
+                } else if (compliance < 60 && a.total_workouts > 0) {
+                    badge = '<span class="athlete-badge warning">Attenzione</span>';
+                }
+                
+                // Days text - handle case of no workouts
+                let daysText;
+                if (a.total_workouts === 0 || a.completed_workouts === 0) {
+                    daysText = 'Mai';
+                } else if (daysSince === 0) {
+                    daysText = 'Oggi';
+                } else if (daysSince === 1) {
+                    daysText = 'Ieri';
+                } else if (daysSince > 99) {
+                    daysText = 'Mai';
+                } else {
+                    daysText = `${daysSince}g fa`;
+                }
+                
                 return `
                     <div class="athlete-card" onclick="openAthleteDetail('${a.id}')">
-                        <div class="athlete-avatar">
-                            ${a.profile_photo ? `<img src="${a.profile_photo}" alt="">` : initials}
+                        <div class="athlete-card-header">
+                            <div class="athlete-avatar">
+                                ${a.profile_photo ? `<img src="${a.profile_photo}" alt="">` : initials}
+                            </div>
+                            <div class="athlete-info">
+                                <div class="athlete-name">${a.first_name} ${a.last_name}</div>
+                                <div class="athlete-meta">
+                                    ${age ? `${age} anni` : ''} ${badge}
+                                </div>
+                            </div>
                         </div>
-                        <div class="athlete-info">
-                            <div class="athlete-name">${a.first_name} ${a.last_name}</div>
-                            <div class="athlete-meta">${goalLabel} • Lv. ${a.level || 1}</div>
+                        <div class="athlete-stats-row">
+                            <div class="athlete-stat-item">
+                                <div class="athlete-stat-value ${complianceClass}">${compliance}%</div>
+                                <div class="athlete-stat-label">Compliance</div>
+                            </div>
+                            <div class="athlete-stat-item">
+                                <div class="athlete-stat-value ${daysClass}">${daysText}</div>
+                                <div class="athlete-stat-label">Ultimo WO</div>
+                            </div>
+                            <div class="athlete-stat-item">
+                                <div class="athlete-stat-value ${trendClass}"><i class="fas ${trendIcon}"></i></div>
+                                <div class="athlete-stat-label">Trend</div>
+                            </div>
                         </div>
-                        <div class="athlete-arrow"><i class="fas fa-chevron-right"></i></div>
                     </div>
                 `;
             }).join('');
         }
         
+        function calculateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const m = today.getMonth() - birth.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            return age;
+        }
+        
         function setupAthletesSearch() {
-            const input = document.getElementById('athletes-search-input');
-            if (!input) return;
-            
-            input.addEventListener('input', () => {
-                const search = input.value.toLowerCase();
-                const filtered = allAthletes.filter(a => {
-                    const matchesSport = normalizeSport(a.sport) === normalizeSport(currentSport);
-                    const matchesSearch = `${a.first_name} ${a.last_name}`.toLowerCase().includes(search);
-                    return matchesSport && matchesSearch;
-                });
-                renderAthletesList(filtered);
-            });
+            // Now handled by filterAthletes() via oninput
         }
         
         function backToSports() {
@@ -2389,6 +4014,7 @@
             document.getElementById('sports-landing').style.display = '';
             document.getElementById('athletes-search-input').value = '';
             currentSport = null;
+            activeFilters = { today: false, attention: false };
         }
         
         function openAthleteDetail(id) {
@@ -2403,8 +4029,18 @@
             document.getElementById('detail-athlete-name').textContent = 
                 `${selectedAthlete.first_name} ${selectedAthlete.last_name}`;
             
-            // Render detail
-            renderAthleteDetail();
+            // Show loading, then render with real data
+            document.getElementById('detail-content').innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:center;height:300px;">
+                    <div style="text-align:center;color:var(--gray-400);">
+                        <i class="fas fa-spinner fa-spin" style="font-size:32px;margin-bottom:12px;"></i>
+                        <p>Caricamento dati...</p>
+                    </div>
+                </div>
+            `;
+            
+            // Render detail with real data
+            renderAthleteDetailWithRealData();
         }
         
         function backToAthletesList() {
@@ -2413,17 +4049,73 @@
             selectedAthlete = null;
         }
         
-        function renderAthleteDetail() {
+        async function renderAthleteDetailWithRealData() {
             const a = selectedAthlete;
             const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
             const hasPhoto = a.profile_photo;
             const bgImages = getSportBackgroundImages(a.sport);
             const metaFallback = `${formatSportLabel(a.sport)} • ${(a.package_type || 'Performance')}`;
+            
+            // Load real workout data for this athlete
+            let workouts = [];
+            try {
+                workouts = await supabase.fetch('workouts', `?athlete_id=eq.${a.id}&order=created_at.desc`);
+                workouts = Array.isArray(workouts) ? workouts : [];
+                console.log('Loaded workouts for detail:', workouts);
+            } catch (e) {
+                console.error('Error loading workouts:', e);
+            }
+            
+            // Calculate real metrics
+            const completedWorkouts = workouts.filter(w => w.status === 'completed' || w.completed_at);
+            const totalWorkouts = workouts.length;
+            const skippedWorkouts = totalWorkouts - completedWorkouts.length;
+            
+            // Last workout date (from most recent completed)
+            let lastWorkoutDate = null;
+            let daysSince = 999;
+            if (completedWorkouts.length > 0) {
+                // Sort by completed_at or created_at
+                const sorted = completedWorkouts.sort((a, b) => {
+                    const dateA = new Date(a.completed_at || a.created_at);
+                    const dateB = new Date(b.completed_at || b.created_at);
+                    return dateB - dateA;
+                });
+                lastWorkoutDate = new Date(sorted[0].completed_at || sorted[0].created_at);
+                daysSince = Math.floor((new Date() - lastWorkoutDate) / (1000 * 60 * 60 * 24));
+            }
+            
+            // Compliance rate (completed / total)
+            const compliance = totalWorkouts > 0 ? Math.round((completedWorkouts.length / totalWorkouts) * 100) : 0;
+            
+            // Status based on real data
+            let statusClass = 'status-good';
+            let statusText = '<i class="fas fa-check-circle"></i> In Forma';
+            if (totalWorkouts === 0) {
+                statusClass = 'status-rest';
+                statusText = '<i class="fas fa-user-plus"></i> Nuovo Atleta';
+            } else if (daysSince > 14) {
+                statusClass = 'status-rest';
+                statusText = '<i class="fas fa-pause-circle"></i> In Pausa';
+            } else if (daysSince > 7 || compliance < 50) {
+                statusClass = 'status-warning';
+                statusText = '<i class="fas fa-exclamation-triangle"></i> Attenzione';
+            }
+            
+            // Last workout text
+            let lastWorkoutText = 'Mai allenato';
+            if (completedWorkouts.length > 0) {
+                lastWorkoutText = daysSince === 0 ? 'Oggi' : daysSince === 1 ? 'Ieri' : `${daysSince} giorni fa`;
+            }
+            
+            // Get next goal
+            const nextGoal = a.primary_goal || 'Migliorare performance';
 
             document.getElementById('detail-content').innerHTML = `
                 <!-- Hero Section -->
                 <div class="athlete-hero">
                     <div class="athlete-hero-bg" style="background-image:${bgImages}"></div>
+                    <div class="athlete-status-badge ${statusClass}">${statusText}</div>
                     <div class="athlete-hero-avatar">
                         ${hasPhoto ? `<img src="${a.profile_photo}" alt="">` : initials}
                     </div>
@@ -2434,20 +4126,46 @@
                 <!-- Stats Bar -->
                 <div class="athlete-stats-bar">
                     <div class="athlete-stat">
-                        <div class="athlete-stat-value">${a.workouts_completed || 0}</div>
-                        <div class="athlete-stat-label">Workout</div>
+                        <div class="athlete-stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="athlete-stat-value">${completedWorkouts.length}</div>
+                        <div class="athlete-stat-label">Completati</div>
                     </div>
                     <div class="athlete-stat">
-                        <div class="athlete-stat-value">${a.level || 1}</div>
-                        <div class="athlete-stat-label">Livello</div>
+                        <div class="athlete-stat-icon"><i class="fas fa-times-circle"></i></div>
+                        <div class="athlete-stat-value">${skippedWorkouts}</div>
+                        <div class="athlete-stat-label">Saltati</div>
                     </div>
                     <div class="athlete-stat">
-                        <div class="athlete-stat-value">${a.xp || 0}</div>
-                        <div class="athlete-stat-label">XP</div>
+                        <div class="athlete-stat-icon"><i class="fas fa-percentage"></i></div>
+                        <div class="athlete-stat-value">${compliance}%</div>
+                        <div class="athlete-stat-label">Compliance</div>
                     </div>
                     <div class="athlete-stat">
+                        <div class="athlete-stat-icon"><i class="fas fa-fire"></i></div>
                         <div class="athlete-stat-value">${a.streak || 0}</div>
                         <div class="athlete-stat-label">Streak</div>
+                    </div>
+                </div>
+                
+                <!-- Quick Insights -->
+                <div class="quick-insights">
+                    <div class="insight-card">
+                        <div class="insight-label"><i class="fas fa-clock"></i> Ultimo Workout</div>
+                        <div class="insight-value">${lastWorkoutText}</div>
+                        <div class="insight-sub">Totale: ${totalWorkouts} workout</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-label"><i class="fas fa-bullseye"></i> Obiettivo</div>
+                        <div class="insight-value">${nextGoal}</div>
+                        <div class="insight-sub">In corso</div>
+                    </div>
+                </div>
+                
+                <!-- Mini Timeline -->
+                <div class="mini-timeline">
+                    <div class="mini-timeline-title"><i class="fas fa-history"></i> Ultimi Workout</div>
+                    <div class="timeline-items" id="timeline-items">
+                        <!-- Loaded dynamically -->
                     </div>
                 </div>
                 
@@ -2475,6 +4193,9 @@
                     <div class="tab-pane" id="tab-tests"></div>
                 </div>
             `;
+            
+            // Load mini timeline with recent workouts
+            loadRecentWorkoutsTimeline(workouts);
 
             // Setup tabs
             document.querySelectorAll('.athlete-tab').forEach(tab => {
@@ -2491,6 +4212,41 @@
             });
 
             loadProfileTab();
+        }
+        
+        function loadRecentWorkoutsTimeline(workouts) {
+            const container = document.getElementById('timeline-items');
+            
+            if (!workouts || workouts.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:20px;color:var(--gray-500);width:100%;">
+                        <i class="fas fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;"></i>
+                        Nessun workout ancora
+                    </div>
+                `;
+                return;
+            }
+            
+            // Show last 7 workouts
+            const recentWorkouts = workouts.slice(0, 7);
+            
+            let html = recentWorkouts.map(w => {
+                const date = new Date(w.created_at);
+                const isCompleted = w.status === 'completed' || w.completed_at;
+                const dayName = date.toLocaleDateString('it-IT', { weekday: 'short' });
+                const dateNum = date.getDate();
+                const workoutType = w.focus || w.type || w.name || 'Workout';
+                
+                return `
+                    <div class="timeline-item ${isCompleted ? 'completed' : ''}">
+                        <div class="timeline-day">${dayName}</div>
+                        <div class="timeline-date">${dateNum}</div>
+                        <div class="timeline-type ${isCompleted ? '' : 'timeline-pending'}">${isCompleted ? '✓' : '○'}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
         }
 
         async function loadProfileTab() {
@@ -2692,6 +4448,19 @@
                     </div>
                 </div>
 
+                <!-- COACH GOALS SECTION -->
+                <div class="profile-section" id="coach-goals-section">
+                    <h3 class="profile-section-title">
+                        <i class="fas fa-target"></i> Obiettivi Personalizzati
+                        <button class="add-goal-btn" onclick="showAddGoalModal('${a.id}')">
+                            <i class="fas fa-plus"></i> Nuovo
+                        </button>
+                    </h3>
+                    <div id="coach-goals-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
                 <div class="profile-section" id="profile-progress-section"></div>
 
                 <div class="profile-section">
@@ -2701,6 +4470,19 @@
                             <span class="profile-item-label">Infortuni / Limitazioni</span>
                             <span class="profile-item-value">${injuriesText}</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Body Composition Section -->
+                <div class="profile-section" id="body-composition-section">
+                    <h3 class="profile-section-title">
+                        <i class="fas fa-weight"></i> Body Composition
+                        <button class="add-goal-btn" onclick="openBodyCompModal('${a.id}')">
+                            <i class="fas fa-plus"></i> Aggiungi
+                        </button>
+                    </h3>
+                    <div class="profile-grid" id="body-comp-grid">
+                        ${renderBodyCompositionData(a)}
                     </div>
                 </div>
             `;
@@ -2714,6 +4496,98 @@
 
             // Progressi (se presenti)
             await renderProgressMetricsSection(a);
+            
+            // Obiettivi del coach
+            await loadCoachGoals(a.id);
+        }
+
+        /**
+         * 📊 Renderizza Body Composition
+         */
+        function renderBodyCompositionData(athlete) {
+            const weight = athlete.weight_kg;
+            const height = athlete.height_cm;
+            const gender = athlete.gender?.toLowerCase() === 'female' ? 'female' : 'male';
+            
+            if (!weight || !height) {
+                return `
+                    <div class="profile-item" style="grid-column: span 2;">
+                        <span class="profile-item-label">Dati</span>
+                        <span class="profile-item-value" style="color: var(--gray-500);">
+                            Inserisci peso e altezza per calcolare
+                        </span>
+                    </div>
+                `;
+            }
+            
+            // Calcola BMI
+            const heightM = height / 100;
+            const bmi = (weight / (heightM * heightM)).toFixed(1);
+            
+            // Calcola FFMI (stima con body fat medio)
+            const estimatedBF = gender === 'female' ? 0.25 : 0.18;
+            const lbm = weight * (1 - estimatedBF);
+            const ffmi = (lbm / (heightM * heightM)).toFixed(1);
+            const ffmiAdj = (parseFloat(ffmi) + 6.1 * (1.8 - heightM)).toFixed(1);
+            
+            // Interpretazione FFMI
+            let ffmiClass = 'neutral';
+            let ffmiLabel = 'Nella media';
+            if (gender === 'male') {
+                if (ffmiAdj >= 25) { ffmiClass = 'success'; ffmiLabel = 'Elite'; }
+                else if (ffmiAdj >= 22) { ffmiClass = 'good'; ffmiLabel = 'Avanzato'; }
+                else if (ffmiAdj >= 20) { ffmiClass = 'neutral'; ffmiLabel = 'Intermedio'; }
+                else { ffmiClass = 'warning'; ffmiLabel = 'Principiante'; }
+            } else {
+                if (ffmiAdj >= 21) { ffmiClass = 'success'; ffmiLabel = 'Elite'; }
+                else if (ffmiAdj >= 18) { ffmiClass = 'good'; ffmiLabel = 'Avanzata'; }
+                else if (ffmiAdj >= 16) { ffmiClass = 'neutral'; ffmiLabel = 'Intermedia'; }
+                else { ffmiClass = 'warning'; ffmiLabel = 'Principiante'; }
+            }
+            
+            // Carica misurazioni salvate
+            const savedData = JSON.parse(localStorage.getItem(`atlas_bodycomp_${athlete.id}`) || '{}');
+            const bodyFat = savedData.bodyFat || '--';
+            const waist = savedData.waist || '--';
+            
+            return `
+                <div class="profile-item">
+                    <span class="profile-item-label">BMI</span>
+                    <span class="profile-item-value">${bmi}</span>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">FFMI Adj.</span>
+                    <span class="profile-item-value ${ffmiClass}">${ffmiAdj} <small>(${ffmiLabel})</small></span>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">Body Fat %</span>
+                    <span class="profile-item-value">${bodyFat !== '--' ? bodyFat + '%' : '--'}</span>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">Vita</span>
+                    <span class="profile-item-value">${waist !== '--' ? waist + ' cm' : '--'}</span>
+                </div>
+            `;
+        }
+
+        /**
+         * 📊 Apri modal Body Composition
+         */
+        function openBodyCompModal(athleteId) {
+            const bodyFat = prompt('📊 Body Fat % (es: 15):');
+            const waist = prompt('📏 Circonferenza vita cm (es: 80):');
+            
+            if (bodyFat || waist) {
+                const data = JSON.parse(localStorage.getItem(`atlas_bodycomp_${athleteId}`) || '{}');
+                if (bodyFat) data.bodyFat = parseFloat(bodyFat);
+                if (waist) data.waist = parseFloat(waist);
+                data.updatedAt = new Date().toISOString();
+                localStorage.setItem(`atlas_bodycomp_${athleteId}`, JSON.stringify(data));
+                
+                // Refresh the section
+                document.getElementById('body-comp-grid').innerHTML = renderBodyCompositionData(selectedAthlete);
+                alert('✅ Dati salvati!');
+            }
         }
 
         function formatGenderLabel(value) {
@@ -3108,8 +4982,14 @@
                     ` :
                         workouts.map((w, idx) => {
                             const date = new Date(w.created_at);
-                            const exercises = w.exercises || [];
+                            const rawExercises = w.exercises;
+                            const exercises = Array.isArray(rawExercises)
+                                ? rawExercises
+                                : (rawExercises && typeof rawExercises === 'object' && Array.isArray(rawExercises.main) ? rawExercises.main : []);
                             const exercisePreview = exercises.slice(0, 3).map(e => e.name).join(', ');
+                            const weekNum = w.week_number ?? w.week ?? '-';
+                            const durationMin = w.actual_duration_minutes || w.estimated_duration_minutes || w.duration_minutes || w.duration || 45;
+                            const isCompleted = (w.status === 'completed') || Boolean(w.completed) || Boolean(w.completed_at);
                             return `
                                 <div class="workout-card" onclick="toggleWorkoutExpand(this)">
                                     <div class="workout-date">
@@ -3118,7 +4998,7 @@
                                     </div>
                                     <div class="workout-info">
                                         <div class="workout-name">${w.name || 'Workout'}</div>
-                                        <div class="workout-meta">${w.duration || 45} min • ${exercises.length} esercizi • Sett. ${w.week || '-'}</div>
+                                        <div class="workout-meta">${durationMin} min • ${exercises.length} esercizi • Sett. ${weekNum}</div>
                                         ${exercises.length > 0 ? `
                                             <div class="workout-exercises-preview">
                                                 ${exercises.slice(0, 3).map(e => `<span class="exercise-chip">${e.name}</span>`).join('')}
@@ -3139,8 +5019,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <span class="workout-status ${w.completed ? 'completed' : 'pending'}">
-                                        ${w.completed ? 'Completato' : 'Da fare'}
+                                    <span class="workout-status ${isCompleted ? 'completed' : 'pending'}">
+                                        ${isCompleted ? 'Completato' : 'Da fare'}
                                     </span>
                                 </div>
                             `;
@@ -3255,6 +5135,258 @@
         document.getElementById('test-modal').addEventListener('click', (e) => {
             if (e.target.id === 'test-modal') closeTestModal();
         });
+
+        // ========== COACH GOALS FUNCTIONS ==========
+        let currentGoalAthleteId = null;
+        let editingGoalId = null;
+
+        async function loadCoachGoals(athleteId) {
+            const container = document.getElementById('coach-goals-list');
+            if (!container) return;
+
+            const emptyHtml = `
+                <div class="empty-goals-coach">
+                    <i class="fas fa-bullseye"></i>
+                    <p>Nessun obiettivo impostato</p>
+                    <p style="font-size: 11px; margin-top: 4px;">Clicca "Nuovo" per aggiungere un obiettivo</p>
+                </div>
+            `;
+
+            try {
+                const goals = await supabase.fetch('coach_goals', 
+                    `?athlete_id=eq.${athleteId}&select=*&order=end_date.asc`
+                );
+
+                if (!goals || goals.length === 0) {
+                    container.innerHTML = emptyHtml;
+                    return;
+                }
+
+                container.innerHTML = goals.map(goal => {
+                    const progress = Math.min(100, Math.round((goal.current_value / goal.target_value) * 100));
+                    const endDate = new Date(goal.end_date);
+                    const deadlineStr = endDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const isCompleted = goal.status === 'completed' || progress >= 100;
+                    
+                    const goalTypeLabels = {
+                        'strength': 'Forza',
+                        'endurance': 'Resistenza',
+                        'weight': 'Peso',
+                        'skill': 'Skill',
+                        'performance': 'Performance',
+                        'other': 'Altro'
+                    };
+
+                    return `
+                        <div class="coach-goal-card ${isCompleted ? 'completed' : ''}">
+                            <div class="coach-goal-actions">
+                                <button class="coach-goal-action-btn" onclick="editGoal('${goal.id}')" title="Modifica">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="coach-goal-action-btn delete" onclick="deleteGoal('${goal.id}')" title="Elimina">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="coach-goal-header">
+                                <div class="coach-goal-title">${goal.goal_title}</div>
+                                <span class="coach-goal-type">${goalTypeLabels[goal.goal_type] || goal.goal_type}</span>
+                            </div>
+                            <div class="coach-goal-progress">
+                                <div class="coach-goal-progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                            <div class="coach-goal-stats">
+                                <span class="coach-goal-current">${goal.current_value} ${goal.unit || ''}</span>
+                                <span class="coach-goal-target">Obiettivo: ${goal.target_value} ${goal.unit || ''}</span>
+                            </div>
+                            <div class="coach-goal-deadline">
+                                ${isCompleted ? '✅ Completato!' : `📅 Scadenza: ${deadlineStr}`}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.log('Tabella coach_goals non trovata:', error);
+                container.innerHTML = emptyHtml;
+            }
+        }
+
+        function showAddGoalModal(athleteId) {
+            currentGoalAthleteId = athleteId;
+            editingGoalId = null;
+            
+            // Reset form
+            document.getElementById('goal-form').reset();
+            document.getElementById('goal-modal-title').textContent = 'Nuovo Obiettivo';
+            
+            // Default dates
+            const today = new Date().toISOString().split('T')[0];
+            const nextMonth = new Date();
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            document.getElementById('goal-start-date').value = today;
+            document.getElementById('goal-end-date').value = nextMonth.toISOString().split('T')[0];
+            document.getElementById('goal-current-value').value = '0';
+            
+            document.getElementById('goal-modal-overlay').classList.add('active');
+        }
+
+        async function editGoal(goalId) {
+            try {
+                const goals = await supabase.fetch('coach_goals', `?id=eq.${goalId}`);
+                if (!goals || goals.length === 0) return;
+                
+                const goal = goals[0];
+                editingGoalId = goalId;
+                currentGoalAthleteId = goal.athlete_id;
+                
+                document.getElementById('goal-modal-title').textContent = 'Modifica Obiettivo';
+                document.getElementById('goal-title').value = goal.goal_title;
+                document.getElementById('goal-type').value = goal.goal_type;
+                document.getElementById('goal-target-value').value = goal.target_value;
+                document.getElementById('goal-current-value').value = goal.current_value;
+                document.getElementById('goal-unit').value = goal.unit || '';
+                document.getElementById('goal-start-date').value = goal.start_date.split('T')[0];
+                document.getElementById('goal-end-date').value = goal.end_date.split('T')[0];
+                document.getElementById('goal-description').value = goal.description || '';
+                
+                document.getElementById('goal-modal-overlay').classList.add('active');
+                
+            } catch (error) {
+                console.error('Errore caricamento goal:', error);
+            }
+        }
+
+        async function deleteGoal(goalId) {
+            if (!confirm('Sei sicuro di voler eliminare questo obiettivo?')) return;
+            
+            try {
+                await supabase.delete('coach_goals', goalId);
+                if (selectedAthlete) {
+                    await loadCoachGoals(selectedAthlete.id);
+                }
+            } catch (error) {
+                console.error('Errore eliminazione goal:', error);
+                alert('Errore durante l\'eliminazione');
+            }
+        }
+
+        function closeGoalModal() {
+            document.getElementById('goal-modal-overlay').classList.remove('active');
+            currentGoalAthleteId = null;
+            editingGoalId = null;
+        }
+
+        async function saveGoal(e) {
+            e.preventDefault();
+            
+            const goalData = {
+                athlete_id: currentGoalAthleteId,
+                goal_title: document.getElementById('goal-title').value.trim(),
+                goal_type: document.getElementById('goal-type').value,
+                target_value: parseFloat(document.getElementById('goal-target-value').value),
+                current_value: parseFloat(document.getElementById('goal-current-value').value) || 0,
+                unit: document.getElementById('goal-unit').value.trim(),
+                start_date: document.getElementById('goal-start-date').value,
+                end_date: document.getElementById('goal-end-date').value,
+                description: document.getElementById('goal-description').value.trim(),
+                status: 'active'
+            };
+
+            // Check if completed
+            if (goalData.current_value >= goalData.target_value) {
+                goalData.status = 'completed';
+            }
+
+            try {
+                if (editingGoalId) {
+                    await supabase.update('coach_goals', editingGoalId, goalData);
+                } else {
+                    await supabase.insert('coach_goals', goalData);
+                }
+                
+                closeGoalModal();
+                if (selectedAthlete) {
+                    await loadCoachGoals(selectedAthlete.id);
+                }
+            } catch (error) {
+                console.error('Errore salvataggio goal:', error);
+                alert('Errore nel salvataggio. Assicurati che la tabella coach_goals esista.');
+            }
+        }
+
+        // Close goal modal on overlay click
+        document.getElementById('goal-modal-overlay')?.addEventListener('click', (e) => {
+            if (e.target.id === 'goal-modal-overlay') closeGoalModal();
+        });
     </script>
+
+    <!-- Goal Modal -->
+    <div class="goal-modal-overlay" id="goal-modal-overlay">
+        <div class="goal-modal">
+            <div class="goal-modal-header">
+                <span class="goal-modal-title" id="goal-modal-title">Nuovo Obiettivo</span>
+                <button class="goal-modal-close" onclick="closeGoalModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="goal-form" onsubmit="saveGoal(event)">
+                    <div class="form-group">
+                        <label class="form-label">Titolo Obiettivo *</label>
+                        <input type="text" class="form-input" id="goal-title" placeholder="Es: Squat 100kg x 5" required>
+                    </div>
+                    
+                    <div class="goal-form-row">
+                        <div class="form-group">
+                            <label class="form-label">Tipo</label>
+                            <select class="form-input" id="goal-type">
+                                <option value="strength">Forza</option>
+                                <option value="endurance">Resistenza</option>
+                                <option value="weight">Peso Corporeo</option>
+                                <option value="skill">Skill</option>
+                                <option value="performance">Performance</option>
+                                <option value="other">Altro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Unità</label>
+                            <input type="text" class="form-input" id="goal-unit" placeholder="Es: kg, sec, rep">
+                        </div>
+                    </div>
+                    
+                    <div class="goal-form-row">
+                        <div class="form-group">
+                            <label class="form-label">Valore Attuale</label>
+                            <input type="number" step="0.1" class="form-input" id="goal-current-value" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Obiettivo Target *</label>
+                            <input type="number" step="0.1" class="form-input" id="goal-target-value" placeholder="100" required>
+                        </div>
+                    </div>
+                    
+                    <div class="goal-form-row">
+                        <div class="form-group">
+                            <label class="form-label">Data Inizio</label>
+                            <input type="date" class="form-input" id="goal-start-date">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Scadenza</label>
+                            <input type="date" class="form-input" id="goal-end-date">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Note (opzionale)</label>
+                        <textarea class="form-input" id="goal-description" rows="2" placeholder="Descrizione o note aggiuntive"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="form-btn">
+                        <i class="fas fa-save"></i> Salva Obiettivo
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

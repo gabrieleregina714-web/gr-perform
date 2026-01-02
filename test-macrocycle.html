@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Macrocycle Planner - GR Perform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        h1 { 
+            color: #FF9800; 
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .subtitle { color: #888; margin-bottom: 40px; }
+        
+        .test-section {
+            background: #111;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #222;
+        }
+        
+        h2 { color: #fff; margin-bottom: 20px; font-size: 18px; }
+        h3 { color: #FF9800; margin: 20px 0 12px; font-size: 16px; }
+        
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #FF9800;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #FF9800, #ff5722);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+        
+        .btn-primary:hover { transform: scale(1.02); }
+        
+        .btn-secondary {
+            background: #333;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+        }
+        
+        /* TIMELINE */
+        .timeline-container {
+            margin-top: 24px;
+            padding: 24px;
+            background: #0a0a0a;
+            border-radius: 12px;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .timeline-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .timeline-stats strong { color: #FF9800; }
+        
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline-bar {
+            height: 40px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .phase-block {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .phase-block:hover {
+            filter: brightness(1.2);
+        }
+        
+        .phase-block.accumulo { background: linear-gradient(135deg, #00D26A, #00A856); }
+        .phase-block.intensificazione { background: linear-gradient(135deg, #2196F3, #1976D2); }
+        .phase-block.peaking { background: linear-gradient(135deg, #FF9800, #F57C00); }
+        .phase-block.taper { background: linear-gradient(135deg, #E63946, #C62828); }
+        
+        .phase-block-label {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #666;
+            white-space: nowrap;
+        }
+        
+        .today-marker {
+            position: absolute;
+            top: -8px;
+            bottom: -8px;
+            width: 3px;
+            background: #fff;
+            border-radius: 2px;
+            z-index: 10;
+        }
+        
+        .today-marker::before {
+            content: 'OGGI';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        /* DELOADS */
+        .deload-markers {
+            display: flex;
+            justify-content: flex-start;
+            gap: 8px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .deload-chip {
+            padding: 4px 10px;
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196F3;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        /* WEEK GRID */
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 4px;
+            margin-top: 20px;
+        }
+        
+        .week-cell {
+            aspect-ratio: 1;
+            background: #1a1a1a;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .week-cell:hover {
+            transform: scale(1.1);
+            z-index: 5;
+        }
+        
+        .week-cell.past { opacity: 0.5; }
+        .week-cell.current { 
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+        
+        .week-cell.accumulo { background: rgba(0, 210, 106, 0.3); color: #00D26A; }
+        .week-cell.intensificazione { background: rgba(33, 150, 243, 0.3); color: #2196F3; }
+        .week-cell.peaking { background: rgba(255, 152, 0, 0.3); color: #FF9800; }
+        .week-cell.taper { background: rgba(230, 57, 70, 0.3); color: #E63946; }
+        
+        .week-cell .deload-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background: #2196F3;
+            border-radius: 50%;
+        }
+        
+        .week-cell-sub {
+            font-size: 8px;
+            color: inherit;
+            opacity: 0.7;
+        }
+        
+        /* RESULTS */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .result-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .result-card h4 {
+            color: #888;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+        
+        .result-card .value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .result-card .label {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        /* PHASE DETAILS */
+        .phase-details {
+            margin-top: 20px;
+        }
+        
+        .phase-row {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .phase-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .phase-row.accumulo .phase-icon { background: rgba(0, 210, 106, 0.2); color: #00D26A; }
+        .phase-row.intensificazione .phase-icon { background: rgba(33, 150, 243, 0.2); color: #2196F3; }
+        .phase-row.peaking .phase-icon { background: rgba(255, 152, 0, 0.2); color: #FF9800; }
+        .phase-row.taper .phase-icon { background: rgba(230, 57, 70, 0.2); color: #E63946; }
+        
+        .phase-info {
+            flex: 1;
+        }
+        
+        .phase-name {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .phase-dates {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .phase-focus {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        .phase-bars {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .phase-bar-group {
+            text-align: center;
+        }
+        
+        .phase-bar-label {
+            font-size: 9px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .phase-bar {
+            width: 60px;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .phase-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+        
+        .phase-bar-fill.volume { background: linear-gradient(90deg, #00D26A, #00A856); }
+        .phase-bar-fill.intensity { background: linear-gradient(90deg, #FF9800, #E63946); }
+        
+        .phase-pct {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        
+        /* LOG */
+        .log-container {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #0a0a0a;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 11px;
+        }
+        
+        .log-line { margin-bottom: 4px; color: #888; }
+        .log-line.success { color: #00D26A; }
+        .log-line.error { color: #E63946; }
+        .log-line.info { color: #2196F3; }
+        
+        /* PROMPT PREVIEW */
+        .prompt-preview {
+            background: #0a0a0a;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            color: #888;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .prompt-preview strong { color: #FF9800; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-calendar-alt"></i> Test Macrocycle Planner</h1>
+        <p class="subtitle">Pianificazione a lungo termine con fasi automatiche</p>
+        
+        <!-- CREATE SECTION -->
+        <div class="test-section">
+            <h2><i class="fas fa-plus-circle"></i> Crea Macrociclo</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Sport</label>
+                    <select id="sport-select">
+                        <option value="boxe">🥊 Boxe</option>
+                        <option value="mma">🥋 MMA</option>
+                        <option value="calcio">⚽ Calcio</option>
+                        <option value="ciclismo">🚴 Ciclismo</option>
+                        <option value="running">🏃 Running</option>
+                        <option value="fitness">💪 Fitness</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Nome Evento</label>
+                    <input type="text" id="event-name" placeholder="es. Match Campionato Italiano">
+                </div>
+                <div class="form-group">
+                    <label>Data Obiettivo</label>
+                    <input type="date" id="target-date">
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button class="btn-primary" onclick="previewMacrocycle()">
+                    <i class="fas fa-eye"></i> Preview
+                </button>
+                <button class="btn-primary" onclick="createMacrocycle()">
+                    <i class="fas fa-check"></i> Crea e Salva
+                </button>
+                <button class="btn-secondary" onclick="clearAll()">
+                    <i class="fas fa-trash"></i> Reset
+                </button>
+            </div>
+            
+            <div id="preview-container" style="display: none;"></div>
+        </div>
+        
+        <!-- SAVED MACROCYCLES -->
+        <div class="test-section">
+            <h2><i class="fas fa-list"></i> Macrocicli Salvati</h2>
+            <div id="saved-list">
+                <p style="color: #666;">Nessun macrociclo salvato</p>
+            </div>
+        </div>
+        
+        <!-- LOG -->
+        <div class="test-section">
+            <h2><i class="fas fa-terminal"></i> Log</h2>
+            <div class="log-container" id="log-container"></div>
+        </div>
+    </div>
+    
+    <script src="js/macrocycle-planner.js"></script>
+    <script>
+        // Set default date to 3 months from now
+        const defaultDate = new Date();
+        defaultDate.setMonth(defaultDate.getMonth() + 3);
+        document.getElementById('target-date').value = defaultDate.toISOString().split('T')[0];
+        document.getElementById('target-date').min = new Date().toISOString().split('T')[0];
+        
+        const TEST_ATHLETE_ID = 'test-athlete-001';
+        
+        function log(message, type = 'info') {
+            const container = document.getElementById('log-container');
+            const line = document.createElement('div');
+            line.className = `log-line ${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.insertBefore(line, container.firstChild);
+        }
+        
+        function previewMacrocycle() {
+            const sport = document.getElementById('sport-select').value;
+            const targetDate = document.getElementById('target-date').value;
+            const eventName = document.getElementById('event-name').value || 'Obiettivo';
+            
+            if (!targetDate) {
+                log('Seleziona una data obiettivo', 'error');
+                return;
+            }
+            
+            log(`Preview macrociclo: ${sport} → ${targetDate}`, 'info');
+            
+            const preview = window.MacrocyclePlanner.preview(sport, targetDate);
+            
+            if (!preview.success) {
+                log(`Errore: ${preview.error}`, 'error');
+                document.getElementById('preview-container').innerHTML = `
+                    <div style="background: rgba(230,57,70,0.1); color: #E63946; padding: 16px; border-radius: 8px; margin-top: 16px;">
+                        <strong>❌ ${preview.error}</strong>
+                    </div>
+                `;
+                document.getElementById('preview-container').style.display = 'block';
+                return;
+            }
+            
+            log(`Piano generato: ${preview.totalWeeks} settimane, ${preview.phases.length} fasi`, 'success');
+            
+            renderPreview(preview, eventName);
+        }
+        
+        function renderPreview(plan, eventName) {
+            const container = document.getElementById('preview-container');
+            
+            // Calculate today position
+            const startDate = new Date(plan.phases[0].startDate);
+            const endDate = new Date(plan.targetDate);
+            const today = new Date();
+            const totalDays = (endDate - startDate) / (24 * 60 * 60 * 1000);
+            const daysFromStart = Math.max(0, (today - startDate) / (24 * 60 * 60 * 1000));
+            const todayPct = Math.min(100, (daysFromStart / totalDays) * 100);
+            
+            // Global week
+            const globalWeek = Math.floor(daysFromStart / 7) + 1;
+            
+            container.innerHTML = `
+                <div class="timeline-container">
+                    <div class="timeline-header">
+                        <div class="timeline-title">📅 ${eventName}</div>
+                        <div class="timeline-stats">
+                            <span><strong>${plan.totalWeeks}</strong> settimane</span>
+                            <span><strong>${plan.phases.length}</strong> fasi</span>
+                            <span><strong>${plan.deloads.length}</strong> deload</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Timeline Bar -->
+                    <div class="timeline">
+                        <div class="timeline-bar">
+                            ${plan.phases.map(phase => {
+                                const widthPct = (phase.weeks / plan.totalWeeks) * 100;
+                                return `
+                                    <div class="phase-block ${phase.code}" style="width: ${widthPct}%" title="${phase.name}: ${phase.weeks} settimane">
+                                        ${phase.name}
+                                        <span class="phase-block-label">${phase.weeks}w</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                            ${todayPct > 0 && todayPct < 100 ? `<div class="today-marker" style="left: ${todayPct}%"></div>` : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Week Grid -->
+                    <h3>📊 Griglia Settimane</h3>
+                    <div class="week-grid">
+                        ${generateWeekGrid(plan, globalWeek)}
+                    </div>
+                    
+                    <!-- Deloads -->
+                    ${plan.deloads.length > 0 ? `
+                        <h3>💤 Deload Programmati</h3>
+                        <div class="deload-markers">
+                            ${plan.deloads.map(d => `
+                                <span class="deload-chip">Sett. ${d.week} (${d.phase})</span>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Phase Details -->
+                    <h3>📋 Dettaglio Fasi</h3>
+                    <div class="phase-details">
+                        ${plan.phases.map(phase => `
+                            <div class="phase-row ${phase.code}">
+                                <div class="phase-icon">
+                                    ${getPhaseIcon(phase.code)}
+                                </div>
+                                <div class="phase-info">
+                                    <div class="phase-name">${phase.name}</div>
+                                    <div class="phase-dates">
+                                        ${formatDate(phase.startDate)} → ${formatDate(phase.endDate)} (${phase.weeks} settimane)
+                                    </div>
+                                    <div class="phase-focus">${phase.focus}</div>
+                                </div>
+                                <div class="phase-bars">
+                                    <div class="phase-bar-group">
+                                        <div class="phase-bar-label">Volume</div>
+                                        <div class="phase-bar">
+                                            <div class="phase-bar-fill volume" style="width: ${phase.volume}%"></div>
+                                        </div>
+                                        <div class="phase-pct" style="color: #00D26A">${phase.volume}%</div>
+                                    </div>
+                                    <div class="phase-bar-group">
+                                        <div class="phase-bar-label">Intensità</div>
+                                        <div class="phase-bar">
+                                            <div class="phase-bar-fill intensity" style="width: ${phase.intensity}%"></div>
+                                        </div>
+                                        <div class="phase-pct" style="color: #FF9800">${phase.intensity}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- Prompt Preview -->
+                    <h3>🤖 Testo per AI Prompt</h3>
+                    <div class="prompt-preview">${escapeHtml(generatePromptPreview(plan, eventName))}</div>
+                </div>
+            `;
+            
+            container.style.display = 'block';
+        }
+        
+        function generateWeekGrid(plan, currentWeek) {
+            let html = '';
+            let weekNum = 1;
+            
+            plan.phases.forEach(phase => {
+                for (let w = 0; w < phase.weeks; w++) {
+                    const isDeload = plan.deloads.some(d => d.week === weekNum);
+                    const isCurrent = weekNum === currentWeek;
+                    const isPast = weekNum < currentWeek;
+                    
+                    html += `
+                        <div class="week-cell ${phase.code} ${isCurrent ? 'current' : ''} ${isPast ? 'past' : ''}" 
+                             title="Settimana ${weekNum} - ${phase.name}${isDeload ? ' (Deload)' : ''}">
+                            ${weekNum}
+                            <span class="week-cell-sub">${phase.code.substring(0, 3)}</span>
+                            ${isDeload ? '<div class="deload-badge"></div>' : ''}
+                        </div>
+                    `;
+                    weekNum++;
+                }
+            });
+            
+            return html;
+        }
+        
+        function getPhaseIcon(code) {
+            const icons = {
+                accumulo: '📈',
+                intensificazione: '💪',
+                peaking: '🎯',
+                taper: '🛏️'
+            };
+            return icons[code] || '📊';
+        }
+        
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+        }
+        
+        function escapeHtml(text) {
+            return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        
+        function generatePromptPreview(plan, eventName) {
+            const phase = plan.phases[0]; // Current phase
+            const daysToEvent = Math.ceil((new Date(plan.targetDate) - new Date()) / (24 * 60 * 60 * 1000));
+            
+            return `📅 MACROCICLO ATTIVO: "${eventName}" (${plan.targetDate})
+   Settimana 1/${plan.totalWeeks} - Mancano ${daysToEvent} giorni all'evento
+   FASE CORRENTE: ${phase.name} (settimana 1/${phase.weeks})
+   Volume target: ${phase.volume}% | Intensità target: ${phase.intensity}%
+   Focus: ${phase.focus}
+   Prossima fase: ${plan.phases[1]?.name || 'N/A'} tra ${phase.weeks} settimane`;
+        }
+        
+        function createMacrocycle() {
+            const sport = document.getElementById('sport-select').value;
+            const targetDate = document.getElementById('target-date').value;
+            const eventName = document.getElementById('event-name').value || 'Obiettivo';
+            
+            if (!targetDate) {
+                log('Seleziona una data obiettivo', 'error');
+                return;
+            }
+            
+            const result = window.MacrocyclePlanner.create(TEST_ATHLETE_ID, sport, targetDate, eventName);
+            
+            if (result.success) {
+                log(`✅ Macrociclo "${eventName}" salvato con successo!`, 'success');
+                loadSavedMacrocycles();
+            } else {
+                log(`❌ Errore: ${result.error}`, 'error');
+            }
+        }
+        
+        function loadSavedMacrocycles() {
+            const macros = window.MacrocyclePlanner.getAll(TEST_ATHLETE_ID);
+            const container = document.getElementById('saved-list');
+            
+            if (macros.length === 0) {
+                container.innerHTML = '<p style="color: #666;">Nessun macrociclo salvato</p>';
+                return;
+            }
+            
+            container.innerHTML = macros.map(m => `
+                <div class="phase-row ${m.phases[0]?.code || 'accumulo'}">
+                    <div class="phase-icon">📅</div>
+                    <div class="phase-info">
+                        <div class="phase-name">${m.eventName}</div>
+                        <div class="phase-dates">
+                            ${m.sport.toUpperCase()} → ${formatDate(m.targetDate)} (${m.totalWeeks} settimane)
+                        </div>
+                        <div class="phase-focus">Fasi: ${m.phases.map(p => p.name).join(' → ')}</div>
+                    </div>
+                    <button class="btn-secondary" onclick="deleteMacro('${m.id}')" style="padding: 8px 12px; font-size: 12px;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        function deleteMacro(macroId) {
+            window.MacrocyclePlanner.delete(TEST_ATHLETE_ID, macroId);
+            log(`Macrociclo eliminato`, 'info');
+            loadSavedMacrocycles();
+        }
+        
+        function clearAll() {
+            const macros = window.MacrocyclePlanner.getAll(TEST_ATHLETE_ID);
+            macros.forEach(m => window.MacrocyclePlanner.delete(TEST_ATHLETE_ID, m.id));
+            document.getElementById('preview-container').style.display = 'none';
+            document.getElementById('event-name').value = '';
+            loadSavedMacrocycles();
+            log('Tutti i macrocicli eliminati', 'info');
+        }
+        
+        // Load on start
+        loadSavedMacrocycles();
+        log('MacrocyclePlanner caricato ✅', 'success');
+        log(`Sport supportati: ${window.MacrocyclePlanner.getSupportedSports().join(', ')}`, 'info');
+    </script>
+</body>
+</html>

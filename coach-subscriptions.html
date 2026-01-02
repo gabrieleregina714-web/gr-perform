@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GR Perform - Gestione Abbonamenti</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E63946">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --red: #E63946;
+            --red-hover: #FF4D5A;
+            --black: #000;
+            --gray-900: #0A0A0A;
+            --gray-800: #111;
+            --gray-700: #1A1A1A;
+            --gray-600: #222;
+            --gray-500: #666;
+            --gray-400: #888;
+            --white: #FFF;
+            --green: #22c55e;
+            --yellow: #f59e0b;
+            --blue: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--black);
+            color: var(--white);
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: 72px; height: 100vh;
+            background: var(--gray-900);
+            border-right: 1px solid var(--gray-600);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 100;
+        }
+
+        .logo {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .logo img { width: 100%; height: 100%; object-fit: cover; }
+
+        .nav-item {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-item:hover { background: var(--gray-700); color: var(--white); }
+        .nav-item.active { background: var(--red); color: var(--white); }
+
+        .nav-spacer { flex: 1; }
+
+        /* MAIN */
+        .main {
+            margin-left: 72px;
+            min-height: 100vh;
+            padding: 40px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .page-subtitle {
+            color: var(--gray-500);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--red);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--red-hover);
+        }
+
+        .btn-secondary {
+            background: var(--gray-700);
+            color: white;
+        }
+
+        /* STATS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--gray-900);
+            border: 1px solid var(--gray-700);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .stat-value.green { color: var(--green); }
+        .stat-value.red { color: var(--red); }
+        .stat-value.yellow { color: var(--yellow); }
+        .stat-value.blue { color: var(--blue); }
+
+        /* TABLE */
+        .table-section {
+            background: var(--gray-900);
+            border: 1px solid var(--gray-700);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .table-title {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px 14px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            border-radius: 8px;
+            color: var(--gray-400);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--white);
+            color: var(--black);
+            border-color: var(--white);
+        }
+
+        .table-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px;
+            padding: 12px 24px;
+            background: var(--gray-800);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-500);
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 120px;
+            padding: 16px 24px;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-800);
+            transition: background 0.2s;
+        }
+
+        .table-row:hover {
+            background: var(--gray-800);
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--green);
+        }
+
+        .status-badge.expired {
+            background: rgba(230, 57, 70, 0.15);
+            color: var(--red);
+        }
+
+        .status-badge.expiring {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--yellow);
+        }
+
+        .status-badge.cancelled {
+            background: rgba(102, 102, 102, 0.15);
+            color: var(--gray-400);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 6px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--gray-700);
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--red);
+            color: white;
+        }
+
+        .action-btn.extend:hover { background: var(--green); }
+        .action-btn.cancel:hover { background: var(--red); }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--gray-900);
+            border: 1px solid var(--gray-700);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--gray-700);
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-400);
+            margin-bottom: 8px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            padding: 24px;
+            border-top: 1px solid var(--gray-700);
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+        }
+
+        .password-display {
+            background: var(--gray-800);
+            border: 1px solid var(--gray-600);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .password-text {
+            font-family: monospace;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .copy-btn {
+            background: var(--red);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--gray-500);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 900px) {
+            .table-grid, .table-row {
+                grid-template-columns: 2fr 1fr 1fr 80px;
+            }
+            .table-grid > *:nth-child(3),
+            .table-grid > *:nth-child(4),
+            .table-row > *:nth-child(3),
+            .table-row > *:nth-child(4) { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { 
+                bottom: 0; top: auto;
+                width: 100%; height: 70px;
+                flex-direction: row;
+                justify-content: space-around;
+                padding: 0 20px;
+            }
+            .logo { display: none; }
+            .nav-spacer { display: none; }
+            .main { margin-left: 0; margin-bottom: 70px; padding: 20px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .page-header { flex-direction: column; gap: 16px; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <a href="coach-dashboard.html" class="logo">
+            <img src="https://cdn.shopify.com/s/files/1/0969/1801/2243/files/Black_White_Bold_Modern_Clothing_Brand_Logo_97389bbf-665b-4465-82ec-d71a0fa4b35e.png?v=1758700090" alt="GR">
+        </a>
+        <a href="coach-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i></a>
+        <a href="coach-clients.html" class="nav-item"><i class="fas fa-users"></i></a>
+        <a href="coach-atlas.html" class="nav-item"><i class="fas fa-brain"></i></a>
+        <a href="coach-subscriptions.html" class="nav-item active"><i class="fas fa-credit-card"></i></a>
+        <div class="nav-spacer"></div>
+        <a href="#" onclick="coachLogout(event)" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
+    </nav>
+
+    <main class="main">
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">Gestione Abbonamenti</h1>
+                <p class="page-subtitle">Monitora e gestisci tutti gli abbonamenti attivi</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="exportSubscriptions()">
+                    <i class="fas fa-download"></i> Esporta
+                </button>
+                <button class="btn btn-primary" onclick="openCreateModal()">
+                    <i class="fas fa-plus"></i> Nuovo Abbonamento
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-label">Totale Abbonamenti</div>
+                <div class="stat-value" id="statTotal">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Attivi</div>
+                <div class="stat-value green" id="statActive">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">In Scadenza (7gg)</div>
+                <div class="stat-value yellow" id="statExpiring">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Scaduti</div>
+                <div class="stat-value red" id="statExpired">--</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Cancellati</div>
+                <div class="stat-value" id="statCancelled">--</div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <section class="table-section">
+            <div class="table-header">
+                <span class="table-title">Lista Abbonamenti</span>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">Tutti</button>
+                    <button class="filter-btn" data-filter="active">Attivi</button>
+                    <button class="filter-btn" data-filter="expiring">In Scadenza</button>
+                    <button class="filter-btn" data-filter="expired">Scaduti</button>
+                </div>
+            </div>
+            <div class="table-grid">
+                <div>Utente</div>
+                <div>Piano</div>
+                <div>Scadenza</div>
+                <div>Giorni</div>
+                <div>Stato</div>
+                <div>Azioni</div>
+            </div>
+            <div id="subscriptionsList">
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Caricamento...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Create Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nuovo Abbonamento</h3>
+                <button class="modal-close" onclick="closeModal('createModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="createForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nome</label>
+                            <input type="text" class="form-input" id="createFirstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cognome</label>
+                            <input type="text" class="form-input" id="createLastName" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="createEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Telefono</label>
+                        <input type="tel" class="form-input" id="createPhone">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tipo Abbonamento</label>
+                        <select class="form-select" id="createPlan">
+                            <option value="monthly">Mensile (30 giorni)</option>
+                            <option value="quarterly">Trimestrale (90 giorni)</option>
+                            <option value="yearly">Annuale (365 giorni)</option>
+                            <option value="trial">Prova (7 giorni)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="passwordSection" style="display:none;">
+                        <label class="form-label">Password Generata</label>
+                        <div class="password-display">
+                            <span class="password-text" id="generatedPassword">-</span>
+                            <button type="button" class="copy-btn" onclick="copyPassword()">
+                                <i class="fas fa-copy"></i> Copia
+                            </button>
+                        </div>
+                        <p style="font-size:12px;color:var(--gray-500);margin-top:8px;">
+                            Invia queste credenziali all'utente via email
+                        </p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('createModal')">Annulla</button>
+                <button class="btn btn-primary" onclick="createSubscription()">
+                    <i class="fas fa-plus"></i> Crea Abbonamento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extend Modal -->
+    <div class="modal" id="extendModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Estendi Abbonamento</h3>
+                <button class="modal-close" onclick="closeModal('extendModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:20px;">Estendi l'abbonamento di <strong id="extendName">-</strong></p>
+                <div class="form-group">
+                    <label class="form-label">Giorni da aggiungere</label>
+                    <select class="form-select" id="extendDays">
+                        <option value="7">7 giorni (1 settimana)</option>
+                        <option value="30" selected>30 giorni (1 mese)</option>
+                        <option value="90">90 giorni (3 mesi)</option>
+                        <option value="365">365 giorni (1 anno)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('extendModal')">Annulla</button>
+                <button class="btn btn-primary" onclick="confirmExtend()" style="background:var(--green);">
+                    <i class="fas fa-plus"></i> Estendi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase-client.js?v=2"></script>
+    <script src="js/subscription-manager.js?v=2"></script>
+    <script>
+        // Auth check
+        if (localStorage.getItem('gr_coach_logged_in') !== 'true') {
+            window.location.href = 'coach-login.html';
+        }
+
+        function coachLogout(event) {
+            if (event) event.preventDefault();
+            localStorage.removeItem('gr_coach_logged_in');
+            window.location.replace('coach-login.html');
+        }
+
+        let allSubscriptions = [];
+        let currentFilter = 'all';
+        let selectedSubscriptionId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadStats();
+            await loadSubscriptions();
+            setupFilters();
+        });
+
+        async function loadStats() {
+            const stats = await SubscriptionManager.getSubscriptionStats();
+            if (stats) {
+                document.getElementById('statTotal').textContent = stats.total;
+                document.getElementById('statActive').textContent = stats.active;
+                document.getElementById('statExpiring').textContent = stats.expiringSoon;
+                document.getElementById('statExpired').textContent = stats.expired;
+                document.getElementById('statCancelled').textContent = stats.cancelled;
+            }
+        }
+
+        async function loadSubscriptions() {
+            allSubscriptions = await SubscriptionManager.listAllSubscriptions();
+            renderSubscriptions(allSubscriptions);
+        }
+
+        function renderSubscriptions(subscriptions) {
+            const list = document.getElementById('subscriptionsList');
+            
+            if (!subscriptions || subscriptions.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-credit-card"></i>
+                        <p>Nessun abbonamento trovato</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const now = new Date();
+
+            list.innerHTML = subscriptions.map(sub => {
+                const initials = ((sub.first_name?.[0] || '') + (sub.last_name?.[0] || '')).toUpperCase() || '?';
+                const endDate = new Date(sub.end_date);
+                const daysLeft = SubscriptionManager.getDaysRemaining(sub);
+                
+                // Determine status
+                let status = 'active';
+                let statusText = 'Attivo';
+                
+                if (sub.status === 'cancelled') {
+                    status = 'cancelled';
+                    statusText = 'Cancellato';
+                } else if (daysLeft <= 0) {
+                    status = 'expired';
+                    statusText = 'Scaduto';
+                } else if (daysLeft <= 7) {
+                    status = 'expiring';
+                    statusText = 'In Scadenza';
+                }
+
+                const planLabels = {
+                    'monthly': 'Mensile',
+                    'quarterly': 'Trimestrale',
+                    'yearly': 'Annuale',
+                    'trial': 'Prova'
+                };
+
+                return `
+                    <div class="table-row" data-status="${status}">
+                        <div class="user-cell">
+                            <div class="user-avatar">${initials}</div>
+                            <div>
+                                <div class="user-name">${sub.first_name || ''} ${sub.last_name || ''}</div>
+                                <div class="user-email">${sub.email}</div>
+                            </div>
+                        </div>
+                        <div>${planLabels[sub.plan_type] || sub.plan_type}</div>
+                        <div>${endDate.toLocaleDateString('it-IT')}</div>
+                        <div>${daysLeft > 0 ? daysLeft + 'g' : 'Scaduto'}</div>
+                        <div><span class="status-badge ${status}">${statusText}</span></div>
+                        <div class="actions-cell">
+                            <button class="action-btn extend" title="Estendi" onclick="openExtendModal('${sub.id}', '${sub.first_name} ${sub.last_name}')">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="action-btn" title="Dettagli" onclick="viewDetails('${sub.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="action-btn cancel" title="Cancella" onclick="cancelSub('${sub.id}')">
+                                <i class="fas fa-ban"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setupFilters() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    currentFilter = btn.dataset.filter;
+                    applyFilter();
+                });
+            });
+        }
+
+        function applyFilter() {
+            let filtered = allSubscriptions;
+            const now = new Date();
+            
+            if (currentFilter === 'active') {
+                filtered = allSubscriptions.filter(s => 
+                    s.status !== 'cancelled' && new Date(s.end_date) > now
+                );
+            } else if (currentFilter === 'expiring') {
+                filtered = allSubscriptions.filter(s => {
+                    const days = SubscriptionManager.getDaysRemaining(s);
+                    return days > 0 && days <= 7;
+                });
+            } else if (currentFilter === 'expired') {
+                filtered = allSubscriptions.filter(s => 
+                    s.status !== 'cancelled' && new Date(s.end_date) <= now
+                );
+            }
+            
+            renderSubscriptions(filtered);
+        }
+
+        // Modals
+        function openCreateModal() {
+            document.getElementById('createForm').reset();
+            document.getElementById('passwordSection').style.display = 'none';
+            document.getElementById('createModal').classList.add('show');
+        }
+
+        function openExtendModal(id, name) {
+            selectedSubscriptionId = id;
+            document.getElementById('extendName').textContent = name;
+            document.getElementById('extendModal').classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        async function createSubscription() {
+            const data = {
+                first_name: document.getElementById('createFirstName').value,
+                last_name: document.getElementById('createLastName').value,
+                email: document.getElementById('createEmail').value,
+                phone: document.getElementById('createPhone').value,
+                plan_type: document.getElementById('createPlan').value
+            };
+
+            const result = await SubscriptionManager.createSubscription(data);
+            
+            if (result.success) {
+                // Show password
+                document.getElementById('generatedPassword').textContent = result.password;
+                document.getElementById('passwordSection').style.display = 'block';
+                
+                // Refresh list
+                await loadStats();
+                await loadSubscriptions();
+                
+                alert(`✅ Abbonamento creato!\n\nEmail: ${data.email}\nPassword: ${result.password}\nScadenza: ${result.endDate.toLocaleDateString('it-IT')}\n\nInvia queste credenziali all'utente.`);
+            } else {
+                alert('❌ Errore: ' + result.error);
+            }
+        }
+
+        async function confirmExtend() {
+            const days = parseInt(document.getElementById('extendDays').value);
+            const result = await SubscriptionManager.extendSubscription(selectedSubscriptionId, days);
+            
+            if (result.success) {
+                alert(`✅ Esteso di ${days} giorni!\nNuova scadenza: ${result.newEndDate.toLocaleDateString('it-IT')}`);
+                closeModal('extendModal');
+                await loadStats();
+                await loadSubscriptions();
+            } else {
+                alert('❌ Errore: ' + result.error);
+            }
+        }
+
+        async function cancelSub(id) {
+            if (!confirm('Sei sicuro di voler cancellare questo abbonamento?')) return;
+            
+            const result = await SubscriptionManager.cancelSubscription(id);
+            
+            if (result.success) {
+                alert('Abbonamento cancellato');
+                await loadStats();
+                await loadSubscriptions();
+            } else {
+                alert('Errore: ' + result.error);
+            }
+        }
+
+        function viewDetails(id) {
+            const sub = allSubscriptions.find(s => s.id === id);
+            if (!sub) return;
+            
+            const details = `
+📧 Email: ${sub.email}
+👤 Nome: ${sub.first_name} ${sub.last_name}
+📱 Telefono: ${sub.phone || '-'}
+
+📅 Inizio: ${new Date(sub.start_date).toLocaleDateString('it-IT')}
+📅 Scadenza: ${new Date(sub.end_date).toLocaleDateString('it-IT')}
+📊 Piano: ${sub.plan_type}
+🔄 Status: ${sub.status}
+
+🔑 Login: ${sub.login_count || 0} volte
+⏰ Ultimo accesso: ${sub.last_login ? new Date(sub.last_login).toLocaleString('it-IT') : 'Mai'}
+            `;
+            
+            alert(details);
+        }
+
+        function copyPassword() {
+            const pw = document.getElementById('generatedPassword').textContent;
+            navigator.clipboard.writeText(pw);
+            alert('Password copiata!');
+        }
+
+        function exportSubscriptions() {
+            const csv = [
+                'Email,Nome,Cognome,Piano,Inizio,Scadenza,Status',
+                ...allSubscriptions.map(s => 
+                    `${s.email},"${s.first_name}","${s.last_name}",${s.plan_type},${s.start_date},${s.end_date},${s.status}`
+                )
+            ].join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `abbonamenti_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+    </script>
+</body>
+</html>

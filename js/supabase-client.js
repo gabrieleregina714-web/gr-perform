@@ -72,6 +72,33 @@ const supabase = {
         }
     },
 
+    async upsert(table, data, onConflict) {
+        try {
+            const conflict = onConflict ? `?on_conflict=${encodeURIComponent(onConflict)}` : '';
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${conflict}`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    // merge duplicates (upsert semantics)
+                    'Prefer': 'return=representation,resolution=merge-duplicates'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+            if (!res.ok) {
+                console.error(`Supabase upsert error for ${table}:`, result);
+                return { error: true, message: result.message || result.error || 'Upsert failed', details: result };
+            }
+            return result;
+        } catch (e) {
+            console.error(`Supabase upsert exception for ${table}:`, e);
+            return { error: true, message: e.message };
+        }
+    },
+
     async delete(table, query) {
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${query}`, {

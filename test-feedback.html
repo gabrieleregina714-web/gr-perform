@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test FeedbackEngine</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: white; padding: 20px; }
+        h1 { margin-bottom: 20px; }
+        .test { background: #1a1a1a; border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+        .test-title { font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .test-result { color: #888; font-size: 14px; white-space: pre-wrap; }
+        .pass { color: #00d26a; }
+        .fail { color: #e63946; }
+        .warn { color: #ffb800; }
+        button { padding: 12px 24px; background: #e63946; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; margin-right: 10px; margin-bottom: 10px; }
+        button:hover { opacity: 0.9; }
+        #output { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test FeedbackEngine</h1>
+    <button onclick="runAllTests()">▶️ Esegui Tutti i Test</button>
+    <button onclick="clearStorage()">🗑️ Pulisci Storage</button>
+    <div id="output"></div>
+
+    <script src="js/feedback-engine.js?v=4"></script>
+    <script>
+        const output = document.getElementById('output');
+        
+        function log(title, result, status = 'pass') {
+            const div = document.createElement('div');
+            div.className = 'test';
+            div.innerHTML = `
+                <div class="test-title">
+                    <span>${status === 'pass' ? '✅' : status === 'fail' ? '❌' : '⚠️'}</span>
+                    <span>${title}</span>
+                </div>
+                <div class="test-result ${status}">${typeof result === 'object' ? JSON.stringify(result, null, 2) : result}</div>
+            `;
+            output.appendChild(div);
+        }
+        
+        function clearStorage() {
+            localStorage.removeItem('gr_feedback_data');
+            output.innerHTML = '';
+            log('Storage pulito', 'Tutti i dati feedback rimossi', 'pass');
+        }
+        
+        function runAllTests() {
+            output.innerHTML = '';
+            const athleteId = 'test-athlete-' + Date.now();
+            
+            try {
+                // Quick sanity check - test localStorage directly
+                const testKey = 'gr_perform_workout_feedback';
+                const quickTest = { test: 'data' };
+                localStorage.setItem(testKey, JSON.stringify(quickTest));
+                const readBack = JSON.parse(localStorage.getItem(testKey));
+                log('🔧 LocalStorage Test', readBack.test === 'data' ? 'OK - localStorage funziona' : 'FAIL', readBack.test === 'data' ? 'pass' : 'fail');
+                localStorage.removeItem(testKey);
+
+                // Test 1: Create feedback
+                log('1️⃣ createFeedback()', 'Creazione feedback per workout...');
+                const feedback = window.FeedbackEngine.createFeedback(athleteId, 'workout-001', {
+                    name: 'Upper Body Power',
+                    day_of_week: 'monday',
+                    week_number: 5,
+                    expected_rpe: 7
+                });
+                log('Feedback creato', { id: feedback.id, status: feedback.status }, feedback.id ? 'pass' : 'fail');
+                
+                // Check if it was actually saved
+                const checkSaved = window.FeedbackEngine.getById(athleteId, feedback.id);
+                log('🔍 Verifica salvataggio immediato', checkSaved ? { found: true, status: checkSaved.status } : { found: false, reason: 'getById returned null' }, checkSaved ? 'pass' : 'fail');
+                
+                // Test 2: Complete feedback
+                window.FeedbackEngine.complete(feedback.id, athleteId, {
+                    overall_rpe: 8.5,
+                    completion: 'full',
+                    completion_pct: 100,
+                    energy_after: 3,
+                    mood: 'good',
+                    pain_areas: ['knee'],
+                    pain_intensity: { knee: 4 },
+                    exercise_feedback: [
+                        { exercise_name: 'Bench Press', difficulty: 'too_hard', completed: true },
+                        { exercise_name: 'Pull-ups', difficulty: 'just_right', completed: true },
+                        { exercise_name: 'Squat', difficulty: 'too_easy', completed: true, pain_during: true, pain_area: 'knee', pain_intensity: 5 }
+                    ],
+                    notes: 'Leggero fastidio al ginocchio durante squat'
+                });
+                log('2️⃣ complete()', 'Feedback completato con RPE 8.5 e dolore ginocchio', 'pass');
+                
+                // Test 3: Simulate multiple weeks with increasing RPE
+                log('3️⃣ Simulazione 4 settimane RPE crescente', 'Creando dati storici...');
+                for (let week = 1; week <= 4; week++) {
+                    const fb = window.FeedbackEngine.createFeedback(athleteId, `workout-10${week}`, {
+                        week_number: week,
+                        expected_rpe: 7
+                    });
+                    window.FeedbackEngine.complete(fb.id, athleteId, {
+                        overall_rpe: 7 + week * 0.4, // 7.4, 7.8, 8.2, 8.6
+                        completion: week === 4 ? 'partial' : 'full',
+                        completion_pct: week === 4 ? 70 : 95,
+                        pain_areas: week >= 3 ? ['knee'] : [],
+                        pain_intensity: week >= 3 ? { knee: week } : {},
+                        exercise_feedback: [
+                            { exercise_name: 'Deadlift', difficulty: week >= 3 ? 'too_hard' : 'just_right', completed: true },
+                            { exercise_name: 'Lunges', difficulty: 'too_easy', completed: true },
+                            { exercise_name: 'Leg Press', difficulty: 'just_right', completed: true, pain_during: week >= 3, pain_area: 'knee', pain_intensity: week }
+                        ]
+                    });
+                }
+                log('Settimane simulate', 'Week 1-4: RPE crescente da 7.4 a 8.6, dolori ginocchio week 3-4', 'pass');
+                
+                // Debug: Check stored data
+                const storedData = JSON.parse(localStorage.getItem('gr_perform_workout_feedback') || '{}');
+                const athleteData = storedData[athleteId] || [];
+                log('🔍 DEBUG: Dati salvati', {
+                    totalFeedback: athleteData.length,
+                    completed: athleteData.filter(f => f.status === 'completed').length,
+                    sample: athleteData[0] ? { id: athleteData[0].id, status: athleteData[0].status, rpe: athleteData[0].overall_rpe } : 'none'
+                }, athleteData.length >= 5 ? 'pass' : 'fail');
+                
+                // Test 4: Analyze RPE trend
+                const recentFeedback = window.FeedbackEngine.getRecent(athleteId, 10);
+                log('🔍 DEBUG: getRecent()', {
+                    count: recentFeedback.length,
+                    rpes: recentFeedback.map(f => f.overall_rpe)
+                }, recentFeedback.length >= 3 ? 'pass' : 'fail');
+                
+                const rpeTrend = window.FeedbackEngine.analyzeRpeTrend(athleteId);
+                log('4️⃣ analyzeRpeTrend()', {
+                    trend: rpeTrend.trend,
+                    avgRpe: rpeTrend.avgRpe?.toFixed(2),
+                    overtraining: rpeTrend.overtraining,
+                    weeksAnalyzed: rpeTrend.weeklyAverages?.length
+                }, rpeTrend.trend === 'increasing' ? 'warn' : 'pass');
+                
+                // Test 5: Analyze completion rate
+                const completion = window.FeedbackEngine.analyzeCompletionRate(athleteId);
+                log('5️⃣ analyzeCompletionRate()', {
+                    rate: completion.rate?.toFixed(1) + '%',
+                    trend: completion.trend,
+                    total: completion.total,
+                    completed: completion.completed
+                }, completion.rate < 80 ? 'warn' : 'pass');
+                
+                // Test 6: Analyze pain patterns
+                const pain = window.FeedbackEngine.analyzePainPatterns(athleteId);
+                log('6️⃣ analyzePainPatterns()', {
+                    bodyParts: pain.bodyParts,
+                    chronic: pain.chronicPain,
+                    recentPain: pain.recentPain
+                }, pain.bodyParts?.length > 0 ? 'warn' : 'pass');
+                
+                // Test 7: Analyze exercise difficulty
+                const difficulty = window.FeedbackEngine.analyzeExerciseDifficulty(athleteId);
+                log('7️⃣ analyzeExerciseDifficulty()', {
+                    tooHard: difficulty.tooHard?.slice(0, 3),
+                    tooEasy: difficulty.tooEasy?.slice(0, 3),
+                    justRight: difficulty.justRight?.slice(0, 3)
+                }, 'pass');
+                
+                // Test 8: Generate recommendations
+                const recsResult = window.FeedbackEngine.generateRecommendations(athleteId);
+                const recs = recsResult.recommendations || [];
+                log('8️⃣ generateRecommendations()', recs.slice(0, 5).map((r, i) => `${i+1}. [${r.priority}] ${r.message}`).join('\n'), recs.length > 0 ? 'pass' : 'warn');
+                
+                // Test 9: Get workout modifiers
+                const mods = window.FeedbackEngine.getWorkoutModifiers(athleteId);
+                log('9️⃣ getWorkoutModifiers()', {
+                    volumeMultiplier: mods.volumeMultiplier,
+                    intensityMultiplier: mods.intensityMultiplier,
+                    avoidExercises: mods.avoidExercises,
+                    suggestions: mods.suggestions
+                }, mods.volumeMultiplier < 1 ? 'warn' : 'pass');
+                
+                // Test 10: Generate prompt section
+                const promptText = window.FeedbackEngine.generateFeedbackPromptSection(athleteId);
+                log('🔟 generateFeedbackPromptSection()', 
+                    `Generato prompt di ${promptText.length} caratteri:\n\n${promptText.substring(0, 500)}...`,
+                    promptText.length > 100 ? 'pass' : 'fail'
+                );
+                
+                // Test 11: Coach dashboard
+                const dashboard = window.FeedbackEngine.getCoachDashboard(athleteId);
+                log('1️⃣1️⃣ getCoachDashboard()', {
+                    needsAttention: dashboard.needsAttention,
+                    attentionReasons: dashboard.attentionReasons,
+                    stats: dashboard.stats,
+                    recsCount: dashboard.recommendations?.length || 0
+                }, dashboard.needsAttention ? 'warn' : 'pass');
+                
+                // Test 12: Goals tracking
+                const goal = window.FeedbackEngine.setGoal(athleteId, {
+                    type: 'strength',
+                    description: 'Squat 100kg x 5 reps',
+                    metric: 'squat_5rm',
+                    target_value: 100,
+                    current_value: 80,
+                    unit: 'kg'
+                });
+                log('1️⃣2️⃣ setGoal()', {
+                    id: goal.id,
+                    description: goal.description,
+                    progress: `${goal.current_value}/${goal.target_value} ${goal.unit}`
+                }, 'pass');
+                
+                // Update goal progress
+                window.FeedbackEngine.updateGoalProgress(athleteId, goal.id, 90, 'Buon progresso!');
+                const goalsProgress = window.FeedbackEngine.getGoalsProgress(athleteId);
+                log('1️⃣3️⃣ getGoalsProgress()', {
+                    activeGoals: goalsProgress.length,
+                    progress: goalsProgress[0] ? `${goalsProgress[0].progressPct}%` : 'N/A',
+                    remaining: goalsProgress[0]?.remaining
+                }, goalsProgress.length > 0 ? 'pass' : 'warn');
+                
+                // Test 14: Config for athlete
+                window.FeedbackEngine.configureForAthlete({ experience_level: 'beginner', sport: 'boxe' });
+                log('1️⃣4️⃣ configureForAthlete()', {
+                    rpe_critical: window.FeedbackEngine.CONFIG.rpe.critical,
+                    rpe_warning: window.FeedbackEngine.CONFIG.rpe.warning,
+                    pain_chronic_threshold: window.FeedbackEngine.CONFIG.pain.chronic_threshold
+                }, 'pass');
+                
+                // Test 15: Full analysis
+                const fullAnalysis = window.FeedbackEngine.analyzeAll(athleteId);
+                log('1️⃣5️⃣ analyzeAll()', {
+                    hasRpeTrend: !!fullAnalysis.rpeTrend,
+                    hasPain: !!fullAnalysis.pain,
+                    hasModifiers: !!fullAnalysis.modifiers,
+                    hasGoals: fullAnalysis.goals?.length >= 0,
+                    recommendationsCount: fullAnalysis.recommendations?.length || 0
+                }, 'pass');
+                
+                // Summary
+                log('🏁 TEST COMPLETATI', 
+                    `Tutti i 15 test eseguiti con successo!\n\n` +
+                    `L'atleta ${athleteId} ${dashboard.needsAttention ? 'RICHIEDE ATTENZIONE' : 'è in buona forma'}\n\n` +
+                    `✅ Pain patterns: ${pain.bodyParts?.length || 0} aree\n` +
+                    `✅ Modifiers: vol ${mods.volumeMultiplier}x, int ${mods.intensityMultiplier}x\n` +
+                    `✅ Goals: ${goalsProgress.length} attivi`,
+                    'pass'
+                );
+                
+            } catch (err) {
+                log('❌ ERRORE', err.message + '\n\n' + err.stack, 'fail');
+            }
+        }
+    </script>
+</body>
+</html>

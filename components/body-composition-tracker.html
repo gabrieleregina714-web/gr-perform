@@ -1,0 +1,802 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     🏋️ ATLAS BODY COMPOSITION TRACKER COMPONENT
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<style>
+.bc-tracker {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 24px;
+    padding: 32px;
+    color: white;
+}
+
+.bc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.bc-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.bc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+/* Cards */
+.bc-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bc-card-title {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+
+/* Stats */
+.bc-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bc-stat:last-child {
+    border-bottom: none;
+}
+
+.bc-stat-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.bc-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.bc-stat-unit {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: 4px;
+}
+
+.bc-stat-delta {
+    font-size: 0.85rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-left: 8px;
+}
+
+.bc-stat-delta.positive {
+    background: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+}
+
+.bc-stat-delta.negative {
+    background: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+}
+
+.bc-stat-delta.neutral {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Form */
+.bc-form {
+    display: grid;
+    gap: 16px;
+}
+
+.bc-form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.bc-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bc-input-group label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.bc-input-group input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.bc-input-group input:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.bc-input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* FFMI Gauge */
+.ffmi-gauge {
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(90deg, 
+        #f87171 0%, 
+        #fbbf24 25%, 
+        #4ade80 50%, 
+        #06b6d4 75%, 
+        #a78bfa 100%);
+    border-radius: 10px;
+    position: relative;
+    margin: 20px 0;
+}
+
+.ffmi-marker {
+    position: absolute;
+    top: -8px;
+    width: 36px;
+    height: 36px;
+    background: white;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #1a1a2e;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.ffmi-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 4px;
+}
+
+/* Chart placeholder */
+.bc-chart {
+    height: 200px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Buttons */
+.bc-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.bc-btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+}
+
+.bc-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.bc-btn-ghost {
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.bc-btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Strength standards */
+.strength-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.strength-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.strength-lift {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.strength-level {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.strength-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.strength-badge.novice { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+.strength-badge.intermediate { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+.strength-badge.advanced { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
+.strength-badge.elite { background: rgba(6, 182, 212, 0.2); color: #06b6d4; }
+.strength-badge.world { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+
+.strength-progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.strength-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    border-radius: 2px;
+}
+
+/* Goal Section */
+.bc-goal {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 24px;
+}
+
+.bc-goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.bc-goal-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.bc-goal-progress {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.bc-goal-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bc-goal-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #22c55e);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.bc-goal-percent {
+    font-weight: 600;
+    color: #4ade80;
+}
+
+/* Recommendations */
+.bc-recommendations {
+    margin-top: 24px;
+}
+
+.bc-rec-item {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.bc-rec-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.bc-rec-icon.warning { background: rgba(251, 191, 36, 0.2); }
+.bc-rec-icon.success { background: rgba(74, 222, 128, 0.2); }
+.bc-rec-icon.info { background: rgba(99, 102, 241, 0.2); }
+.bc-rec-icon.training { background: rgba(236, 72, 153, 0.2); }
+.bc-rec-icon.nutrition { background: rgba(6, 182, 212, 0.2); }
+
+.bc-rec-content {
+    flex: 1;
+}
+
+.bc-rec-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.bc-rec-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .bc-form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .strength-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="bc-tracker" id="body-composition-tracker">
+    <div class="bc-header">
+        <h2 class="bc-title">
+            <span>🏋️</span>
+            Body Composition
+        </h2>
+        <button class="bc-btn bc-btn-primary" onclick="openAddRecordModal()">
+            + Nuovo Record
+        </button>
+    </div>
+    
+    <div class="bc-grid">
+        <!-- Current Stats -->
+        <div class="bc-card">
+            <h3 class="bc-card-title">📊 Stato Attuale</h3>
+            
+            <div class="bc-stat">
+                <span class="bc-stat-label">Peso</span>
+                <span>
+                    <span class="bc-stat-value" id="bc-weight">--</span>
+                    <span class="bc-stat-unit">kg</span>
+                    <span class="bc-stat-delta neutral" id="bc-weight-delta">+0.0</span>
+                </span>
+            </div>
+            
+            <div class="bc-stat">
+                <span class="bc-stat-label">Body Fat</span>
+                <span>
+                    <span class="bc-stat-value" id="bc-bodyfat">--</span>
+                    <span class="bc-stat-unit">%</span>
+                    <span class="bc-stat-delta neutral" id="bc-bodyfat-delta">+0.0</span>
+                </span>
+            </div>
+            
+            <div class="bc-stat">
+                <span class="bc-stat-label">Massa Magra</span>
+                <span>
+                    <span class="bc-stat-value" id="bc-leanmass">--</span>
+                    <span class="bc-stat-unit">kg</span>
+                </span>
+            </div>
+            
+            <div class="bc-stat">
+                <span class="bc-stat-label">BMI</span>
+                <span>
+                    <span class="bc-stat-value" id="bc-bmi">--</span>
+                </span>
+            </div>
+        </div>
+        
+        <!-- FFMI -->
+        <div class="bc-card">
+            <h3 class="bc-card-title">💪 FFMI (Fat-Free Mass Index)</h3>
+            
+            <div class="bc-stat">
+                <span class="bc-stat-label">FFMI Normalizzato</span>
+                <span>
+                    <span class="bc-stat-value" id="bc-ffmi">--</span>
+                </span>
+            </div>
+            
+            <div class="ffmi-gauge">
+                <div class="ffmi-marker" id="ffmi-marker" style="left: 50%;">--</div>
+            </div>
+            <div class="ffmi-labels">
+                <span>18 Sotto media</span>
+                <span>20 Media</span>
+                <span>22 Sopra</span>
+                <span>25 Elite</span>
+            </div>
+            
+            <p id="ffmi-interpretation" style="margin-top: 16px; text-align: center; color: rgba(255,255,255,0.7);">
+                Inserisci i dati per calcolare il tuo FFMI
+            </p>
+        </div>
+        
+        <!-- Measurements -->
+        <div class="bc-card">
+            <h3 class="bc-card-title">📐 Misure</h3>
+            
+            <div class="bc-stat">
+                <span class="bc-stat-label">Vita</span>
+                <span>
+                    <span class="bc-stat-value" id="bc-waist">--</span>
+                    <span class="bc-stat-unit">cm</span>
+                </span>
+            </div>
+            
+            <div class="bc-stat">
+                <span class="bc-stat-label">Petto</span>
+                <span>
+                    <span class="bc-stat-value" id="bc-chest">--</span>
+                    <span class="bc-stat-unit">cm</span>
+                </span>
+            </div>
+            
+            <div class="bc-stat">
+                <span class="bc-stat-label">Braccio (sx/dx)</span>
+                <span>
+                    <span class="bc-stat-value" id="bc-arms">--</span>
+                    <span class="bc-stat-unit">cm</span>
+                </span>
+            </div>
+            
+            <div class="bc-stat">
+                <span class="bc-stat-label">Coscia (sx/dx)</span>
+                <span>
+                    <span class="bc-stat-value" id="bc-thighs">--</span>
+                    <span class="bc-stat-unit">cm</span>
+                </span>
+            </div>
+        </div>
+        
+        <!-- Strength Standards -->
+        <div class="bc-card">
+            <h3 class="bc-card-title">🏆 Strength Standards</h3>
+            
+            <div class="strength-grid" id="strength-standards">
+                <!-- Populated by JS -->
+                <div class="strength-item">
+                    <div class="strength-lift">Squat</div>
+                    <div class="strength-level">
+                        <span class="strength-badge intermediate">Intermediate</span>
+                        <span style="color: rgba(255,255,255,0.6)">1.5x BW</span>
+                    </div>
+                    <div class="strength-progress">
+                        <div class="strength-progress-fill" style="width: 60%"></div>
+                    </div>
+                </div>
+                
+                <div class="strength-item">
+                    <div class="strength-lift">Deadlift</div>
+                    <div class="strength-level">
+                        <span class="strength-badge advanced">Advanced</span>
+                        <span style="color: rgba(255,255,255,0.6)">2.0x BW</span>
+                    </div>
+                    <div class="strength-progress">
+                        <div class="strength-progress-fill" style="width: 75%"></div>
+                    </div>
+                </div>
+                
+                <div class="strength-item">
+                    <div class="strength-lift">Bench Press</div>
+                    <div class="strength-level">
+                        <span class="strength-badge intermediate">Intermediate</span>
+                        <span style="color: rgba(255,255,255,0.6)">1.25x BW</span>
+                    </div>
+                    <div class="strength-progress">
+                        <div class="strength-progress-fill" style="width: 55%"></div>
+                    </div>
+                </div>
+                
+                <div class="strength-item">
+                    <div class="strength-lift">OHP</div>
+                    <div class="strength-level">
+                        <span class="strength-badge novice">Novice</span>
+                        <span style="color: rgba(255,255,255,0.6)">0.6x BW</span>
+                    </div>
+                    <div class="strength-progress">
+                        <div class="strength-progress-fill" style="width: 35%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Goal Progress -->
+    <div class="bc-goal" id="bc-goal-section" style="display: none;">
+        <div class="bc-goal-header">
+            <span class="bc-goal-title">🎯 Obiettivo: <span id="goal-description">Recomp</span></span>
+            <span id="goal-timeline" style="color: rgba(255,255,255,0.6)">12 settimane</span>
+        </div>
+        <div class="bc-goal-progress">
+            <div class="bc-goal-bar">
+                <div class="bc-goal-bar-fill" id="goal-progress-bar" style="width: 0%"></div>
+            </div>
+            <span class="bc-goal-percent" id="goal-percent">0%</span>
+        </div>
+    </div>
+    
+    <!-- Recommendations -->
+    <div class="bc-recommendations" id="bc-recommendations">
+        <!-- Populated by JS -->
+    </div>
+</div>
+
+<!-- Add Record Modal -->
+<div id="bc-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: none; align-items: center; justify-content: center;">
+    <div style="background: #1a1a2e; border-radius: 24px; padding: 32px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;">
+        <h3 style="margin-bottom: 24px; font-size: 1.3rem;">➕ Nuovo Record</h3>
+        
+        <form class="bc-form" id="bc-form" onsubmit="saveBodyCompositionRecord(event)">
+            <div class="bc-form-row">
+                <div class="bc-input-group">
+                    <label>Peso (kg) *</label>
+                    <input type="number" step="0.1" id="input-weight" placeholder="75.0" required>
+                </div>
+                <div class="bc-input-group">
+                    <label>Body Fat %</label>
+                    <input type="number" step="0.1" id="input-bodyfat" placeholder="15.0">
+                </div>
+            </div>
+            
+            <div class="bc-input-group">
+                <label>Data</label>
+                <input type="date" id="input-date" value="">
+            </div>
+            
+            <h4 style="margin-top: 16px; color: rgba(255,255,255,0.6);">Misure (opzionale)</h4>
+            
+            <div class="bc-form-row">
+                <div class="bc-input-group">
+                    <label>Vita (cm)</label>
+                    <input type="number" step="0.5" id="input-waist" placeholder="82">
+                </div>
+                <div class="bc-input-group">
+                    <label>Petto (cm)</label>
+                    <input type="number" step="0.5" id="input-chest" placeholder="100">
+                </div>
+            </div>
+            
+            <div class="bc-form-row">
+                <div class="bc-input-group">
+                    <label>Braccio Sinistro (cm)</label>
+                    <input type="number" step="0.5" id="input-arm-left" placeholder="38">
+                </div>
+                <div class="bc-input-group">
+                    <label>Braccio Destro (cm)</label>
+                    <input type="number" step="0.5" id="input-arm-right" placeholder="38">
+                </div>
+            </div>
+            
+            <div class="bc-form-row">
+                <div class="bc-input-group">
+                    <label>Coscia Sinistra (cm)</label>
+                    <input type="number" step="0.5" id="input-thigh-left" placeholder="58">
+                </div>
+                <div class="bc-input-group">
+                    <label>Coscia Destra (cm)</label>
+                    <input type="number" step="0.5" id="input-thigh-right" placeholder="58">
+                </div>
+            </div>
+            
+            <div class="bc-input-group">
+                <label>Note</label>
+                <input type="text" id="input-notes" placeholder="Es: Misurato a digiuno...">
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button type="button" class="bc-btn bc-btn-ghost" style="flex: 1;" onclick="closeAddRecordModal()">
+                    Annulla
+                </button>
+                <button type="submit" class="bc-btn bc-btn-primary" style="flex: 1;">
+                    💾 Salva
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// BODY COMPOSITION TRACKER UI LOGIC
+// ═══════════════════════════════════════════════════════════════════════════
+
+function openAddRecordModal() {
+    const modal = document.getElementById('bc-modal');
+    modal.style.display = 'flex';
+    
+    // Set default date to today
+    document.getElementById('input-date').value = new Date().toISOString().split('T')[0];
+}
+
+function closeAddRecordModal() {
+    document.getElementById('bc-modal').style.display = 'none';
+}
+
+async function saveBodyCompositionRecord(event) {
+    event.preventDefault();
+    
+    const data = {
+        weight: parseFloat(document.getElementById('input-weight').value),
+        bodyFatPercentage: parseFloat(document.getElementById('input-bodyfat').value) || null,
+        recorded_at: document.getElementById('input-date').value || new Date().toISOString(),
+        waist: parseFloat(document.getElementById('input-waist').value) || null,
+        chest: parseFloat(document.getElementById('input-chest').value) || null,
+        armLeft: parseFloat(document.getElementById('input-arm-left').value) || null,
+        armRight: parseFloat(document.getElementById('input-arm-right').value) || null,
+        thighLeft: parseFloat(document.getElementById('input-thigh-left').value) || null,
+        thighRight: parseFloat(document.getElementById('input-thigh-right').value) || null,
+        notes: document.getElementById('input-notes').value || null,
+        source: 'manual'
+    };
+    
+    // Get athlete ID from profile
+    const athleteId = window.currentProfile?.id || 'demo';
+    
+    // Save to ATLASBodyComposition
+    if (window.ATLASBodyComposition) {
+        const result = await ATLASBodyComposition.saveRecord(athleteId, data);
+        
+        if (result.success) {
+            showNotification('✅ Record salvato!', 'success');
+            closeAddRecordModal();
+            refreshBodyCompositionUI();
+        } else {
+            showNotification('❌ Errore: ' + result.error, 'error');
+        }
+    } else {
+        // Fallback: save to localStorage
+        const history = JSON.parse(localStorage.getItem('bodyCompositionHistory') || '[]');
+        history.unshift({ ...data, id: Date.now() });
+        localStorage.setItem('bodyCompositionHistory', JSON.stringify(history));
+        
+        showNotification('✅ Record salvato (locale)', 'success');
+        closeAddRecordModal();
+        refreshBodyCompositionUI();
+    }
+}
+
+function refreshBodyCompositionUI() {
+    // Get latest data
+    const history = JSON.parse(localStorage.getItem('bodyCompositionHistory') || '[]');
+    const profile = window.currentProfile || {};
+    
+    if (history.length === 0 && !profile.weight) return;
+    
+    const latest = history[0] || { weight: profile.weight, bodyFatPercentage: profile.bodyFat };
+    const previous = history[1];
+    
+    // Update weight
+    document.getElementById('bc-weight').textContent = latest.weight?.toFixed(1) || '--';
+    
+    if (previous) {
+        const weightDelta = latest.weight - previous.weight;
+        const deltaEl = document.getElementById('bc-weight-delta');
+        deltaEl.textContent = (weightDelta >= 0 ? '+' : '') + weightDelta.toFixed(1);
+        deltaEl.className = 'bc-stat-delta ' + (Math.abs(weightDelta) < 0.3 ? 'neutral' : (weightDelta > 0 ? 'positive' : 'negative'));
+    }
+    
+    // Update body fat
+    document.getElementById('bc-bodyfat').textContent = latest.bodyFatPercentage?.toFixed(1) || '--';
+    
+    if (previous && latest.bodyFatPercentage && previous.bodyFatPercentage) {
+        const bfDelta = latest.bodyFatPercentage - previous.bodyFatPercentage;
+        const bfDeltaEl = document.getElementById('bc-bodyfat-delta');
+        bfDeltaEl.textContent = (bfDelta >= 0 ? '+' : '') + bfDelta.toFixed(1);
+        bfDeltaEl.className = 'bc-stat-delta ' + (Math.abs(bfDelta) < 0.3 ? 'neutral' : (bfDelta > 0 ? 'negative' : 'positive'));
+    }
+    
+    // Calculate lean mass
+    if (latest.weight && latest.bodyFatPercentage) {
+        const leanMass = latest.weight * (1 - latest.bodyFatPercentage / 100);
+        document.getElementById('bc-leanmass').textContent = leanMass.toFixed(1);
+    }
+    
+    // Calculate BMI
+    const height = profile.height || 175;
+    if (latest.weight && height) {
+        const bmi = ATLASBodyComposition?.formulas?.bmi(latest.weight, height) || (latest.weight / Math.pow(height/100, 2));
+        document.getElementById('bc-bmi').textContent = bmi.toFixed(1);
+    }
+    
+    // Calculate FFMI
+    if (latest.weight && latest.bodyFatPercentage && height && window.ATLASBodyComposition) {
+        const ffmiResult = ATLASBodyComposition.formulas.ffmi(latest.weight, height, latest.bodyFatPercentage);
+        document.getElementById('bc-ffmi').textContent = ffmiResult.adjustedFFMI.toFixed(1);
+        
+        // Position marker (18-26 range)
+        const markerPos = Math.min(100, Math.max(0, (ffmiResult.adjustedFFMI - 18) / (26 - 18) * 100));
+        document.getElementById('ffmi-marker').style.left = markerPos + '%';
+        document.getElementById('ffmi-marker').textContent = ffmiResult.adjustedFFMI.toFixed(1);
+        
+        document.getElementById('ffmi-interpretation').textContent = ffmiResult.interpretation.label;
+    }
+    
+    // Update measurements
+    document.getElementById('bc-waist').textContent = latest.waist || '--';
+    document.getElementById('bc-chest').textContent = latest.chest || '--';
+    
+    if (latest.armLeft || latest.armRight) {
+        document.getElementById('bc-arms').textContent = 
+            (latest.armLeft || '--') + ' / ' + (latest.armRight || '--');
+    }
+    
+    if (latest.thighLeft || latest.thighRight) {
+        document.getElementById('bc-thighs').textContent = 
+            (latest.thighLeft || '--') + ' / ' + (latest.thighRight || '--');
+    }
+}
+
+function showNotification(message, type) {
+    // Simple notification (you can enhance this)
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        background: ${type === 'success' ? '#4ade80' : '#f87171'};
+        color: white;
+        font-weight: 600;
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.remove(), 3000);
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+    refreshBodyCompositionUI();
+});
+
+// Also refresh when profile changes
+if (typeof window.addEventListener === 'function') {
+    window.addEventListener('profileLoaded', refreshBodyCompositionUI);
+}
+</script>

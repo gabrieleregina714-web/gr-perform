@@ -344,23 +344,25 @@
         async function loadWeekStats() {
             if (!athleteId) return;
             
-            // Get this week's completed workouts
+            // Get this week's completed workouts (canonical: workout_session_feedback)
             const oneWeekAgo = new Date();
             oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-            
-            const workouts = await supabase.fetch('workouts', 
-                `?athlete_id=eq.${athleteId}&status=eq.completed&completed_at=gte.${oneWeekAgo.toISOString()}`
+
+            const rows = await supabase.fetch(
+                'workout_session_feedback',
+                `?athlete_id=eq.${athleteId}&completed_at=gte.${oneWeekAgo.toISOString()}&select=duration_minutes,rpe`
             );
-            
-            const completed = workouts.length;
+
+            const sessions = Array.isArray(rows) ? rows : [];
+            const completed = sessions.length;
             let totalMins = 0;
             let totalRPE = 0;
             let rpeCount = 0;
-            
-            workouts.forEach(w => {
-                totalMins += w.actual_duration_minutes || w.estimated_duration_minutes || 60;
-                if (w.athlete_feedback?.rpe) {
-                    totalRPE += w.athlete_feedback.rpe;
+
+            sessions.forEach(s => {
+                totalMins += Number(s.duration_minutes || 0);
+                if (s.rpe != null && String(s.rpe).trim() !== '') {
+                    totalRPE += Number(s.rpe);
                     rpeCount++;
                 }
             });
@@ -371,6 +373,11 @@
         }
         
         async function submitReport() {
+            if (!athleteId) {
+                alert('Atleta non autenticato. Effettua il login e riprova.');
+                return;
+            }
+
             const report = {
                 athlete_id: athleteId,
                 week_number: parseInt(weekNum),
@@ -401,19 +408,36 @@
             report.readiness_score = Math.max(1, Math.min(10, Math.round(readiness)));
             
             try {
-                // Save to weekly_feedback table (or athlete's feedback history)
-                // For now, update athlete record with latest feedback
-                await supabase.update('athletes', athleteId, {
-                    latest_weekly_feedback: report,
-                    readiness_score: report.readiness_score
-                });
+                const btn = document.querySelector('.submit-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Invio...';
+                }
+
+                // Idempotency: avoid duplicate rows for the same athlete+week
+                if (report.week_number != null && !Number.isNaN(report.week_number)) {
+                    await supabase.delete('weekly_feedback', `?athlete_id=eq.${athleteId}&week_number=eq.${report.week_number}`);
+                }
+
+                // Canonical save: weekly_feedback
+                const res = await supabase.insert('weekly_feedback', report);
+                if (res && res.error) {
+                    throw new Error(res.message || 'Inserimento weekly_feedback fallito');
+                }
                 
                 alert(`✅ Report inviato!\n\nPunteggio Readiness: ${report.readiness_score}/10\n\nIl tuo prossimo allenamento sarà adattato in base a questi dati.`);
                 window.location.href = 'app-dashboard.html';
                 
             } catch (error) {
                 console.error('Errore:', error);
-                alert('Errore durante l\'invio. Riprova.');
+                const msg = String(error?.message || error || 'Errore sconosciuto');
+                alert(`Errore durante l'invio.\n\nDettagli: ${msg}\n\nSe vedi errori tipo "relation weekly_feedback does not exist", esegui prima supabase-telemetry-v1.sql.`);
+            } finally {
+                const btn = document.querySelector('.submit-btn');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Invia Report';
+                }
             }
         }
         

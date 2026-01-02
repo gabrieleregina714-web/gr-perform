@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Layout Workout</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #111; color: #fff; padding: 20px; }
+        .btn { background: #E63946; border: none; color: #fff; padding: 12px 24px; font-size: 16px; cursor: pointer; margin: 10px 5px; }
+        .btn:hover { background: #c62828; }
+        h2 { margin: 30px 0 10px; color: #E63946; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Layout Workout Session</h1>
+    <p>Clicca su un test per simulare un workout con quella metodologia:</p>
+
+    <h2>Test Superset</h2>
+    <button class="btn" onclick="testSuperset()">🔗 Test Superset A1/A2</button>
+    
+    <h2>Test Drop Set</h2>
+    <button class="btn" onclick="testDropSet()">📉 Test Drop Set</button>
+    
+    <h2>Test Circuit</h2>
+    <button class="btn" onclick="testCircuit()">🔄 Test Circuito</button>
+    
+    <h2>Test EMOM</h2>
+    <button class="btn" onclick="testEmom()">⏱️ Test EMOM</button>
+    
+    <h2>Test Mix Completo</h2>
+    <button class="btn" onclick="testMix()">🏋️ Test Mix (Superset + Drop + Normal)</button>
+
+    <script>
+        function createMockWorkout(exercises) {
+            const workout = {
+                id: 'test-' + Date.now(),
+                name: 'Test Workout Layout',
+                athlete_id: 'test',
+                status: 'active',
+                exercises: { main: exercises },
+                estimated_duration_minutes: 45
+            };
+            
+            // Store in localStorage for workout-session to read
+            localStorage.setItem('test_workout', JSON.stringify(workout));
+            
+            // Open workout session with test mode
+            window.location.href = 'workout-session.html?id=' + workout.id + '&test=1';
+        }
+
+        function testSuperset() {
+            createMockWorkout([
+                { order: 1, name: 'A1: Panca Piana (superset)', sets: 4, reps: '8-10', rest_seconds: 0, load_suggestion: '70kg', RPE_target: 8 },
+                { order: 2, name: 'A2: Rematore con Bilanciere (superset)', sets: 4, reps: '8-10', rest_seconds: 90, load_suggestion: '60kg', RPE_target: 8 },
+                { order: 3, name: 'B1: Shoulder Press (superset)', sets: 3, reps: '10-12', rest_seconds: 0, load_suggestion: '25kg', RPE_target: 7 },
+                { order: 4, name: 'B2: Face Pull (superset)', sets: 3, reps: '12-15', rest_seconds: 60, load_suggestion: '20kg', RPE_target: 7 },
+                { order: 5, name: 'Curl Bicipiti', sets: 3, reps: '12', rest_seconds: 60, load_suggestion: '12kg' }
+            ]);
+        }
+
+        function testDropSet() {
+            createMockWorkout([
+                { order: 1, name: 'Squat', sets: 4, reps: '6-8', rest_seconds: 120, load_suggestion: '100kg', RPE_target: 8 },
+                { order: 2, name: 'Leg Press (drop set)', sets: 3, reps: '10 + drop 8 + drop 6', rest_seconds: 90, notes: 'Togli 20% peso ad ogni drop' },
+                { order: 3, name: 'Leg Curl (drop set)', sets: 3, reps: '12 + drop 10 + drop 8', rest_seconds: 60 },
+                { order: 4, name: 'Calf Raises', sets: 4, reps: '15-20', rest_seconds: 45 }
+            ]);
+        }
+
+        function testCircuit() {
+            createMockWorkout([
+                { order: 1, name: 'Boxing Circuit: 5 rounds', sets: 5, reps: '3 min lavoro / 1 min recupero', rest_seconds: 60, 
+                  notes: 'Round 1: Jab-Cross, Round 2: Hooks, Round 3: Uppercuts, Round 4: Combo, Round 5: All Out',
+                  type: 'conditioning' },
+                { order: 2, name: 'Core Circuit', sets: 3, reps: '45s per esercizio', rest_seconds: 30, 
+                  notes: 'Plank → Side Plank L → Side Plank R → Dead Bug → Mountain Climbers' },
+                { order: 3, name: 'Finisher: Burpees', sets: 1, reps: 'AMRAP 3 min', rest_seconds: 0 }
+            ]);
+        }
+
+        function testEmom() {
+            createMockWorkout([
+                { order: 1, name: 'EMOM 12 minuti', sets: 12, reps: 'Vedi note', rest_seconds: 0, 
+                  notes: 'Min 1: 10 Kettlebell Swing, Min 2: 8 Push-up, Min 3: 6 Squat Jump, Ripeti' },
+                { order: 2, name: 'Deadlift', sets: 5, reps: '5', rest_seconds: 180, load_suggestion: '120kg', RPE_target: 7 },
+                { order: 3, name: 'AMRAP 8 minuti', sets: 1, reps: 'Max rounds', rest_seconds: 0, 
+                  notes: '5 Pull-up + 10 Push-up + 15 Air Squat' }
+            ]);
+        }
+
+        function testMix() {
+            createMockWorkout([
+                { order: 1, name: 'Squat', sets: 4, reps: '6', rest_seconds: 180, load_suggestion: '100kg', RPE_target: 8, 
+                  technique_cues: ['Petto alto', 'Ginocchia in fuori', 'Core attivo'] },
+                { order: 2, name: 'A1: Romanian Deadlift (superset)', sets: 3, reps: '10-12', rest_seconds: 0, load_suggestion: '70kg' },
+                { order: 3, name: 'A2: Leg Curl (superset)', sets: 3, reps: '12-15', rest_seconds: 90 },
+                { order: 4, name: 'Leg Extension (drop set)', sets: 3, reps: '12 + 10 + 8', rest_seconds: 60, 
+                  notes: 'Riduci peso 20% ogni drop' },
+                { order: 5, name: 'Walking Lunge', sets: 3, reps: '12 per gamba', rest_seconds: 60 },
+                { order: 6, name: 'Calf Raises', sets: 4, reps: '15-20', rest_seconds: 45, tempo: '2-0-2-0' }
+            ]);
+        }
+    </script>
+</body>
+</html>

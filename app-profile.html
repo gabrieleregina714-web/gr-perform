@@ -5,67 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>GR Perform - Profilo</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        :root {
-            --red: #E63946;
-            --black: #000;
-            --gray-900: #0A0A0A;
-            --gray-800: #111;
-            --gray-700: #1A1A1A;
-            --gray-600: #222;
-            --gray-500: #333;
-            --gray-400: #666;
-            --gray-300: #888;
-            --white: #FFF;
-            --green: #00D26A;
-            --blue: #007AFF;
-            --orange: #FF9500;
-        }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--black);
-            color: var(--white);
+            background: #000;
+            color: #fff;
             min-height: 100vh;
             padding-bottom: 100px;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* HEADER */
+        /* ========== HEADER ========== */
         .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--gray-600);
+            padding: 12px 20px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
-        .header-title {
-            font-size: 18px;
-            font-weight: 700;
+        .header-logo {
+            height: 48px;
         }
 
         .header-btn {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: var(--gray-700);
-            border: none;
-            color: var(--white);
+            background: transparent;
+            border: 1.5px solid #333;
+            color: #fff;
+            font-size: 14px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
 
-        /* PROFILE HERO */
+        .header-btn:hover {
+            border-color: #E63946;
+            color: #E63946;
+        }
+
+        /* ========== PROFILE HERO ========== */
         .profile-hero {
             position: relative;
-            text-align: center;
-            padding: 32px 20px;
-            min-height: 280px;
+            padding: 100px 24px 32px;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
         }
 
@@ -75,71 +79,63 @@
             background-size: cover;
             background-position: center top;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.5s ease;
         }
 
         .profile-hero-bg.loaded {
-            opacity: 0.7;
+            opacity: 0.4;
+        }
+
+        /* Sport backgrounds */
+        .profile-hero-bg.boxe {
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/boxe.png?v=1749809498');
+        }
+        .profile-hero-bg.basket {
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/basket.png?v=1749809498');
+        }
+        .profile-hero-bg.calcio {
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/calcio.png?v=1749809498');
+        }
+        .profile-hero-bg.palestra {
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/palestra.png?v=1749809498');
+        }
+        .profile-hero-bg.default {
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/palestra.png?v=1749809498');
         }
 
         .profile-hero-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.95) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,1) 100%);
         }
 
         .profile-hero-content {
             position: relative;
             z-index: 2;
-        }
-
-        /* Sport backgrounds - Pexels images */
-        .profile-hero-bg.calcio, .profile-hero-bg.football {
-            background-image: url('https://images.pexels.com/photos/3797/black-and-white-sport-fight-boxer.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-        }
-        .profile-hero-bg.basket, .profile-hero-bg.basketball {
-            background-image: url('https://images.pexels.com/photos/3797/black-and-white-sport-fight-boxer.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-        }
-        .profile-hero-bg.boxe, .profile-hero-bg.boxing {
-            background-image: url('https://images.pexels.com/photos/3797/black-and-white-sport-fight-boxer.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-            background-position: center 20%;
-        }
-
-        @media (min-width: 768px) {
-            .profile-hero-bg.boxe, .profile-hero-bg.boxing {
-                background-position: center 30%;
-            }
-        }
-        .profile-hero-bg.palestra, .profile-hero-bg.fitness, .profile-hero-bg.gym {
-            background-image: url('https://images.pexels.com/photos/949132/pexels-photo-949132.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-        }
-        .profile-hero-bg.running, .profile-hero-bg.corsa {
-            background-image: url('https://images.pexels.com/photos/949132/pexels-photo-949132.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
-        }
-        .profile-hero-bg.default {
-            background-image: url('https://images.pexels.com/photos/949132/pexels-photo-949132.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+            text-align: center;
         }
 
         .avatar-container {
             position: relative;
             display: inline-block;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .avatar {
-            width: 110px;
-            height: 110px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--red), #B71C1C);
+            background: linear-gradient(135deg, #E63946, #B71C1C);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 38px;
+            font-size: 40px;
             font-weight: 800;
             overflow: hidden;
-            border: 3px solid rgba(255,255,255,0.2);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            position: relative;
         }
+
+
 
         .avatar img {
             width: 100%;
@@ -149,17 +145,27 @@
 
         .avatar-edit {
             position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 32px;
-            height: 32px;
-            background: var(--red);
+            bottom: 4px;
+            right: 4px;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #E63946, #B71C1C);
             border-radius: 50%;
-            border: 3px solid var(--black);
+            border: 3px solid #000;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(230,57,70,0.4);
+            transition: all 0.2s;
+        }
+
+        .avatar-edit:active {
+            transform: scale(0.9);
+        }
+
+        .avatar-edit:hover {
+            box-shadow: 0 6px 20px rgba(230,57,70,0.6);
         }
 
         .avatar-edit input {
@@ -171,300 +177,128 @@
         }
 
         .profile-name {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
             margin-bottom: 4px;
         }
 
-        .profile-meta {
-            color: var(--gray-300);
+        .profile-sport {
             font-size: 14px;
-            margin-bottom: 16px;
-        }
-
-        .level-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--gray-700);
-            padding: 10px 20px;
-            border-radius: 24px;
-        }
-
-        .level-icon {
-            width: 32px;
-            height: 32px;
-            background: var(--red);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-        }
-
-        .level-info {
-            text-align: left;
-        }
-
-        .level-title {
-            font-size: 14px;
+            color: #E63946;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .level-xp {
-            font-size: 12px;
-            color: var(--gray-300);
+        /* ========== STATS ========== */
+        .stats-section {
+            padding: 0 24px 32px;
         }
 
-        /* STATS GRID */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-            background: var(--gray-600);
-            margin: 0 16px 24px;
-            border-radius: 16px;
-            overflow: hidden;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
 
-        .stat-item {
-            background: var(--gray-800);
-            padding: 16px 8px;
+        .stat-card {
+            background: #111;
+            border: 1px solid #222;
+            padding: 20px 16px;
             text-align: center;
+        }
+
+        .stat-card:hover {
+            border-color: #333;
         }
 
         .stat-value {
-            font-size: 22px;
-            font-weight: 800;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
         }
-
-        .stat-value.green { color: var(--green); }
-        .stat-value.red { color: var(--red); }
-        .stat-value.blue { color: var(--blue); }
-        .stat-value.orange { color: var(--orange); }
 
         .stat-label {
-            font-size: 10px;
-            color: var(--gray-300);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
-        }
-
-        /* BADGES */
-        .badges-section {
-            padding: 0 16px 24px;
-        }
-
-        .badges-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .badges-title {
-            font-size: 12px;
+            font-size: 9px;
             font-weight: 700;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--gray-300);
+            color: rgba(255,255,255,0.4);
+            margin-top: 6px;
         }
 
-        .badges-count {
-            font-size: 12px;
-            color: var(--gray-300);
-        }
-
-        .badges-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
-
-        .badge-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .badge-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--gray-700);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 6px;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .badge-item.unlocked .badge-icon {
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            box-shadow: 0 4px 16px rgba(255, 215, 0, 0.3);
-        }
-
-        .badge-item.locked .badge-icon {
-            opacity: 0.4;
-            filter: grayscale(1);
-        }
-
-        .badge-item.locked .badge-icon::after {
-            content: '🔒';
-            position: absolute;
-            font-size: 12px;
-            bottom: -2px;
-            right: -2px;
-        }
-
-        .badge-name {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--gray-300);
-            max-width: 70px;
-            line-height: 1.2;
-        }
-
-        .badge-item.unlocked .badge-name {
-            color: var(--white);
-        }
-
-        /* Badge Modal */
-        .badge-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-
-        .badge-modal.visible {
-            display: flex;
-        }
-
-        .badge-modal-content {
-            background: var(--gray-800);
-            border-radius: 24px;
-            padding: 32px;
-            text-align: center;
-            max-width: 320px;
-            animation: badgeModalIn 0.3s ease;
-        }
-
-        @keyframes badgeModalIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .badge-modal-icon {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            margin: 0 auto 20px;
-            box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
-        }
-
-        .badge-modal-icon.locked {
-            background: var(--gray-700);
-            filter: grayscale(1);
-            opacity: 0.5;
-        }
-
-        .badge-modal-title {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .badge-modal-desc {
-            color: var(--gray-300);
-            font-size: 14px;
-            line-height: 1.5;
-            margin-bottom: 16px;
-        }
-
-        .badge-modal-date {
-            font-size: 12px;
-            color: var(--green);
-        }
-
-        .badge-modal-progress {
-            background: var(--gray-700);
-            border-radius: 8px;
-            height: 8px;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-
-        .badge-modal-progress-fill {
-            height: 100%;
-            background: var(--red);
-            border-radius: 8px;
-        }
-
-        .badge-modal-progress-text {
-            font-size: 12px;
-            color: var(--gray-300);
-        }
-
-        .badge-modal-close {
-            margin-top: 20px;
-            padding: 12px 32px;
-            background: var(--gray-700);
-            border: none;
-            border-radius: 12px;
-            color: var(--white);
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* CONTENT */
+        /* ========== CONTENT ========== */
         .content {
-            padding: 0 16px;
+            padding: 0 24px;
         }
 
         .section {
-            margin-bottom: 24px;
+            margin-bottom: 32px;
         }
 
-        .section-title {
-            font-size: 12px;
+        .section-label {
+            font-size: 10px;
             font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 12px;
+        }
+
+        /* ========== DATA GRID ========== */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .data-card {
+            background: #111;
+            border: 1px solid #222;
+            padding: 18px;
+        }
+
+        .data-card:hover {
+            border-color: #333;
+        }
+
+        .data-label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: var(--gray-300);
-            margin-bottom: 12px;
-            padding-left: 4px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
-        /* MENU CARDS */
+        .data-value {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .data-unit {
+            font-size: 14px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 400;
+        }
+
+        /* ========== MENU CARDS ========== */
         .menu-card {
-            background: var(--gray-800);
-            border-radius: 16px;
+            background: #111;
+            border: 1px solid #222;
             overflow: hidden;
         }
 
         .menu-item {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 16px;
-            border-bottom: 1px solid var(--gray-600);
+            gap: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
             text-decoration: none;
             color: inherit;
         }
@@ -473,25 +307,30 @@
             border-bottom: none;
         }
 
+        .menu-item:hover {
+            background: #1a1a1a;
+        }
+
         .menu-item:active {
-            background: var(--gray-700);
+            background: #1a1a1a;
         }
 
         .menu-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 48px;
+            height: 48px;
+            background: #1a1a1a;
+            border: 2px solid #333;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 18px;
+            color: #E63946;
+            transition: transform 0.2s;
         }
 
-        .menu-icon.red { background: rgba(230, 57, 70, 0.2); color: var(--red); }
-        .menu-icon.green { background: rgba(0, 210, 106, 0.2); color: var(--green); }
-        .menu-icon.blue { background: rgba(0, 122, 255, 0.2); color: var(--blue); }
-        .menu-icon.orange { background: rgba(255, 149, 0, 0.2); color: var(--orange); }
-        .menu-icon.gray { background: var(--gray-600); color: var(--white); }
+        .menu-item:hover .menu-icon {
+            transform: scale(1.05);
+        }
 
         .menu-info {
             flex: 1;
@@ -499,299 +338,270 @@
 
         .menu-info h4 {
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 2px;
         }
 
         .menu-info p {
             font-size: 12px;
-            color: var(--gray-300);
+            color: rgba(255,255,255,0.4);
         }
 
-        .menu-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray-400);
-        }
-
-        .menu-badge {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 12px;
-        }
-
-        .menu-badge.connected {
-            background: rgba(0, 210, 106, 0.2);
-            color: var(--green);
-        }
-
-        .menu-badge.disconnected {
-            background: var(--gray-600);
-            color: var(--gray-300);
-        }
-
-        /* PHYSICAL DATA */
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .data-card {
-            background: var(--gray-800);
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .data-card.full {
-            grid-column: span 2;
-        }
-
-        .data-label {
-            font-size: 11px;
-            color: var(--gray-300);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }
-
-        .data-value {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .data-unit {
-            font-size: 14px;
-            color: var(--gray-300);
-            font-weight: 400;
-        }
-
-        /* BIOMETRICS */
-        .biometrics-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .biometric-card {
-            background: var(--gray-800);
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .biometric-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .biometric-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .menu-arrow {
+            color: rgba(255,255,255,0.3);
             font-size: 14px;
         }
 
-        .biometric-icon.heart { background: rgba(230, 57, 70, 0.2); color: var(--red); }
-        .biometric-icon.steps { background: rgba(0, 210, 106, 0.2); color: var(--green); }
-        .biometric-icon.sleep { background: rgba(0, 122, 255, 0.2); color: var(--blue); }
-        .biometric-icon.calories { background: rgba(255, 149, 0, 0.2); color: var(--orange); }
-
-        .biometric-title {
-            font-size: 12px;
-            color: var(--gray-300);
-        }
-
-        .biometric-value {
-            font-size: 28px;
-            font-weight: 800;
-        }
-
-        .biometric-unit {
-            font-size: 12px;
-            color: var(--gray-300);
-        }
-
-        .biometric-chart {
-            height: 40px;
-            margin-top: 12px;
-            display: flex;
-            align-items: flex-end;
-            gap: 4px;
-        }
-
-        .biometric-bar {
-            flex: 1;
-            background: var(--gray-600);
-            border-radius: 2px;
-            min-height: 4px;
-        }
-
-        .biometric-bar.active {
-            background: var(--red);
-        }
-
-        /* WEARABLE CONNECTION */
-        .wearable-connect-card {
-            background: linear-gradient(135deg, var(--gray-800), var(--gray-700));
-            border: 1px solid var(--gray-600);
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-        }
-
-        .wearable-icons {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .wearable-icon {
-            width: 56px;
-            height: 56px;
-            background: var(--gray-600);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .wearable-icon.apple { color: var(--white); }
-        .wearable-icon.google { color: #4285F4; }
-        .wearable-icon.garmin { color: #007DC5; }
-        .wearable-icon.fitbit { color: #00B0B9; }
-
-        .wearable-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .wearable-text {
-            font-size: 14px;
-            color: var(--gray-300);
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: var(--red);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            transform: scale(1.02);
-        }
-
-        .btn-secondary {
-            background: var(--gray-600);
-            color: var(--white);
-        }
-
-        /* FAQ */
-        .faq-item {
-            background: var(--gray-800);
-            border-radius: 12px;
-            margin-bottom: 8px;
-            overflow: hidden;
-        }
-
-        .faq-question {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .faq-question i {
-            transition: transform 0.3s;
-            color: var(--gray-300);
-        }
-
-        .faq-item.open .faq-question i {
-            transform: rotate(180deg);
-        }
-
-        .faq-answer {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s;
-        }
-
-        .faq-item.open .faq-answer {
-            max-height: 200px;
-        }
-
-        .faq-answer-content {
-            padding: 0 16px 16px;
-            font-size: 13px;
-            color: var(--gray-300);
-            line-height: 1.6;
-        }
-
-        /* LOGOUT */
+        /* ========== LOGOUT ========== */
         .logout-btn {
             width: 100%;
             padding: 16px;
             background: transparent;
-            border: 1px solid var(--red);
-            color: var(--red);
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
+            border: 1px solid #E63946;
+            color: #E63946;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
-            margin-top: 8px;
+            margin-top: 16px;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .logout-btn:hover {
-            background: var(--red);
-            color: var(--white);
+            background: #E63946;
+            color: #fff;
+        }
+
+        .logout-btn:active {
+            transform: scale(0.98);
         }
 
         .app-version {
             text-align: center;
-            color: var(--gray-400);
-            font-size: 12px;
+            color: rgba(255,255,255,0.25);
+            font-size: 11px;
             margin-top: 24px;
             padding-bottom: 20px;
         }
 
-        /* BOTTOM NAV */
+        /* ========== ACTIVITY CALENDAR ========== */
+        .calendar-container {
+            background: #111;
+            border: 1px solid #222;
+            padding: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .calendar-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .calendar-nav-btn {
+            width: 32px;
+            height: 32px;
+            background: transparent;
+            border: 1px solid #333;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .calendar-nav-btn:hover {
+            border-color: #E63946;
+            color: #E63946;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: #1a1a1a;
+            border: 1px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            position: relative;
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            border: none;
+        }
+
+        .calendar-day.today {
+            border-color: #E63946;
+            color: #fff;
+        }
+
+        .calendar-day.workout {
+            background: #E63946;
+            border-color: #E63946;
+            color: #fff;
+        }
+
+        .calendar-day.workout::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+        }
+
+        .calendar-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #222;
+        }
+
+        .calendar-stat {
+            text-align: center;
+        }
+
+        .calendar-stat-value {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .calendar-stat-label {
+            font-size: 9px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ========== WEEKLY GOAL ========== */
+        .weekly-goal {
+            background: #111;
+            border: 1px solid #222;
+            padding: 20px;
+            margin-bottom: 12px;
+        }
+
+        .weekly-goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .weekly-goal-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .weekly-goal-count {
+            font-size: 14px;
+            font-weight: 800;
+            color: #E63946;
+        }
+
+        .weekly-goal-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .weekly-goal-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #E63946, #FF6B6B);
+            border-radius: 4px;
+            transition: width 0.5s ease-out;
+        }
+
+        .weekly-goal-days {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+
+        .weekly-goal-day {
+            width: 36px;
+            height: 36px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .weekly-goal-day.completed {
+            background: #E63946;
+            border-color: #E63946;
+            color: #fff;
+        }
+
+        .weekly-goal-day.today {
+            border: 2px solid #E63946;
+        }
+
+        /* ========== BOTTOM NAV ========== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--gray-900);
-            border-top: 1px solid var(--gray-600);
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid #1a1a1a;
             display: flex;
             justify-content: space-around;
-            padding: 10px 0 20px;
+            padding: 12px 0 24px;
             z-index: 100;
         }
 
@@ -800,10 +610,14 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            color: var(--gray-400);
+            color: rgba(255,255,255,0.3);
             text-decoration: none;
-            font-size: 10px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             padding: 4px 12px;
+            transition: all 0.2s;
         }
 
         .nav-item i {
@@ -811,14 +625,14 @@
         }
 
         .nav-item.active {
-            color: var(--red);
+            color: #E63946;
         }
 
-        /* MODAL */
+        /* ========== MODAL ========== */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             z-index: 200;
             display: none;
             align-items: flex-end;
@@ -830,7 +644,7 @@
         }
 
         .modal {
-            background: var(--gray-800);
+            background: #111;
             width: 100%;
             max-width: 500px;
             border-radius: 24px 24px 0 0;
@@ -848,16 +662,17 @@
 
         .modal-title {
             font-size: 20px;
-            font-weight: 800;
+            font-weight: 900;
+            text-transform: uppercase;
         }
 
         .modal-close {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: var(--gray-600);
+            background: rgba(255,255,255,0.1);
             border: none;
-            color: var(--white);
+            color: #fff;
             font-size: 18px;
             cursor: pointer;
         }
@@ -868,28 +683,28 @@
 
         .form-label {
             display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--gray-300);
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             margin-bottom: 8px;
         }
 
         .form-input {
             width: 100%;
             padding: 14px 16px;
-            background: var(--gray-700);
-            border: 1px solid var(--gray-600);
-            border-radius: 10px;
-            color: var(--white);
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: #fff;
             font-size: 15px;
             font-family: inherit;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: var(--red);
+            border-color: #E63946;
         }
 
         .form-row {
@@ -898,32 +713,43 @@
             gap: 12px;
         }
 
-        /* LOADING */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--gray-600);
-            border-top-color: var(--red);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .btn-save {
+            width: 100%;
+            padding: 16px;
+            background: #E63946;
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 8px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* Safe area iOS */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .bottom-nav {
+                padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            }
+            body {
+                padding-bottom: calc(100px + env(safe-area-inset-bottom));
+            }
         }
     </style>
 </head>
 <body>
     <!-- HEADER -->
     <header class="header">
-        <div></div>
-        <div class="header-title">Profilo</div>
-        <button class="header-btn" onclick="openEditModal()"><i class="fas fa-pen"></i></button>
+        <img src="https://cdn.shopify.com/s/files/1/0969/1801/2243/files/Black_White_Bold_Modern_Clothing_Brand_Logo_97389bbf-665b-4465-82ec-d71a0fa4b35e.png?v=1758700090" alt="GR Perform" class="header-logo">
+        <button class="header-btn" onclick="openEditModal()">
+            <i class="fas fa-pen"></i>
+        </button>
     </header>
 
     <!-- PROFILE HERO -->
-    <section class="profile-hero" id="profileHero">
+    <section class="profile-hero">
         <div class="profile-hero-bg" id="heroBg"></div>
         <div class="profile-hero-overlay"></div>
         <div class="profile-hero-content">
@@ -935,71 +761,32 @@
                 </label>
             </div>
             <h1 class="profile-name" id="profileName">-</h1>
-            <p class="profile-meta" id="profileMeta">-</p>
-            <div class="level-badge">
-                <div class="level-icon"><i class="fas fa-bolt"></i></div>
-                <div class="level-info">
-                    <div class="level-title">Livello <span id="userLevel">1</span></div>
-                    <div class="level-xp"><span id="userXP">0</span> XP totali</div>
-                </div>
-            </div>
+            <p class="profile-sport" id="profileSport">-</p>
         </div>
     </section>
 
     <!-- STATS -->
-    <div class="stats-grid">
-        <div class="stat-item">
-            <div class="stat-value green" id="statWorkouts">0</div>
-            <div class="stat-label">Workout</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value red" id="statStreak">0</div>
-            <div class="stat-label">Streak</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value blue" id="statWeeks">0</div>
-            <div class="stat-label">Settimane</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value orange" id="statTests">0</div>
-            <div class="stat-label">Test</div>
-        </div>
-    </div>
-
-    <!-- BADGES SECTION -->
-    <section class="badges-section" id="badges">
-        <div class="badges-header">
-            <div class="badges-title">🏆 I Miei Badge</div>
-            <div class="badges-count"><span id="badgesUnlocked">0</span>/8 sbloccati</div>
-        </div>
-        <div class="badges-grid" id="badgesGrid">
-            <!-- Loaded by JS -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value green" id="statWorkouts">0</div>
+                <div class="stat-label">Workout</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value red" id="statStreak">0</div>
+                <div class="stat-label">Streak</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value blue" id="statWeeks">0</div>
+                <div class="stat-label">Settimane</div>
+            </div>
         </div>
     </section>
 
-    <!-- BADGE MODAL -->
-    <div class="badge-modal" id="badgeModal" onclick="closeBadgeModal(event)">
-        <div class="badge-modal-content" onclick="event.stopPropagation()">
-            <div class="badge-modal-icon" id="badgeModalIcon">🔥</div>
-            <div class="badge-modal-title" id="badgeModalTitle">-</div>
-            <div class="badge-modal-desc" id="badgeModalDesc">-</div>
-            <div id="badgeModalStatus"></div>
-            <button class="badge-modal-close" onclick="closeBadgeModal()">Chiudi</button>
-        </div>
-    </div>
-
     <div class="content">
-        <!-- WEARABLES / BIOMETRICS -->
-        <section class="section" id="wearablesSection">
-            <div class="section-title">Monitoraggio Salute</div>
-            <div id="wearablesContent">
-                <!-- Loaded by JS -->
-            </div>
-        </section>
-
         <!-- DATI FISICI -->
         <section class="section">
-            <div class="section-title">Dati Fisici</div>
+            <div class="section-label">Dati Fisici</div>
             <div class="data-grid">
                 <div class="data-card">
                     <div class="data-label">Altezza</div>
@@ -1020,143 +807,173 @@
             </div>
         </section>
 
+        <!-- WEEKLY GOAL -->
+        <section class="section">
+            <div class="section-label">Obiettivo Settimanale</div>
+            <div class="weekly-goal">
+                <div class="weekly-goal-header">
+                    <span class="weekly-goal-title">Allenamenti questa settimana</span>
+                    <span class="weekly-goal-count" id="weeklyCount">0/4</span>
+                </div>
+                <div class="weekly-goal-bar">
+                    <div class="weekly-goal-progress" id="weeklyProgress" style="width: 0%"></div>
+                </div>
+                <div class="weekly-goal-days" id="weeklyDays">
+                    <div class="weekly-goal-day">L</div>
+                    <div class="weekly-goal-day">M</div>
+                    <div class="weekly-goal-day">M</div>
+                    <div class="weekly-goal-day">G</div>
+                    <div class="weekly-goal-day">V</div>
+                    <div class="weekly-goal-day">S</div>
+                    <div class="weekly-goal-day">D</div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ACTIVITY CALENDAR -->
+        <section class="section">
+            <div class="section-label">Attività</div>
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <span class="calendar-title" id="calendarMonth">Dicembre 2025</span>
+                    <div class="calendar-nav">
+                        <button class="calendar-nav-btn" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <button class="calendar-nav-btn" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="calendar-weekday">L</div>
+                    <div class="calendar-weekday">M</div>
+                    <div class="calendar-weekday">M</div>
+                    <div class="calendar-weekday">G</div>
+                    <div class="calendar-weekday">V</div>
+                    <div class="calendar-weekday">S</div>
+                    <div class="calendar-weekday">D</div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Generated by JS -->
+                </div>
+                <div class="calendar-stats">
+                    <div class="calendar-stat">
+                        <div class="calendar-stat-value" id="calendarWorkouts">0</div>
+                        <div class="calendar-stat-label">Questo mese</div>
+                    </div>
+                    <div class="calendar-stat">
+                        <div class="calendar-stat-value" id="calendarStreak">0</div>
+                        <div class="calendar-stat-label">Streak attuale</div>
+                    </div>
+                    <div class="calendar-stat">
+                        <div class="calendar-stat-value" id="calendarBest">0</div>
+                        <div class="calendar-stat-label">Miglior streak</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- PROGRESSI -->
         <section class="section">
-            <div class="section-title">I Miei Progressi</div>
+            <div class="section-label">I Miei Progressi</div>
             <div class="menu-card">
                 <a href="app-progress.html" class="menu-item">
-                    <div class="menu-icon red"><i class="fas fa-chart-line"></i></div>
+                    <div class="menu-icon"><i class="fas fa-chart-line"></i></div>
                     <div class="menu-info">
                         <h4>Statistiche Allenamenti</h4>
                         <p>Grafici e andamento</p>
                     </div>
-                    <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
                 </a>
                 <a href="app-progress.html#tests" class="menu-item">
-                    <div class="menu-icon green"><i class="fas fa-stopwatch"></i></div>
+                    <div class="menu-icon"><i class="fas fa-stopwatch"></i></div>
                     <div class="menu-info">
                         <h4>Test Fisici</h4>
                         <p>Miglioramenti nel tempo</p>
                     </div>
-                    <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
                 </a>
+                <div class="menu-item" onclick="openBodyCompositionModal()">
+                    <div class="menu-icon"><i class="fas fa-weight"></i></div>
+                    <div class="menu-info">
+                        <h4>Body Composition</h4>
+                        <p>Peso, misure, FFMI</p>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </div>
             </div>
+        </section>
+
+        <!-- BODY COMPOSITION QUICK STATS -->
+        <section class="section" id="body-composition-section">
+            <div class="section-label">💪 Body Composition</div>
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                <div class="stat-card" style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: 700;" id="bc-quick-weight">--</div>
+                    <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">Peso kg</div>
+                </div>
+                <div class="stat-card" style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: 700;" id="bc-quick-bf">--</div>
+                    <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">Body Fat %</div>
+                </div>
+                <div class="stat-card" style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px; text-align: center;">
+                    <div style="font-size: 1.5rem; font-weight: 700;" id="bc-quick-ffmi">--</div>
+                    <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">FFMI</div>
+                </div>
+            </div>
+            <button onclick="openBodyCompositionModal()" style="width: 100%; margin-top: 12px; padding: 14px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">
+                + Aggiungi Misurazione
+            </button>
         </section>
 
         <!-- ACCOUNT -->
         <section class="section">
-            <div class="section-title">Account</div>
+            <div class="section-label">Account</div>
             <div class="menu-card">
                 <div class="menu-item" onclick="openEditModal()">
-                    <div class="menu-icon blue"><i class="fas fa-user-edit"></i></div>
+                    <div class="menu-icon"><i class="fas fa-user-edit"></i></div>
                     <div class="menu-info">
                         <h4>Modifica Profilo</h4>
                         <p>Nome, dati personali</p>
                     </div>
-                    <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
                 </div>
                 <a href="anamnesi.html" class="menu-item">
-                    <div class="menu-icon orange"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="menu-icon"><i class="fas fa-clipboard-list"></i></div>
                     <div class="menu-info">
                         <h4>Anamnesi</h4>
                         <p>Obiettivi, disponibilità, infortuni</p>
                     </div>
-                    <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
                 </a>
-                <div class="menu-item" onclick="toggleNotifications()">
-                    <div class="menu-icon gray"><i class="fas fa-bell"></i></div>
-                    <div class="menu-info">
-                        <h4>Notifiche</h4>
-                        <p>Reminder allenamenti</p>
-                    </div>
-                    <div class="menu-right">
-                        <span class="menu-badge" id="notifBadge">Attive</span>
-                    </div>
-                </div>
             </div>
         </section>
 
-        <!-- FAQ -->
+        <!-- SUPPORTO -->
         <section class="section">
-            <div class="section-title">Domande Frequenti</div>
-            <div id="faqList">
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Come funziona il sistema XP?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            Guadagni XP completando workout, raggiungendo streak e superando test fisici. Ogni 1000 XP sali di livello. I livelli sbloccano badge e mostrano i tuoi progressi al coach.
-                        </div>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Come collego il mio Apple Watch?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            Clicca su "Connetti Dispositivo" nella sezione Monitoraggio Salute. L'app chiederà il permesso di accedere ai dati di Apple Health. Una volta autorizzato, i dati si sincronizzeranno automaticamente.
-                        </div>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Come contatto il mio coach?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            Vai nella sezione Chat dal menu in basso. Puoi inviare messaggi di testo, foto e vocali. Il coach risponderà appena possibile.
-                        </div>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Cosa sono i test fisici?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            Ogni 4 settimane circa il coach ti assegnerà dei test fisici (sprint, forza, resistenza, etc.) per misurare i tuoi progressi. I risultati vengono salvati e mostrati in grafici nella sezione Progressi.
-                        </div>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>Come vengono creati i miei workout?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            Il tuo coach usa un sistema AI avanzato che analizza il tuo sport, ruolo, obiettivi, livello e dati biometrici per creare workout personalizzati. Ogni programma è unico per te.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SUPPORT -->
-        <section class="section">
-            <div class="section-title">Supporto</div>
+            <div class="section-label">Supporto</div>
             <div class="menu-card">
                 <a href="app-chat.html" class="menu-item">
-                    <div class="menu-icon red"><i class="fas fa-comments"></i></div>
+                    <div class="menu-icon"><i class="fas fa-comments"></i></div>
                     <div class="menu-info">
                         <h4>Chat con il Coach</h4>
                         <p>Parla direttamente con Gabriele</p>
                     </div>
-                    <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
                 </a>
-                <a href="mailto:help@grperform.it" class="menu-item">
-                    <div class="menu-icon gray"><i class="fas fa-envelope"></i></div>
+                <a href="mailto:grperforminfo@gmail.com" class="menu-item">
+                    <div class="menu-icon"><i class="fas fa-envelope"></i></div>
                     <div class="menu-info">
                         <h4>Contatta Supporto</h4>
-                        <p>help@grperform.it</p>
+                        <p>grperforminfo@gmail.com</p>
                     </div>
-                    <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
+                </a>
+                <a href="tel:+393519033801" class="menu-item">
+                    <div class="menu-icon"><i class="fas fa-phone"></i></div>
+                    <div class="menu-info">
+                        <h4>Chiama</h4>
+                        <p>+39 351 903 3801</p>
+                    </div>
+                    <i class="fas fa-chevron-right menu-arrow"></i>
                 </a>
             </div>
         </section>
@@ -1224,9 +1041,7 @@
                         <input type="number" class="form-input" id="editWeight" min="30" max="200" step="0.1">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
-                    Salva Modifiche
-                </button>
+                <button type="submit" class="btn-save">Salva Modifiche</button>
             </form>
         </div>
     </div>
@@ -1235,7 +1050,6 @@
     <script>
         const athleteId = localStorage.getItem('gr_athlete_id');
         let athlete = null;
-        let healthData = null;
 
         if (!athleteId) {
             window.location.href = 'login.html';
@@ -1259,24 +1073,22 @@
                 const sport = (athlete.sport || '').toLowerCase().replace(/\s/g, '');
                 const heroBg = document.getElementById('heroBg');
                 heroBg.className = 'profile-hero-bg';
+                
                 if (['calcio', 'football', 'soccer'].includes(sport)) {
                     heroBg.classList.add('calcio');
                 } else if (['basket', 'basketball', 'pallacanestro'].includes(sport)) {
                     heroBg.classList.add('basket');
                 } else if (['boxe', 'boxing', 'pugilato'].includes(sport)) {
                     heroBg.classList.add('boxe');
-                } else if (['palestra', 'fitness', 'gym', 'bodybuilding'].includes(sport)) {
+                } else if (['palestra', 'fitness', 'gym', 'bodybuilding', 'crossfit'].includes(sport)) {
                     heroBg.classList.add('palestra');
-                } else if (['running', 'corsa', 'atletica'].includes(sport)) {
-                    heroBg.classList.add('running');
                 } else {
                     heroBg.classList.add('default');
                 }
 
-                // Show background with fade-in after correct class is set
                 setTimeout(() => heroBg.classList.add('loaded'), 50);
 
-                // Avatar - check Supabase first, then localStorage as fallback
+                // Avatar
                 const initials = (athlete.first_name?.[0] || '') + (athlete.last_name?.[0] || '');
                 const avatarEl = document.getElementById('avatar');
                 const savedPhoto = athlete.profile_photo || localStorage.getItem('gr_athlete_photo');
@@ -1288,16 +1100,11 @@
                     avatarEl.textContent = initials.toUpperCase();
                 }
 
-                // Name & Meta
+                // Name & Sport
                 document.getElementById('profileName').textContent = 
                     `${athlete.first_name} ${athlete.last_name}`;
-                
-                const meta = [athlete.sport, athlete.role, athlete.goal].filter(Boolean).join(' • ');
-                document.getElementById('profileMeta').textContent = meta || athlete.experience_level || '-';
-
-                // Level & XP
-                document.getElementById('userLevel').textContent = athlete.current_level || 1;
-                document.getElementById('userXP').textContent = athlete.total_xp || 0;
+                document.getElementById('profileSport').textContent = 
+                    athlete.sport || 'Atleta';
 
                 // Physical Data
                 document.getElementById('dataHeight').innerHTML = athlete.height_cm 
@@ -1332,480 +1139,33 @@
                 document.getElementById('editHeight').value = athlete.height_cm || '';
                 document.getElementById('editWeight').value = athlete.weight_kg || '';
 
-                // Now check wearables AFTER athlete is loaded
-                checkHealthKit();
-
-                // Load badges
-                await loadBadges();
-
             } catch (error) {
                 console.error('Error loading profile:', error);
             }
-        }
-
-        // ===== BADGES SYSTEM =====
-        
-        const BADGES = [
-            { id: 'first_workout', name: 'Prima Fiamma', icon: '🔥', desc: 'Completa il tuo primo workout', requirement: { type: 'workouts', count: 1 } },
-            { id: 'streak_7', name: 'Costanza', icon: '💪', desc: 'Mantieni una streak di 7 giorni', requirement: { type: 'streak', count: 7 } },
-            { id: 'workouts_10', name: 'Maratoneta', icon: '🏃', desc: 'Completa 10 workout', requirement: { type: 'workouts', count: 10 } },
-            { id: 'workouts_25', name: 'Instancabile', icon: '⚡', desc: 'Completa 25 workout', requirement: { type: 'workouts', count: 25 } },
-            { id: 'workouts_50', name: 'Leggenda', icon: '👑', desc: 'Completa 50 workout', requirement: { type: 'workouts', count: 50 } },
-            { id: 'test_improved', name: 'In Crescita', icon: '📈', desc: 'Migliora un test fisico', requirement: { type: 'tests', count: 1 } },
-            { id: 'level_5', name: 'Atleta', icon: '🎯', desc: 'Raggiungi il livello 5', requirement: { type: 'level', count: 5 } },
-            { id: 'level_10', name: 'Elite', icon: '🏆', desc: 'Raggiungi il livello 10', requirement: { type: 'level', count: 10 } }
-        ];
-
-        let athleteStats = { workouts: 0, streak: 0, tests: 0, level: 1 };
-
-        async function loadBadges() {
-            // Get stats for badge calculation
-            try {
-                const workouts = await supabase.fetch('workouts', 
-                    `?athlete_id=eq.${athleteId}&status=eq.completed&select=id`
-                );
-                athleteStats.workouts = workouts?.length || 0;
-                athleteStats.streak = Math.min(athleteStats.workouts, 7); // Simplified streak
-                athleteStats.level = athlete.current_level || 1;
-                
-                // Check for test improvements
-                try {
-                    const tests = await supabase.fetch('fitness_tests', 
-                        `?athlete_id=eq.${athleteId}&select=test_name`
-                    );
-                    athleteStats.tests = tests?.length || 0;
-                } catch (e) {
-                    athleteStats.tests = 0;
-                }
-            } catch (e) {
-                console.error('Error loading badge stats:', e);
-            }
-
-            renderBadges();
-        }
-
-        function checkBadgeUnlocked(badge) {
-            const req = badge.requirement;
-            switch (req.type) {
-                case 'workouts':
-                    return athleteStats.workouts >= req.count;
-                case 'streak':
-                    return athleteStats.streak >= req.count;
-                case 'tests':
-                    return athleteStats.tests >= req.count;
-                case 'level':
-                    return athleteStats.level >= req.count;
-                default:
-                    return false;
-            }
-        }
-
-        function getBadgeProgress(badge) {
-            const req = badge.requirement;
-            let current = 0;
-            switch (req.type) {
-                case 'workouts':
-                    current = athleteStats.workouts;
-                    break;
-                case 'streak':
-                    current = athleteStats.streak;
-                    break;
-                case 'tests':
-                    current = athleteStats.tests;
-                    break;
-                case 'level':
-                    current = athleteStats.level;
-                    break;
-            }
-            return { current, target: req.count, percent: Math.min(100, (current / req.count) * 100) };
-        }
-
-        function renderBadges() {
-            const grid = document.getElementById('badgesGrid');
-            let unlockedCount = 0;
-
-            grid.innerHTML = BADGES.map(badge => {
-                const unlocked = checkBadgeUnlocked(badge);
-                if (unlocked) unlockedCount++;
-                
-                return `
-                    <div class="badge-item ${unlocked ? 'unlocked' : 'locked'}" onclick="showBadgeModal('${badge.id}')">
-                        <div class="badge-icon">${badge.icon}</div>
-                        <div class="badge-name">${badge.name}</div>
-                    </div>
-                `;
-            }).join('');
-
-            document.getElementById('badgesUnlocked').textContent = unlockedCount;
-        }
-
-        function showBadgeModal(badgeId) {
-            const badge = BADGES.find(b => b.id === badgeId);
-            if (!badge) return;
-
-            const unlocked = checkBadgeUnlocked(badge);
-            const progress = getBadgeProgress(badge);
-
-            document.getElementById('badgeModalIcon').textContent = badge.icon;
-            document.getElementById('badgeModalIcon').className = `badge-modal-icon ${unlocked ? '' : 'locked'}`;
-            document.getElementById('badgeModalTitle').textContent = badge.name;
-            document.getElementById('badgeModalDesc').textContent = badge.desc;
-
-            const statusEl = document.getElementById('badgeModalStatus');
-            if (unlocked) {
-                statusEl.innerHTML = '<div class="badge-modal-date">✅ Sbloccato!</div>';
-            } else {
-                statusEl.innerHTML = `
-                    <div class="badge-modal-progress">
-                        <div class="badge-modal-progress-fill" style="width: ${progress.percent}%"></div>
-                    </div>
-                    <div class="badge-modal-progress-text">${progress.current}/${progress.target}</div>
-                `;
-            }
-
-            document.getElementById('badgeModal').classList.add('visible');
-        }
-
-        function closeBadgeModal(event) {
-            if (event && event.target !== event.currentTarget) return;
-            document.getElementById('badgeModal').classList.remove('visible');
         }
 
         async function loadStats() {
             try {
                 // Completed workouts
                 const workouts = await supabase.fetch('workouts', 
-                    `?athlete_id=eq.${athleteId}&status=eq.completed&select=id`
+                    `?athlete_id=eq.${athleteId}&status=eq.completed&select=id,created_at`
                 );
-                document.getElementById('statWorkouts').textContent = workouts.length;
+                document.getElementById('statWorkouts').textContent = workouts?.length || 0;
+                document.getElementById('statStreak').textContent = athlete.streak || 0;
 
-                // Weeks trained
-                const programs = await supabase.fetch('programs', 
-                    `?athlete_id=eq.${athleteId}&select=current_week`
-                );
-                const totalWeeks = programs.reduce((sum, p) => sum + (p.current_week || 0), 0);
-                document.getElementById('statWeeks').textContent = totalWeeks;
-
-                // Streak
-                document.getElementById('statStreak').textContent = Math.min(workouts.length, 7);
-
-                // Tests count
-                try {
-                    const tests = await supabase.fetch('fitness_tests', 
-                        `?athlete_id=eq.${athleteId}&select=id`
-                    );
-                    document.getElementById('statTests').textContent = tests.length;
-                } catch (e) {
-                    document.getElementById('statTests').textContent = '0';
+                // Weeks active
+                if (workouts && workouts.length > 0) {
+                    const dates = workouts.map(w => new Date(w.created_at));
+                    const firstDate = new Date(Math.min(...dates));
+                    const today = new Date();
+                    const weeks = Math.ceil((today - firstDate) / (7 * 24 * 60 * 60 * 1000));
+                    document.getElementById('statWeeks').textContent = weeks;
                 }
-
             } catch (error) {
                 console.error('Error loading stats:', error);
             }
         }
 
-        // ===== HEALTH KIT / WEARABLES =====
-        
-        function checkHealthKit() {
-            // Check if HealthKit is available (iOS Safari)
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const hasHealthData = athlete?.biometrics_data?.hasData;
-
-            if (hasHealthData) {
-                renderConnectedWearables();
-            } else {
-                renderWearableConnect(isIOS);
-            }
-        }
-
-        function renderWearableConnect(isIOS) {
-            const html = `
-                <div class="wearable-connect-card">
-                    <div class="wearable-icons">
-                        <div class="wearable-icon apple"><i class="fab fa-apple"></i></div>
-                        <div class="wearable-icon google"><i class="fab fa-google"></i></div>
-                        <div class="wearable-icon garmin"><i class="fas fa-circle"></i></div>
-                    </div>
-                    <h3 class="wearable-title">Connetti il tuo dispositivo</h3>
-                    <p class="wearable-text">
-                        Sincronizzando Apple Watch, Google Fit, Garmin o Fitbit permetti al tuo coach di monitorare frequenza cardiaca, qualità del sonno e livelli di energia per creare allenamenti ancora più personalizzati.
-                    </p>
-                    <button class="btn btn-primary" onclick="connectHealthKit()">
-                        <i class="fas fa-link"></i> Connetti Dispositivo
-                    </button>
-                </div>
-            `;
-            document.getElementById('wearablesContent').innerHTML = html;
-        }
-
-        function renderConnectedWearables() {
-            const data = athlete?.biometrics_data || {};
-            const html = `
-                <div class="menu-card" style="margin-bottom: 16px;">
-                    <div class="menu-item">
-                        <div class="menu-icon green"><i class="fab fa-apple"></i></div>
-                        <div class="menu-info">
-                            <h4>${data.source || 'Apple Health'}</h4>
-                            <p>Ultimo sync: ${data.lastSync || 'adesso'}</p>
-                        </div>
-                        <span class="menu-badge connected">Connesso</span>
-                    </div>
-                </div>
-                <div class="biometrics-grid">
-                    <div class="biometric-card">
-                        <div class="biometric-header">
-                            <div class="biometric-icon heart"><i class="fas fa-heart"></i></div>
-                            <div class="biometric-title">Frequenza Cardiaca</div>
-                        </div>
-                        <div class="biometric-value">${data.heartRate || '--'}</div>
-                        <div class="biometric-unit">bpm media</div>
-                    </div>
-                    <div class="biometric-card">
-                        <div class="biometric-header">
-                            <div class="biometric-icon steps"><i class="fas fa-shoe-prints"></i></div>
-                            <div class="biometric-title">Passi Oggi</div>
-                        </div>
-                        <div class="biometric-value">${data.steps?.toLocaleString() || '--'}</div>
-                        <div class="biometric-unit">passi</div>
-                    </div>
-                    <div class="biometric-card">
-                        <div class="biometric-header">
-                            <div class="biometric-icon calories"><i class="fas fa-fire"></i></div>
-                            <div class="biometric-title">Calorie</div>
-                        </div>
-                        <div class="biometric-value">${data.calories || '--'}</div>
-                        <div class="biometric-unit">kcal bruciate</div>
-                    </div>
-                    <div class="biometric-card">
-                        <div class="biometric-header">
-                            <div class="biometric-icon sleep"><i class="fas fa-moon"></i></div>
-                            <div class="biometric-title">Sonno</div>
-                        </div>
-                        <div class="biometric-value">${data.sleep || '--'}</div>
-                        <div class="biometric-unit">ore stanotte</div>
-                    </div>
-                </div>
-                <button class="btn btn-secondary" style="width: 100%; margin-top: 16px;" onclick="syncHealthData()">
-                    <i class="fas fa-sync"></i> Sincronizza Ora
-                </button>
-            `;
-            document.getElementById('wearablesContent').innerHTML = html;
-        }
-
-        async function connectHealthKit() {
-            // Check if we're in a PWA or can access Health APIs
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            
-            if (isIOS) {
-                // For iOS, we'll use a native bridge or simulate
-                // In production, this would use Apple HealthKit via Capacitor/Cordova
-                
-                // Simulate permission request
-                const proceed = confirm(
-                    'GR Perform vuole accedere ai tuoi dati di Salute.\n\n' +
-                    'Verranno letti:\n' +
-                    '• Frequenza cardiaca\n' +
-                    '• Passi\n' +
-                    '• Calorie bruciate\n' +
-                    '• Dati sonno\n\n' +
-                    'Vuoi continuare?'
-                );
-
-                if (proceed) {
-                    await simulateHealthKitConnect();
-                }
-            } else {
-                // For Android/Web, use Google Fit API or simulate
-                const proceed = confirm(
-                    'GR Perform vuole accedere a Google Fit.\n\n' +
-                    'Verranno letti i dati di attività e salute.\n\n' +
-                    'Vuoi continuare?'
-                );
-
-                if (proceed) {
-                    await simulateGoogleFitConnect();
-                }
-            }
-        }
-
-        async function simulateHealthKitConnect() {
-            // Show loading
-            document.getElementById('wearablesContent').innerHTML = `
-                <div class="wearable-connect-card">
-                    <div class="loading-spinner"></div>
-                    <p style="margin-top: 16px; color: var(--gray-300);">Connessione in corso...</p>
-                </div>
-            `;
-
-            // Simulate API call delay
-            await new Promise(r => setTimeout(r, 2000));
-
-            // Save mock health data
-            const healthData = {
-                hasData: true,
-                source: 'Apple Health',
-                lastSync: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
-                heartRate: Math.floor(60 + Math.random() * 20),
-                steps: Math.floor(5000 + Math.random() * 8000),
-                calories: Math.floor(300 + Math.random() * 500),
-                sleep: (6 + Math.random() * 2).toFixed(1)
-            };
-
-            await supabase.update('athletes', athleteId, {
-                biometrics_data: healthData
-            });
-
-            athlete.biometrics_data = healthData;
-            renderConnectedWearables();
-
-            alert('Apple Health connesso con successo!');
-        }
-
-        async function simulateGoogleFitConnect() {
-            document.getElementById('wearablesContent').innerHTML = `
-                <div class="wearable-connect-card">
-                    <div class="loading-spinner"></div>
-                    <p style="margin-top: 16px; color: var(--gray-300);">Connessione in corso...</p>
-                </div>
-            `;
-
-            await new Promise(r => setTimeout(r, 2000));
-
-            const healthData = {
-                hasData: true,
-                source: 'Google Fit',
-                lastSync: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
-                heartRate: Math.floor(60 + Math.random() * 20),
-                steps: Math.floor(5000 + Math.random() * 8000),
-                calories: Math.floor(300 + Math.random() * 500),
-                sleep: (6 + Math.random() * 2).toFixed(1)
-            };
-
-            await supabase.update('athletes', athleteId, {
-                biometrics_data: healthData
-            });
-
-            athlete.biometrics_data = healthData;
-            renderConnectedWearables();
-
-            alert('Google Fit connesso con successo!');
-        }
-
-        async function syncHealthData() {
-            const btn = event.target;
-            btn.innerHTML = '<div class="loading-spinner"></div>';
-            btn.disabled = true;
-
-            await new Promise(r => setTimeout(r, 1500));
-
-            // Update with new mock data
-            const healthData = {
-                ...athlete.biometrics_data,
-                lastSync: new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
-                heartRate: Math.floor(60 + Math.random() * 20),
-                steps: Math.floor(5000 + Math.random() * 8000),
-                calories: Math.floor(300 + Math.random() * 500),
-                sleep: (6 + Math.random() * 2).toFixed(1)
-            };
-
-            await supabase.update('athletes', athleteId, {
-                biometrics_data: healthData
-            });
-
-            athlete.biometrics_data = healthData;
-            renderConnectedWearables();
-        }
-
-        // ===== PHOTO UPLOAD =====
-        
-        async function uploadPhoto(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const avatar = document.getElementById('avatar');
-            const originalContent = avatar.innerHTML;
-            avatar.innerHTML = '<div class="loading-spinner"></div>';
-
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    const base64 = e.target.result;
-
-                    // Resize image before saving (higher quality)
-                    const resized = await resizeImage(base64, 400);
-
-                    // Save to Supabase
-                    const result = await supabase.update('athletes', athleteId, {
-                        profile_photo: resized
-                    });
-
-                    console.log('Photo save result:', result);
-                    
-                    // Check if save was successful
-                    if (result && result.error) {
-                        console.error('Supabase error:', result.error);
-                        // Still save to localStorage as fallback
-                    }
-
-                    // Update local athlete object
-                    athlete.profile_photo = resized;
-
-                    // Update avatar
-                    avatar.innerHTML = `<img src="${resized}" alt="Profile">`;
-                    
-                    // ALWAYS store in localStorage (primary storage for now)
-                    localStorage.setItem('gr_athlete_photo', resized);
-                    
-                    console.log('Photo saved successfully, length:', resized.length);
-
-                } catch (error) {
-                    console.error('Upload error:', error);
-                    avatar.innerHTML = originalContent;
-                    alert('Errore durante il caricamento. Riprova.');
-                }
-            };
-
-            reader.onerror = () => {
-                console.error('File read error');
-                avatar.innerHTML = originalContent;
-                alert('Errore nella lettura del file.');
-            };
-
-            reader.readAsDataURL(file);
-        }
-
-        function resizeImage(base64, maxSize) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > maxSize) {
-                            height *= maxSize / width;
-                            width = maxSize;
-                        }
-                    } else {
-                        if (height > maxSize) {
-                            width *= maxSize / height;
-                            height = maxSize;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.92));
-                };
-                img.src = base64;
-            });
-        }
-
-        // ===== EDIT PROFILE =====
-        
         function openEditModal() {
             document.getElementById('editModal').classList.add('show');
         }
@@ -1816,8 +1176,8 @@
 
         async function saveProfile(e) {
             e.preventDefault();
-
-            const data = {
+            
+            const updates = {
                 first_name: document.getElementById('editFirstName').value,
                 last_name: document.getElementById('editLastName').value,
                 birth_date: document.getElementById('editBirthDate').value || null,
@@ -1826,60 +1186,337 @@
             };
 
             try {
-                await supabase.update('athletes', athleteId, data);
-                
-                // Update localStorage
-                localStorage.setItem('gr_athlete_name', `${data.first_name} ${data.last_name}`);
-                
+                await supabase.update('athletes', athleteId, updates);
                 closeEditModal();
                 loadProfile();
-                
             } catch (error) {
                 console.error('Error saving profile:', error);
-                alert('Errore durante il salvataggio');
+                alert('Errore nel salvataggio');
             }
         }
 
-        // ===== FAQ =====
-        
-        function toggleFaq(el) {
-            const item = el.closest('.faq-item');
-            item.classList.toggle('open');
+        async function uploadPhoto(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const dataUrl = e.target.result;
+                
+                // Show immediately
+                document.getElementById('avatar').innerHTML = `<img src="${dataUrl}" alt="Profile">`;
+                localStorage.setItem('gr_athlete_photo', dataUrl);
+                
+                // Save to Supabase
+                try {
+                    await supabase.update('athletes', athleteId, { profile_photo: dataUrl });
+                } catch (error) {
+                    console.error('Error saving photo:', error);
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
-        // ===== NOTIFICATIONS =====
-        
-        function toggleNotifications() {
-            const badge = document.getElementById('notifBadge');
-            if (badge.textContent === 'Attive') {
-                badge.textContent = 'Disattive';
-                badge.classList.remove('connected');
-                badge.classList.add('disconnected');
-            } else {
-                badge.textContent = 'Attive';
-                badge.classList.add('connected');
-                badge.classList.remove('disconnected');
-            }
-        }
-
-        // ===== LOGOUT =====
-        
         function logout() {
             if (confirm('Sei sicuro di voler uscire?')) {
                 localStorage.removeItem('gr_athlete_id');
-                localStorage.removeItem('gr_athlete_name');
                 localStorage.removeItem('gr_athlete_photo');
-                localStorage.removeItem('gr_logged_in');
-                window.location.replace('login.html');
+                window.location.href = 'login.html';
             }
         }
 
-        // Close modal on background click
-        document.getElementById('editModal').addEventListener('click', (e) => {
-            if (e.target.id === 'editModal') {
-                closeEditModal();
+        // ========== CALENDAR ==========
+        let currentCalendarDate = new Date();
+        let workoutDates = [];
+
+        const monthNames = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
+                           'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+
+        function changeMonth(delta) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            
+            document.getElementById('calendarMonth').textContent = `${monthNames[month]} ${year}`;
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            
+            // Get starting day (0 = Sunday, convert to Monday start)
+            let startDay = firstDay.getDay() - 1;
+            if (startDay < 0) startDay = 6;
+            
+            const today = new Date();
+            const grid = document.getElementById('calendarGrid');
+            let html = '';
+            
+            // Empty cells before first day
+            for (let i = 0; i < startDay; i++) {
+                html += '<div class="calendar-day empty"></div>';
             }
+            
+            // Days of month
+            let monthWorkouts = 0;
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = today.getDate() === day && today.getMonth() === month && today.getFullYear() === year;
+                const hasWorkout = workoutDates.includes(dateStr);
+                
+                if (hasWorkout) monthWorkouts++;
+                
+                let classes = 'calendar-day';
+                if (isToday) classes += ' today';
+                if (hasWorkout) classes += ' workout';
+                
+                html += `<div class="${classes}">${day}</div>`;
+            }
+            
+            grid.innerHTML = html;
+            document.getElementById('calendarWorkouts').textContent = monthWorkouts;
+        }
+
+        async function loadCalendarData() {
+            try {
+                const sessions = await supabase.fetch('workout_sessions', 
+                    `?athlete_id=eq.${athleteId}&select=completed_at`);
+                
+                workoutDates = (sessions || []).map(s => {
+                    const d = new Date(s.completed_at);
+                    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                });
+                
+                // Calculate streak
+                const streak = parseInt(localStorage.getItem('gr_streak') || '0');
+                document.getElementById('calendarStreak').textContent = streak;
+                document.getElementById('calendarBest').textContent = Math.max(streak, parseInt(localStorage.getItem('gr_best_streak') || '0'));
+                
+                renderCalendar();
+            } catch (e) {
+                console.log('Calendar data not available');
+                renderCalendar();
+            }
+        }
+
+        function updateWeeklyGoal(workoutsThisWeek, targetPerWeek = 4) {
+            const count = Math.min(workoutsThisWeek, targetPerWeek);
+            const percent = (count / targetPerWeek) * 100;
+            
+            document.getElementById('weeklyCount').textContent = `${count}/${targetPerWeek}`;
+            document.getElementById('weeklyProgress').style.width = `${percent}%`;
+            
+            // Update day circles
+            const today = new Date().getDay();
+            const dayMapping = [6, 0, 1, 2, 3, 4, 5]; // Sun=6, Mon=0, etc
+            const todayIndex = dayMapping[today];
+            
+            const days = document.querySelectorAll('.weekly-goal-day');
+            days.forEach((day, i) => {
+                day.classList.remove('today', 'completed');
+                if (i === todayIndex) day.classList.add('today');
+                if (i < workoutsThisWeek && i <= todayIndex) day.classList.add('completed');
+            });
+        }
+
+        // Initialize gamification after loading profile
+        async function initGamification() {
+            try {
+                // Get workout count
+                const sessions = await supabase.fetch('workout_sessions', 
+                    `?athlete_id=eq.${athleteId}&select=id,completed_at`);
+                
+                const thisWeek = sessions?.filter(s => {
+                    const d = new Date(s.completed_at);
+                    const now = new Date();
+                    const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+                    return d >= weekAgo;
+                }).length || 0;
+                
+                updateWeeklyGoal(thisWeek, 4);
+                loadCalendarData();
+                
+            } catch (e) {
+                console.log('Using default gamification');
+                renderCalendar();
+            }
+        }
+
+        // Close modal on outside click
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // BODY COMPOSITION FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════════════════
+        
+        function openBodyCompositionModal() {
+            document.getElementById('bcModal').style.display = 'flex';
+            document.getElementById('bc-input-date').value = new Date().toISOString().split('T')[0];
+            
+            // Pre-fill with current weight if available
+            const currentWeight = profile?.weight || localStorage.getItem('gr_weight');
+            if (currentWeight) {
+                document.getElementById('bc-input-weight').value = currentWeight;
+            }
+        }
+        
+        function closeBodyCompositionModal() {
+            document.getElementById('bcModal').style.display = 'none';
+        }
+        
+        async function saveBodyComposition(event) {
+            event.preventDefault();
+            
+            const data = {
+                weight: parseFloat(document.getElementById('bc-input-weight').value),
+                bodyFatPercentage: parseFloat(document.getElementById('bc-input-bodyfat').value) || null,
+                recorded_at: document.getElementById('bc-input-date').value || new Date().toISOString(),
+                waist: parseFloat(document.getElementById('bc-input-waist').value) || null,
+                chest: parseFloat(document.getElementById('bc-input-chest').value) || null,
+                armLeft: parseFloat(document.getElementById('bc-input-arm-l').value) || null,
+                armRight: parseFloat(document.getElementById('bc-input-arm-r').value) || null,
+                notes: document.getElementById('bc-input-notes').value || null,
+                source: 'manual'
+            };
+            
+            // Save to localStorage history
+            const history = JSON.parse(localStorage.getItem('bodyCompositionHistory') || '[]');
+            history.unshift({ ...data, id: Date.now() });
+            localStorage.setItem('bodyCompositionHistory', JSON.stringify(history.slice(0, 100)));
+            
+            // Update profile weight
+            if (data.weight) {
+                localStorage.setItem('gr_weight', data.weight);
+            }
+            
+            // Try to save to Supabase
+            if (window.supabase && athleteId) {
+                try {
+                    await supabase.insert('body_composition', {
+                        athlete_id: athleteId,
+                        weight_kg: data.weight,
+                        body_fat_percentage: data.bodyFatPercentage,
+                        waist_cm: data.waist,
+                        chest_cm: data.chest,
+                        arm_left_cm: data.armLeft,
+                        arm_right_cm: data.armRight,
+                        recorded_at: data.recorded_at,
+                        notes: data.notes,
+                        source: 'manual'
+                    });
+                } catch (e) {
+                    console.log('Supabase save failed, using local storage');
+                }
+            }
+            
+            // Update UI
+            updateBodyCompositionQuickStats();
+            closeBodyCompositionModal();
+            
+            // Show success
+            alert('✅ Misurazione salvata!');
+        }
+        
+        function updateBodyCompositionQuickStats() {
+            const history = JSON.parse(localStorage.getItem('bodyCompositionHistory') || '[]');
+            const latest = history[0];
+            
+            if (latest) {
+                document.getElementById('bc-quick-weight').textContent = latest.weight?.toFixed(1) || '--';
+                document.getElementById('bc-quick-bf').textContent = latest.bodyFatPercentage?.toFixed(1) || '--';
+                
+                // Calculate FFMI if we have body fat
+                if (latest.weight && latest.bodyFatPercentage && profile?.height) {
+                    const heightM = profile.height / 100;
+                    const leanMass = latest.weight * (1 - latest.bodyFatPercentage / 100);
+                    const ffmi = leanMass / (heightM * heightM);
+                    const adjustedFFMI = ffmi + 6.1 * (1.80 - heightM);
+                    document.getElementById('bc-quick-ffmi').textContent = adjustedFFMI.toFixed(1);
+                }
+            } else if (profile?.weight) {
+                document.getElementById('bc-quick-weight').textContent = profile.weight;
+            }
+        }
+        
+        // Initialize body composition stats
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(updateBodyCompositionQuickStats, 600);
+        });
+
+        // Init gamification after page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(initGamification, 500);
         });
     </script>
+    
+    <!-- Body Composition Modal -->
+    <div id="bcModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: #1a1a2e; border-radius: 24px; padding: 28px; max-width: 420px; width: 100%; max-height: 85vh; overflow-y: auto;">
+            <h3 style="margin-bottom: 20px; font-size: 1.3rem;">💪 Nuova Misurazione</h3>
+            
+            <form onsubmit="saveBodyComposition(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                    <div>
+                        <label style="font-size: 0.85rem; color: rgba(255,255,255,0.6); display: block; margin-bottom: 6px;">Peso (kg) *</label>
+                        <input type="number" step="0.1" id="bc-input-weight" required style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: rgba(255,255,255,0.6); display: block; margin-bottom: 6px;">Body Fat %</label>
+                        <input type="number" step="0.1" id="bc-input-bodyfat" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem;">
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="font-size: 0.85rem; color: rgba(255,255,255,0.6); display: block; margin-bottom: 6px;">Data</label>
+                    <input type="date" id="bc-input-date" style="width: 100%; padding: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 1rem;">
+                </div>
+                
+                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.5); margin: 16px 0 12px;">Misure (opzionale)</div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: rgba(255,255,255,0.5); display: block; margin-bottom: 4px;">Vita (cm)</label>
+                        <input type="number" step="0.5" id="bc-input-waist" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: rgba(255,255,255,0.5); display: block; margin-bottom: 4px;">Petto (cm)</label>
+                        <input type="number" step="0.5" id="bc-input-chest" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white;">
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div>
+                        <label style="font-size: 0.8rem; color: rgba(255,255,255,0.5); display: block; margin-bottom: 4px;">Braccio SX (cm)</label>
+                        <input type="number" step="0.5" id="bc-input-arm-l" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white;">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.8rem; color: rgba(255,255,255,0.5); display: block; margin-bottom: 4px;">Braccio DX (cm)</label>
+                        <input type="number" step="0.5" id="bc-input-arm-r" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white;">
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size: 0.8rem; color: rgba(255,255,255,0.5); display: block; margin-bottom: 4px;">Note</label>
+                    <input type="text" id="bc-input-notes" placeholder="Es: A digiuno, post workout..." style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white;">
+                </div>
+                
+                <div style="display: flex; gap: 12px;">
+                    <button type="button" onclick="closeBodyCompositionModal()" style="flex: 1; padding: 14px; background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">
+                        Annulla
+                    </button>
+                    <button type="submit" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border: none; border-radius: 12px; color: white; font-weight: 600; cursor: pointer;">
+                        💾 Salva
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="js/atlas-body-composition.js?v=1"></script>
 </body>
 </html>

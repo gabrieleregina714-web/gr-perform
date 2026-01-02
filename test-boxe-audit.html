@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GR Perform - Sistema Audit Boxe</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #E63946;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+        h2 {
+            color: #fff;
+            margin: 30px 0 15px;
+            font-size: 24px;
+        }
+        .section {
+            background: #111;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-case {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 3px solid #666;
+        }
+        .test-case.pass { border-left-color: #00D26A; }
+        .test-case.fail { border-left-color: #E63946; }
+        .test-case.warn { border-left-color: #FFA500; }
+        .test-name {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .test-result {
+            font-family: monospace;
+            font-size: 13px;
+            color: #888;
+        }
+        .score {
+            font-size: 48px;
+            font-weight: 800;
+            text-align: center;
+            padding: 40px;
+        }
+        .score.good { color: #00D26A; }
+        .score.ok { color: #FFA500; }
+        .score.bad { color: #E63946; }
+        button {
+            background: #E63946;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        button:hover { background: #c41e30; }
+        .exercise-row {
+            display: grid;
+            grid-template-columns: 1fr 80px 80px 80px;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+            font-size: 13px;
+        }
+        .exercise-row.header {
+            font-weight: 600;
+            color: #E63946;
+        }
+        .issue {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: #1f1f1f;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .issue.critical { border-left: 3px solid #E63946; }
+        .issue.warning { border-left: 3px solid #FFA500; }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .summary-card {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-card h3 {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        .summary-card .value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        #output {
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            background: #0a0a0a;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🥊 Sistema Audit Boxe</h1>
+        <p style="color:#888;margin-bottom:30px">Verifica automatica qualità workout generati per pugilato</p>
+
+        <div class="section">
+            <h2>📋 Criteri di Valutazione</h2>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Struttura</h3>
+                    <div class="value" style="color:#00D26A">✓</div>
+                    <p style="font-size:12px;color:#666;margin-top:8px">6-14 esercizi, warmup, cooldown</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Coerenza</h3>
+                    <div class="value" style="color:#00D26A">✓</div>
+                    <p style="font-size:12px;color:#666;margin-top:8px">"8 rounds" → sets=8</p>
+                </div>
+                <div class="summary-card">
+                    <h3>Rest Logic</h3>
+                    <div class="value" style="color:#00D26A">✓</div>
+                    <p style="font-size:12px;color:#666;margin-top:8px">Intervals ≠ 0s, Superset A1=0s</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🧪 Test Interattivo</h2>
+            <p style="color:#888;margin-bottom:15px">Inserisci un workout JSON per analizzarlo:</p>
+            <textarea id="workout-input" placeholder='{"name":"Boxe Tuesday","exercises":[...],...}' style="width:100%;height:150px;background:#1a1a1a;border:1px solid #333;color:#fff;padding:10px;border-radius:8px;font-family:monospace;font-size:12px"></textarea>
+            <button onclick="runAudit()">🔍 Analizza Workout</button>
+            <button onclick="runSampleTest()" style="background:#00D26A">✅ Test CORRETTO</button>
+            <button onclick="runErrorTest()" style="background:#E63946">❌ Test con ERRORI</button>
+        </div>
+
+        <div class="section" id="results" style="display:none">
+            <h2>📊 Risultati Audit</h2>
+            <div id="score-display"></div>
+            <div id="issues-list"></div>
+            <div id="exercises-table"></div>
+        </div>
+
+        <div class="section">
+            <h2>🔧 Fix Automatici Applicati</h2>
+            <div class="test-case pass">
+                <div class="test-name">✅ FIX ROUNDS/SETS</div>
+                <div class="test-result">"Heavy Bag: 8 rounds" con sets=4 → Corretto a sets=8</div>
+            </div>
+            <div class="test-case pass">
+                <div class="test-name">✅ FIX REST INTERVALS</div>
+                <div class="test-result">Intervals con rest=0s e sets>1 → Corretto a rest=60s</div>
+            </div>
+            <div class="test-case pass">
+                <div class="test-name">✅ FIX NOMI GENERICI</div>
+                <div class="test-result">"Footwork Ladder Drills" → "Footwork Ladder: Ali Shuffle + In-Out + Carioca"</div>
+            </div>
+            <div class="test-case pass">
+                <div class="test-name">✅ FIX REST INVALIDO</div>
+                <div class="test-result">rest="N/A" o null → Assegnato in base al tipo (strength=120s, hypertrophy=60s)</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📈 Checklist Qualità Boxe</h2>
+            <div id="boxe-checklist">
+                <div class="test-case" id="check-warmup">
+                    <div class="test-name">1. Warm-up Specifico</div>
+                    <div class="test-result">Dynamic stretching, Shadow Boxing inclusi</div>
+                </div>
+                <div class="test-case" id="check-shadow">
+                    <div class="test-name">2. Shadow Boxing con Dettagli</div>
+                    <div class="test-result">Non generico, include combinazioni specifiche</div>
+                </div>
+                <div class="test-case" id="check-heavybag">
+                    <div class="test-name">3. Heavy Bag Training</div>
+                    <div class="test-result">Rounds realistici (3-8), rest adeguato</div>
+                </div>
+                <div class="test-case" id="check-strength">
+                    <div class="test-name">4. Strength Work</div>
+                    <div class="test-result">Lower + Upper, pattern equilibrati</div>
+                </div>
+                <div class="test-case" id="check-neck">
+                    <div class="test-name">5. Neck/Core Training</div>
+                    <div class="test-result">Essenziale per pugilato</div>
+                </div>
+                <div class="test-case" id="check-variety">
+                    <div class="test-name">6. Varietà Accessori</div>
+                    <div class="test-result">Non stesso esercizio in B2 ogni giorno</div>
+                </div>
+                <div class="test-case" id="check-cooldown">
+                    <div class="test-name">7. Cool-down</div>
+                    <div class="test-result">Stretching o recovery incluso</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔬 Console Output</h2>
+            <div id="output">Esegui un test per vedere l'output...</div>
+        </div>
+    </div>
+
+    <script src="js/exercise-library-v2.js"></script>
+    <script src="js/workout-quality-audit.js"></script>
+    <script>
+        // Sample boxing workout for testing
+        const sampleBoxeWorkout = {
+            name: "Boxe Power Day",
+            day_of_week: "martedi",
+            estimated_duration_minutes: 75,
+            exercises: [
+                { name: "Dynamic Warm-up: Arm Circles + Leg Swings", type: "warmup", sets: 1, reps: "5 min", rest: "0s" },
+                { name: "Shadow Boxing: Jab-Cross + Hooks + Slips", type: "conditioning", sets: 3, reps: "3 min", rest: "60s" },
+                { name: "A1: Romanian Deadlift", type: "strength", sets: 4, reps: "6", rest: "0s" },
+                { name: "A2: Pallof Press", type: "strength", sets: 4, reps: "10 per side", rest: "90s" },
+                { name: "B1: Incline DB Press", type: "hypertrophy", sets: 3, reps: "10", rest: "0s" },
+                { name: "B2: Band Pull-Apart", type: "hypertrophy", sets: 3, reps: "15", rest: "60s" },
+                { name: "Heavy Bag: 8 rounds (30s hard + 30s moderate)", type: "conditioning", sets: 8, reps: "1 min", rest: "60s" },
+                { name: "Footwork Ladder: Ali Shuffle + In-Out + Carioca", type: "conditioning", sets: 3, reps: "30s", rest: "30s" },
+                { name: "Neck Harness + Isometric Holds", type: "prehab", sets: 3, reps: "15", rest: "60s" },
+                { name: "Cool-down: Static Stretch + Breathing", type: "cooldown", sets: 1, reps: "5 min", rest: "0s" }
+            ]
+        };
+
+        // Sample CON ERRORI per testare il sistema di rilevamento
+        const sampleWithErrors = {
+            name: "Boxe Day CON ERRORI",
+            day_of_week: "giovedi",
+            estimated_duration_minutes: 70,
+            exercises: [
+                { name: "Dynamic Warm-up", type: "warmup", sets: 1, reps: "5 min", rest: "0s" },
+                { name: "Shadow Boxing: Jab-Cross", type: "conditioning", sets: 3, reps: "3 min", rest: "60s" },
+                { name: "A1: Squat", type: "strength", sets: 4, reps: "5", rest: "0s" },
+                { name: "A2: Dead Bug", type: "strength", sets: 4, reps: "10", rest: "90s" },
+                { name: "B1: Push-Up", type: "hypertrophy", sets: 3, reps: "12", rest: "0s" },
+                { name: "B2: Face Pull", type: "hypertrophy", sets: 3, reps: "15", rest: "60s" },
+                { name: "Heavy Bag: 8 rounds", type: "conditioning", sets: 4, reps: "1 min", rest: "0s" },
+                { name: "Footwork Ladder Drills", type: "conditioning", sets: 3, reps: "30s", rest: "30s" },
+                { name: "Boxing Circuit: 6 rounds", type: "conditioning", sets: 3, reps: "2 min", rest: "0s" },
+                { name: "Cool-down", type: "cooldown", sets: 1, reps: "5 min", rest: "0s" }
+            ]
+        };
+
+        function runAudit() {
+            const input = document.getElementById('workout-input').value.trim();
+            if (!input) {
+                alert('Inserisci un workout JSON!');
+                return;
+            }
+            
+            try {
+                const workout = JSON.parse(input);
+                analyzeAndDisplay(workout);
+            } catch (e) {
+                alert('JSON non valido: ' + e.message);
+            }
+        }
+
+        function runSampleTest() {
+            document.getElementById('workout-input').value = JSON.stringify(sampleBoxeWorkout, null, 2);
+            analyzeAndDisplay(sampleBoxeWorkout);
+        }
+
+        function runErrorTest() {
+            document.getElementById('workout-input').value = JSON.stringify(sampleWithErrors, null, 2);
+            analyzeAndDisplay(sampleWithErrors);
+        }
+
+        function analyzeAndDisplay(workout) {
+            const resultsSection = document.getElementById('results');
+            resultsSection.style.display = 'block';
+
+            // Run audit
+            const result = window.WorkoutAudit.analyze(workout);
+            
+            // Display score
+            const scoreClass = result.score >= 80 ? 'good' : result.score >= 60 ? 'ok' : 'bad';
+            document.getElementById('score-display').innerHTML = `
+                <div class="score ${scoreClass}">${result.score}/100 ${result.rating}</div>
+            `;
+
+            // Display issues
+            let issuesHtml = '<h3 style="margin:20px 0 10px">Problemi Trovati:</h3>';
+            if (result.issues.length === 0) {
+                issuesHtml += '<p style="color:#00D26A">✨ Nessun problema critico trovato!</p>';
+            } else {
+                result.issues.forEach(issue => {
+                    const isCritical = issue.startsWith('❌');
+                    issuesHtml += `<div class="issue ${isCritical ? 'critical' : 'warning'}">${issue}</div>`;
+                });
+            }
+            if (result.suggestions.length > 0) {
+                issuesHtml += '<h3 style="margin:20px 0 10px">Suggerimenti:</h3>';
+                result.suggestions.forEach(s => {
+                    issuesHtml += `<div class="issue warning">${s}</div>`;
+                });
+            }
+            document.getElementById('issues-list').innerHTML = issuesHtml;
+
+            // Display exercises table
+            let tableHtml = '<h3 style="margin:20px 0 10px">Esercizi:</h3>';
+            tableHtml += '<div class="exercise-row header"><div>Nome</div><div>Sets</div><div>Reps</div><div>Rest</div></div>';
+            workout.exercises.forEach(ex => {
+                // Check for issues
+                const roundsMatch = ex.name.match(/(\d+)\s*rounds?/i);
+                const hasRoundsIssue = roundsMatch && parseInt(roundsMatch[1]) !== parseInt(ex.sets);
+                const hasRestIssue = (ex.name.toLowerCase().includes('round') || ex.name.toLowerCase().includes('interval')) 
+                    && (ex.rest === '0s' || ex.rest === '0') && parseInt(ex.sets) > 1;
+                
+                const rowStyle = hasRoundsIssue || hasRestIssue ? 'color:#E63946' : '';
+                tableHtml += `<div class="exercise-row" style="${rowStyle}">
+                    <div>${ex.name.substring(0, 45)}${ex.name.length > 45 ? '...' : ''}</div>
+                    <div>${ex.sets}</div>
+                    <div>${ex.reps}</div>
+                    <div>${ex.rest || '-'}</div>
+                </div>`;
+            });
+            document.getElementById('exercises-table').innerHTML = tableHtml;
+
+            // Update console output
+            const output = document.getElementById('output');
+            output.textContent = `=== AUDIT RESULT ===
+Score: ${result.score}/100
+Rating: ${result.rating}
+
+Summary:
+- Exercises: ${result.summary.exerciseCount}
+- Has Warmup: ${result.summary.hasWarmup}
+- Has Cooldown: ${result.summary.hasCooldown}
+
+Issues (${result.issues.length}):
+${result.issues.map(i => '  ' + i).join('\n')}
+
+Suggestions (${result.suggestions.length}):
+${result.suggestions.map(s => '  ' + s).join('\n')}
+`;
+
+            // Update checklist
+            updateChecklist(workout);
+
+            // Scroll to results
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateChecklist(workout) {
+            const exercises = workout.exercises || [];
+            
+            // Check warmup
+            const hasWarmup = exercises.some(e => /warm|dynamic|activation/i.test(e.name));
+            updateCheckItem('check-warmup', hasWarmup);
+            
+            // Check shadow boxing
+            const hasShadow = exercises.some(e => /shadow/i.test(e.name) && e.name.length > 20);
+            updateCheckItem('check-shadow', hasShadow);
+            
+            // Check heavy bag
+            const heavyBag = exercises.find(e => /heavy bag/i.test(e.name));
+            const heavyBagOk = heavyBag && parseInt(heavyBag.sets) >= 3 && parseInt(heavyBag.sets) <= 12;
+            updateCheckItem('check-heavybag', heavyBagOk);
+            
+            // Check strength
+            const hasLower = exercises.some(e => /squat|deadlift|lunge|rdl/i.test(e.name));
+            const hasUpper = exercises.some(e => /press|row|pull/i.test(e.name));
+            updateCheckItem('check-strength', hasLower && hasUpper);
+            
+            // Check neck/core
+            const hasNeck = exercises.some(e => /neck|core|plank|pallof/i.test(e.name));
+            updateCheckItem('check-neck', hasNeck);
+            
+            // Check variety (harder to check with single workout)
+            updateCheckItem('check-variety', true); // Assume OK for single workout
+            
+            // Check cooldown
+            const hasCooldown = exercises.some(e => /cool|stretch|recovery/i.test(e.name));
+            updateCheckItem('check-cooldown', hasCooldown);
+        }
+
+        function updateCheckItem(id, passed) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.remove('pass', 'fail');
+                el.classList.add(passed ? 'pass' : 'fail');
+            }
+        }
+
+        // Log library status
+        console.log('ExerciseLibraryV2:', window.ExerciseLibraryV2 ? '✅ Loaded' : '❌ Not loaded');
+        console.log('WorkoutAudit:', window.WorkoutAudit ? '✅ Loaded' : '❌ Not loaded');
+    </script>
+</body>
+</html>

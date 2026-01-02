@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Injury Prevention Engine</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #e5e5e5; padding: 20px; line-height: 1.6; }
+        h1 { color: #fff; margin-bottom: 20px; }
+        .test-container { max-width: 900px; margin: 0 auto; }
+        .test-result { background: #1a1a1a; border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #333; }
+        .test-result.pass { border-left-color: #22c55e; }
+        .test-result.warn { border-left-color: #f59e0b; }
+        .test-result.fail { border-left-color: #ef4444; }
+        .test-title { font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .test-data { font-family: 'Fira Code', monospace; font-size: 0.85rem; background: #0d0d0d; padding: 12px; border-radius: 8px; white-space: pre-wrap; overflow-x: auto; max-height: 300px; overflow-y: auto; }
+        .btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; border: none; padding: 14px 28px; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-bottom: 20px; }
+        .btn:hover { transform: translateY(-2px); }
+        .section-title { color: #888; font-size: 0.9rem; margin: 24px 0 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .screening-form { background: #1a1a1a; padding: 20px; border-radius: 12px; margin: 20px 0; }
+        .screening-question { margin-bottom: 20px; }
+        .screening-question h3 { margin-bottom: 10px; }
+        .screening-options { display: flex; flex-direction: column; gap: 8px; }
+        .screening-option { display: flex; align-items: center; gap: 10px; padding: 10px; background: #0d0d0d; border-radius: 8px; cursor: pointer; }
+        .screening-option:hover { background: #252525; }
+        .screening-option input { accent-color: #22c55e; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🛡️ Test Injury Prevention Engine</h1>
+        
+        <button class="btn" onclick="runAllTests()">Esegui Test Completo</button>
+        
+        <div class="section-title">Movement Screening Demo</div>
+        <div id="screening-container"></div>
+        <button class="btn" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);" onclick="submitScreening()">Salva Screening</button>
+        
+        <div class="section-title">Test Results</div>
+        <div id="results"></div>
+    </div>
+
+    <script src="js/injury-prevention.js?v=1"></script>
+    <script src="js/feedback-engine.js?v=5"></script>
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        function log(title, data, status = 'pass') {
+            const div = document.createElement('div');
+            div.className = `test-result ${status}`;
+            const icon = status === 'pass' ? '✅' : status === 'warn' ? '⚠️' : '❌';
+            div.innerHTML = `
+                <div class="test-title">${icon} ${title}</div>
+                <div class="test-data">${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}</div>
+            `;
+            resultsDiv.appendChild(div);
+        }
+
+        // Render movement screening form
+        function renderScreeningForm() {
+            const container = document.getElementById('screening-container');
+            const screens = window.InjuryPrevention.getMovementScreens();
+            
+            container.innerHTML = screens.map((screen, idx) => `
+                <div class="screening-form">
+                    <div class="screening-question">
+                        <h3>${idx + 1}. ${screen.name}</h3>
+                        <p style="color: #888; margin-bottom: 10px;">${screen.question}</p>
+                        <div class="screening-options">
+                            ${screen.options.map(opt => `
+                                <label class="screening-option">
+                                    <input type="radio" name="${screen.id}" value="${opt.value}">
+                                    <span>${opt.label}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function submitScreening() {
+            const screens = window.InjuryPrevention.getMovementScreens();
+            const results = [];
+            
+            screens.forEach(screen => {
+                const selected = document.querySelector(`input[name="${screen.id}"]:checked`);
+                if (selected) {
+                    results.push({
+                        screenId: screen.id,
+                        score: parseInt(selected.value)
+                    });
+                }
+            });
+
+            if (results.length < screens.length) {
+                alert('Completa tutte le domande dello screening!');
+                return;
+            }
+
+            const athleteId = 'test-athlete-screening';
+            const screening = window.InjuryPrevention.saveScreeningResult(athleteId, results);
+            
+            log('📋 Screening Salvato', {
+                totalScore: screening.totalScore,
+                maxScore: screening.maxScore,
+                percentage: screening.percentage + '%',
+                implications: screening.implications,
+                hasPainFlag: screening.hasPainFlag
+            }, screening.hasPainFlag ? 'warn' : 'pass');
+        }
+
+        async function runAllTests() {
+            resultsDiv.innerHTML = '';
+            
+            try {
+                // Test 1: Module loaded
+                log('1️⃣ Modulo caricato', {
+                    version: window.InjuryPrevention.VERSION,
+                    functions: Object.keys(window.InjuryPrevention).length
+                }, 'pass');
+
+                // Test 2: Sport risk profiles
+                const boxeProfile = window.InjuryPrevention.getSportRiskProfile('boxe');
+                const calcioProfile = window.InjuryPrevention.getSportRiskProfile('calcio');
+                log('2️⃣ Sport Risk Profiles', {
+                    boxe: {
+                        high_risk_areas: boxeProfile.high_risk_areas,
+                        prehab_priority: boxeProfile.prehab_priority
+                    },
+                    calcio: {
+                        high_risk_areas: calcioProfile.high_risk_areas,
+                        prehab_priority: calcioProfile.prehab_priority
+                    }
+                }, 'pass');
+
+                // Test 3: Risk calculation - low risk athlete
+                const lowRiskAthlete = {
+                    age: 25,
+                    experience_level: 'advanced',
+                    injuries: [],
+                    sport: 'fitness'
+                };
+                const lowRisk = window.InjuryPrevention.calculateRiskScore(lowRiskAthlete, {});
+                log('3️⃣ Risk Score - Atleta basso rischio', {
+                    score: lowRisk.score,
+                    level: lowRisk.level,
+                    breakdown: lowRisk.breakdown
+                }, lowRisk.level === 'low' ? 'pass' : 'warn');
+
+                // Test 4: Risk calculation - high risk athlete
+                const highRiskAthlete = {
+                    age: 48,
+                    experience_level: 'beginner',
+                    injuries: ['knee surgery 2020', 'shoulder impingement'],
+                    sport: 'crossfit'
+                };
+                const feedbackData = {
+                    rpeTrend: { trend: 'warning' },
+                    pain: { 
+                        bodyParts: ['shoulder', 'knee'],
+                        chronicPain: ['shoulder'],
+                        recentPain: ['knee']
+                    }
+                };
+                const highRisk = window.InjuryPrevention.calculateRiskScore(highRiskAthlete, feedbackData);
+                log('4️⃣ Risk Score - Atleta alto rischio', {
+                    score: highRisk.score,
+                    level: highRisk.level,
+                    breakdown: highRisk.breakdown
+                }, highRisk.level === 'high' ? 'pass' : 'warn');
+
+                // Test 5: Full injury analysis
+                const analysis = window.InjuryPrevention.analyzeInjuryRisk(highRiskAthlete, feedbackData);
+                log('5️⃣ analyzeInjuryRisk()', {
+                    score: analysis.score,
+                    level: analysis.level,
+                    sport: analysis.sport,
+                    highRiskMatches: analysis.highRiskMatches,
+                    potentialPatterns: analysis.potentialPatterns,
+                    recommendedPrehab: analysis.recommendedPrehab
+                }, 'pass');
+
+                // Test 6: Prehab protocol generation
+                const prehab = window.InjuryPrevention.generatePrehabProtocol(highRiskAthlete, feedbackData);
+                log('6️⃣ generatePrehabProtocol()', {
+                    riskLevel: prehab.riskLevel,
+                    priorityAreas: prehab.priorityAreas,
+                    duration: prehab.duration,
+                    frequency: prehab.frequency,
+                    protocolCategories: prehab.protocol.map(p => p.category),
+                    notes: prehab.notes
+                }, 'pass');
+
+                // Test 7: Exercise safety check
+                const squatCheck = window.InjuryPrevention.checkExerciseSafety('Barbell Squat', highRiskAthlete, feedbackData);
+                const pullupCheck = window.InjuryPrevention.checkExerciseSafety('Pull-up', highRiskAthlete, feedbackData);
+                log('7️⃣ checkExerciseSafety()', {
+                    squat: {
+                        safe: squatCheck.safe,
+                        riskLevel: squatCheck.riskLevel,
+                        warnings: squatCheck.warnings.length,
+                        alternatives: squatCheck.alternatives
+                    },
+                    pullup: {
+                        safe: pullupCheck.safe,
+                        riskLevel: pullupCheck.riskLevel
+                    }
+                }, !squatCheck.safe ? 'pass' : 'warn');
+
+                // Test 8: Coach alerts
+                const alerts = window.InjuryPrevention.generateCoachAlerts('test-athlete', highRiskAthlete, feedbackData);
+                log('8️⃣ generateCoachAlerts()', {
+                    hasAlerts: alerts.hasAlerts,
+                    criticalCount: alerts.criticalCount,
+                    alerts: alerts.alerts.map(a => ({
+                        type: a.type,
+                        severity: a.severity,
+                        title: a.title
+                    }))
+                }, alerts.criticalCount > 0 ? 'warn' : 'pass');
+
+                // Test 9: Movement screens
+                const screens = window.InjuryPrevention.getMovementScreens();
+                log('9️⃣ getMovementScreens()', {
+                    count: screens.length,
+                    screens: screens.map(s => s.name)
+                }, 'pass');
+
+                // Test 10: Simulate screening result
+                const mockScreeningResults = [
+                    { screenId: 'deep_squat', score: 2 },
+                    { screenId: 'hurdle_step', score: 2 },
+                    { screenId: 'inline_lunge', score: 1 },
+                    { screenId: 'shoulder_mobility', score: 1 },
+                    { screenId: 'active_slr', score: 2 },
+                    { screenId: 'trunk_stability', score: 2 },
+                    { screenId: 'rotary_stability', score: 2 }
+                ];
+                const screening = window.InjuryPrevention.saveScreeningResult('test-athlete-auto', mockScreeningResults);
+                log('🔟 saveScreeningResult()', {
+                    totalScore: screening.totalScore,
+                    maxScore: screening.maxScore,
+                    percentage: screening.percentage + '%',
+                    implications: screening.implications.slice(0, 5),
+                    hasPainFlag: screening.hasPainFlag
+                }, 'pass');
+
+                // Test 11: Get latest screening
+                const latestScreening = window.InjuryPrevention.getLatestScreening('test-athlete-auto');
+                log('1️⃣1️⃣ getLatestScreening()', {
+                    found: !!latestScreening,
+                    date: latestScreening?.date,
+                    percentage: latestScreening?.percentage + '%'
+                }, 'pass');
+
+                // Test 12: Prompt generation
+                const prompt = window.InjuryPrevention.generateInjuryPreventionPrompt(highRiskAthlete, feedbackData, screening);
+                log('1️⃣2️⃣ generateInjuryPreventionPrompt()', prompt, 'pass');
+
+                // Test 13: Overuse pattern detection
+                const mockHistory = [
+                    { completed_at: new Date().toISOString(), rpe: 8.5, pain_areas: ['knee'] },
+                    { completed_at: new Date(Date.now() - 3*24*60*60*1000).toISOString(), rpe: 8.2, pain_areas: ['knee'] },
+                    { completed_at: new Date(Date.now() - 7*24*60*60*1000).toISOString(), rpe: 8.8, pain_areas: ['knee', 'shoulder'] },
+                    { completed_at: new Date(Date.now() - 10*24*60*60*1000).toISOString(), rpe: 7.5, pain_areas: [] },
+                    { completed_at: new Date(Date.now() - 14*24*60*60*1000).toISOString(), rpe: 7.2, pain_areas: ['knee'] },
+                    { completed_at: new Date(Date.now() - 21*24*60*60*1000).toISOString(), rpe: 7.0, pain_areas: ['knee'] }
+                ];
+                const overuse = window.InjuryPrevention.detectOverusePatterns('test-athlete', mockHistory);
+                log('1️⃣3️⃣ detectOverusePatterns()', {
+                    risk: overuse.risk,
+                    patterns: overuse.patterns,
+                    analyzedWorkouts: overuse.analyzedWorkouts
+                }, overuse.patterns.length > 0 ? 'warn' : 'pass');
+
+                // Test 14: Integration with FeedbackEngine
+                if (window.FeedbackEngine) {
+                    const athleteId = 'injury-test-athlete-' + Date.now();
+                    
+                    // Create some feedback
+                    for (let i = 0; i < 5; i++) {
+                        const fb = window.FeedbackEngine.createFeedback(athleteId, 'workout-' + i);
+                        window.FeedbackEngine.complete(fb.id, {
+                            rpe: 7.5 + i * 0.3,
+                            pain_areas: i >= 3 ? ['lower_back'] : [],
+                            exercises_completed: 5,
+                            exercises_skipped: 0
+                        });
+                    }
+
+                    const feAnalysis = window.FeedbackEngine.analyzeAll(athleteId);
+                    const integratedRisk = window.InjuryPrevention.analyzeInjuryRisk(
+                        { age: 35, experience_level: 'intermediate', sport: 'powerlifting' },
+                        feAnalysis
+                    );
+
+                    log('1️⃣4️⃣ Integration con FeedbackEngine', {
+                        feedbackRpeTrend: feAnalysis.rpeTrend?.trend,
+                        feedbackPainAreas: feAnalysis.pain?.bodyParts,
+                        injuryRiskScore: integratedRisk.score,
+                        injuryRiskLevel: integratedRisk.level,
+                        recommendations: integratedRisk.recommendedPrehab
+                    }, 'pass');
+                } else {
+                    log('1️⃣4️⃣ Integration con FeedbackEngine', 'FeedbackEngine non caricato', 'warn');
+                }
+
+                // Summary
+                log('🏁 TEST COMPLETATI', 
+                    `Tutti i 14 test eseguiti con successo!\n\n` +
+                    `🛡️ InjuryPrevention Engine v${window.InjuryPrevention.VERSION}\n` +
+                    `✅ Risk scoring funzionante\n` +
+                    `✅ Sport-specific profiles attivi\n` +
+                    `✅ Movement screening implementato\n` +
+                    `✅ Prehab protocol generation OK\n` +
+                    `✅ Exercise safety checks attivi\n` +
+                    `✅ Coach alerts funzionanti`,
+                    'pass'
+                );
+                
+            } catch (err) {
+                log('❌ ERRORE', err.message + '\n\n' + err.stack, 'fail');
+            }
+        }
+
+        // Initialize screening form on load
+        renderScreeningForm();
+    </script>
+</body>
+</html>

@@ -278,7 +278,7 @@ REGOLE FONDAMENTALI:
     },
     
     async callGroq(model, prompt, systemPrompt = null) {
-        const response = await fetch('/api/ai/groq-chat', {
+        const response = await fetch('/api/ai/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -304,13 +304,18 @@ REGOLE FONDAMENTALI:
         
         const data = await response.json();
         const content = data.choices[0].message.content;
-        
-        // Parse JSON dalla risposta
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-            return JSON.parse(jsonMatch[0]);
+
+        // Parse JSON dalla risposta (robusto)
+        try {
+            const parsed = window.GR_AI_JSON?.parseFirstJson ? window.GR_AI_JSON.parseFirstJson(content) : null;
+            if (parsed?.ok) return parsed.value;
+        } catch {
+            // ignore
         }
-        
+
+        // Fallback legacy (regex)
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) return JSON.parse(jsonMatch[0]);
         throw new Error('Invalid JSON response');
     },
     

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GR Perform - Telemetry Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --black:#0A0A0A; --dark:#1A1A1A; --medium:#2D2D2D; --white:#FFF; --red:#E63946; --green:#22C55E; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: var(--black); color: var(--white); }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 24px; }
+    .card { background: var(--dark); border: 1px solid var(--medium); border-radius: 16px; padding: 18px; margin: 14px 0; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    p { margin: 0; color: #A0A0A0; line-height: 1.5; }
+    .row { display:flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    button, a.btn { border:0; border-radius: 12px; padding: 12px 14px; font-weight: 700; cursor: pointer; text-decoration:none; display:inline-flex; align-items:center; gap:10px; }
+    button.primary { background: var(--green); color: white; }
+    button.secondary { background: var(--medium); color: white; }
+    a.btn { background: var(--medium); color: white; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #D0D0D0; }
+    .status { margin-top: 10px; font-size: 12px; color: #B0B0B0; }
+    .err { color: #FFB4B4; }
+    .ok { color: #B4FFCF; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Telemetry Test (Cliente)</h1>
+      <p>Questa pagina serve solo per testare che la telemetria scriva davvero su Supabase: <span class="mono">workout_session_feedback</span> e <span class="mono">weekly_feedback</span>.</p>
+      <p class="status" id="authStatus">Controllo atleta...</p>
+
+      <div class="row">
+        <button class="primary" id="createBtn" onclick="createTestWorkout()">Crea workout test → Apri sessione</button>
+        <a class="btn" href="weekly-feedback.html?week=1">Apri report settimanale (week=1)</a>
+      </div>
+
+      <p class="status" id="statusLine"></p>
+    </div>
+
+    <div class="card">
+      <p><strong>Prerequisito:</strong> devi avere <span class="mono">gr_athlete_id</span> in localStorage (cioè essere loggato come atleta).</p>
+      <p>Se vedi "Atleta non autenticato", apri prima <span class="mono">login.html</span> e fai login, poi torna qui.</p>
+    </div>
+  </div>
+
+  <script src="js/supabase-client.js"></script>
+  <script>
+    const athleteId = localStorage.getItem('gr_athlete_id');
+
+    function setLine(text, cls) {
+      const el = document.getElementById('statusLine');
+      el.textContent = text || '';
+      el.className = 'status ' + (cls || '');
+    }
+
+    async function init() {
+      const authEl = document.getElementById('authStatus');
+      const btn = document.getElementById('createBtn');
+
+      if (!athleteId) {
+        authEl.textContent = 'Atleta non autenticato (manca gr_athlete_id).';
+        authEl.className = 'status err';
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        return;
+      }
+
+      authEl.textContent = `Atleta OK: ${athleteId}`;
+      authEl.className = 'status ok';
+    }
+
+    async function createTestWorkout() {
+      if (!athleteId) return;
+
+      const btn = document.getElementById('createBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creo workout test...';
+      setLine('', '');
+
+      try {
+        // Validate athlete exists (fail loud)
+        const athletes = await supabase.fetch('athletes', `?id=eq.${athleteId}&select=id,first_name,last_name`);
+        const a = athletes && athletes[0] ? athletes[0] : null;
+        if (!a) throw new Error('Atleta non trovato in Supabase.');
+
+        const workout = {
+          athlete_id: athleteId,
+          program_id: null,
+          week_number: 1,
+          day_of_week: 'monday',
+          workout_date: null,
+          name: 'TEST TELEMETRIA - Full Body',
+          workout_type: 'performance',
+          exercises: [
+            { order: 1, name: 'Goblet Squat', sets: 3, reps: '10', rest_seconds: 90, notes: 'Tecnica pulita' },
+            { order: 2, name: 'Push-ups', sets: 3, reps: '8-12', rest_seconds: 90 },
+            { order: 3, name: 'Row (elastico/TRX)', sets: 3, reps: '10-12', rest_seconds: 90 }
+          ],
+          ai_generated: false,
+          reviewed_by_coach: false,
+          coach_notes: 'Workout creato automaticamente per test telemetria.',
+          estimated_duration_minutes: 30,
+          status: 'pending'
+        };
+
+        const res = await supabase.insert('workouts', workout);
+        if (res && res.error) throw new Error(res.message || 'Insert workout fallito');
+
+        const created = Array.isArray(res) ? res[0] : null;
+        const id = created?.id;
+        if (!id) throw new Error('Workout creato ma id non ricevuto.');
+
+        setLine('Workout test creato. Apro la sessione...', 'ok');
+        window.location.href = `workout-session.html?id=${encodeURIComponent(id)}`;
+      } catch (e) {
+        const msg = String(e?.message || e || 'Errore sconosciuto');
+        setLine(`Errore: ${msg}`, 'err');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Crea workout test → Apri sessione';
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

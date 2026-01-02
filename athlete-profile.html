@@ -610,6 +610,7 @@
         <div class="tabs-container">
             <div class="tabs">
                 <div class="tab active" data-tab="overview">Panoramica</div>
+                <div class="tab" data-tab="intelligence">🧠 Intelligence 360°</div>
                 <div class="tab" data-tab="workouts">Workout</div>
                 <div class="tab" data-tab="progress">Progressi</div>
                 <div class="tab" data-tab="plan">Piano</div>
@@ -621,6 +622,22 @@
         <div class="content">
             <!-- OVERVIEW TAB -->
             <div class="tab-content active" id="tab-overview">
+                <!-- ATLAS Intelligence Banner -->
+                <div id="atlas-readiness-banner" style="background: linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(0,0,0,0) 100%); border: 1px solid var(--gray-700); border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px;">
+                    <div id="readiness-circle" style="width: 80px; height: 80px; border-radius: 50%; background: conic-gradient(#22c55e 0%, #22c55e 70%, var(--gray-700) 70%); display: flex; align-items: center; justify-content: center;">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--gray-900); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800;" id="readiness-value">-</div>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 13px; color: var(--gray-400); margin-bottom: 4px;">ATLAS READINESS SCORE</div>
+                        <div id="readiness-label" style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Analisi in corso...</div>
+                        <div id="readiness-recommendation" style="font-size: 13px; color: var(--gray-400);">Caricamento dati intelligenza...</div>
+                    </div>
+                    <div id="injury-risk-indicator" style="text-align: center; padding: 12px 20px; background: var(--gray-800); border-radius: 12px;">
+                        <div style="font-size: 11px; color: var(--gray-400); margin-bottom: 4px;">RISCHIO</div>
+                        <div id="injury-risk-value" style="font-size: 18px; font-weight: 700; color: #22c55e;">-</div>
+                    </div>
+                </div>
+                
                 <div class="stats-grid">
                     <div class="stat-card red">
                         <div class="stat-icon"><i class="fas fa-dumbbell"></i></div>
@@ -629,10 +646,10 @@
                         <div class="stat-change up" id="change-workouts"><i class="fas fa-arrow-up"></i> +3 questa sett.</div>
                     </div>
                     <div class="stat-card green">
-                        <div class="stat-icon"><i class="fas fa-percentage"></i></div>
-                        <div class="stat-value" id="stat-compliance">0%</div>
-                        <div class="stat-label">Compliance</div>
-                        <div class="stat-change up"><i class="fas fa-arrow-up"></i> +5%</div>
+                        <div class="stat-icon"><i class="fas fa-heartbeat"></i></div>
+                        <div class="stat-value" id="stat-recovery">-</div>
+                        <div class="stat-label">Recovery Medio</div>
+                        <div class="stat-change" id="change-recovery"><i class="fas fa-minus"></i> -</div>
                     </div>
                     <div class="stat-card yellow">
                         <div class="stat-icon"><i class="fas fa-brain"></i></div>
@@ -708,6 +725,72 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTELLIGENCE 360° TAB -->
+            <div class="tab-content" id="tab-intelligence">
+                <!-- Readiness Breakdown -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fas fa-bolt"></i> Readiness Breakdown</span>
+                        <span class="card-action" onclick="refreshIntelligence()"><i class="fas fa-sync"></i> Aggiorna</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="readiness-factors" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                            <!-- Filled dynamically -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Muscle Recovery Heatmap -->
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fas fa-fire-alt"></i> Recupero Muscolare</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="muscle-recovery-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
+                            <!-- Filled dynamically -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <!-- Recommendations -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fas fa-lightbulb"></i> Raccomandazioni AI</span>
+                        </div>
+                        <div class="card-body">
+                            <div id="ai-recommendations" style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- Filled dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Predictions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title"><i class="fas fa-crystal-ball"></i> Predizioni</span>
+                        </div>
+                        <div class="card-body">
+                            <div id="ai-predictions" style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- Filled dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Injury Risk Analysis -->
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-header">
+                        <span class="card-title"><i class="fas fa-shield-alt"></i> Analisi Rischio Infortunio</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="injury-risk-details">
+                            <!-- Filled dynamically -->
                         </div>
                     </div>
                 </div>
@@ -800,12 +883,20 @@
         </div>
     </main>
 
+    <!-- ATLAS Intelligence Scripts -->
+    <script src="js/atlas-recovery.js"></script>
+    <script src="js/atlas-feedback.js"></script>
+    <script src="js/atlas-progression.js"></script>
+    <script src="js/atlas-memory.js"></script>
+    <script src="js/atlas-athlete-intelligence.js"></script>
+    
     <script src="js/supabase-client.js"></script>
     <script>
         let athlete = null;
         let workouts = [];
         let feedback = [];
         let currentWeek = 1;
+        let intelligenceReport = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -834,6 +925,9 @@
                 populatePage();
                 initCharts();
                 initTabs();
+                
+                // 🧠 ATLAS Intelligence - Generate 360° Report
+                generateIntelligenceReport();
 
             } catch (error) {
                 console.error('Error:', error);
@@ -935,18 +1029,20 @@
 
             container.innerHTML = workouts.slice(0, 10).map(w => {
                 const date = new Date(w.created_at).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
-                const type = w.type || 'strength';
+                const type = w.workout_type || w.type || 'strength';
                 const iconClass = type.includes('cardio') ? 'cardio' : type.includes('mobil') ? 'mobility' : 'strength';
                 const fb = feedback.find(f => f.workout_id === w.id);
+                const isCompleted = (w.status === 'completed') || Boolean(w.completed) || Boolean(w.completed_at);
+                const durationMin = w.actual_duration_minutes || w.estimated_duration_minutes || w.duration_minutes || w.duration || 45;
 
                 return `
                     <div class="workout-item">
                         <div class="workout-icon ${iconClass}"><i class="fas fa-${iconClass === 'cardio' ? 'running' : iconClass === 'mobility' ? 'child' : 'dumbbell'}"></i></div>
                         <div class="workout-info">
                             <div class="workout-name">${w.name || type}</div>
-                            <div class="workout-meta">${date} • ${w.duration || 45} min${fb ? ` • RPE ${fb.rpe}` : ''}</div>
+                            <div class="workout-meta">${date} • ${durationMin} min${fb ? ` • RPE ${fb.rpe}` : ''}</div>
                         </div>
-                        <span class="workout-badge ${w.completed ? 'completed' : 'pending'}">${w.completed ? 'Completato' : 'In attesa'}</span>
+                        <span class="workout-badge ${isCompleted ? 'completed' : 'pending'}">${isCompleted ? 'Completato' : 'In attesa'}</span>
                     </div>
                 `;
             }).join('');
@@ -1094,9 +1190,10 @@
 
             // Group workouts by week
             workouts.forEach(w => {
-                const week = w.week || 1;
+                const week = w.week_number || w.week || 1;
                 if (week >= 1 && week <= 8) {
-                    if (w.completed) {
+                    const isCompleted = (w.status === 'completed') || Boolean(w.completed) || Boolean(w.completed_at);
+                    if (isCompleted) {
                         // XP: 100 per completed workout
                         result.xp[week - 1] += 100;
                         
@@ -1109,7 +1206,8 @@
                             });
                         } else {
                             // Fallback: estimate based on duration
-                            result.volume[week - 1] += (w.duration || 45) * 20;
+                            const durationMin = w.actual_duration_minutes || w.estimated_duration_minutes || w.duration_minutes || w.duration || 45;
+                            result.volume[week - 1] += durationMin * 20;
                         }
                     }
                 }
@@ -1120,7 +1218,7 @@
             const weeklyRpeCount = {};
 
             feedback.forEach(f => {
-                const week = f.week || 1;
+                const week = f.week_number || f.week || 1;
                 if (week >= 1 && week <= 8 && f.rpe) {
                     if (!weeklyRpe[week]) {
                         weeklyRpe[week] = 0;
@@ -1167,6 +1265,221 @@
                 alert('Note salvate!');
             } catch (error) {
                 alert('Errore nel salvataggio');
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════
+        // 🧠 ATLAS INTELLIGENCE 360° DASHBOARD
+        // ═══════════════════════════════════════════════════════════════════════
+        
+        function generateIntelligenceReport() {
+            if (!window.ATLASAthleteIntelligence) {
+                console.warn('ATLAS Athlete Intelligence not loaded');
+                return;
+            }
+            
+            try {
+                intelligenceReport = ATLASAthleteIntelligence.getFullAthleteReport(
+                    athlete.id,
+                    workouts,
+                    feedback
+                );
+                
+                updateReadinessBanner(intelligenceReport);
+                updateIntelligenceTab(intelligenceReport);
+                
+                console.log('🧠 ATLAS Intelligence Report generated:', intelligenceReport);
+            } catch (e) {
+                console.error('Failed to generate intelligence report:', e);
+            }
+        }
+        
+        function refreshIntelligence() {
+            generateIntelligenceReport();
+        }
+        
+        function updateReadinessBanner(report) {
+            // Readiness circle
+            const readinessEl = document.getElementById('readiness-value');
+            const readinessLabel = document.getElementById('readiness-label');
+            const readinessRec = document.getElementById('readiness-recommendation');
+            const readinessCircle = document.getElementById('readiness-circle');
+            const injuryRiskValue = document.getElementById('injury-risk-value');
+            const recoveryEl = document.getElementById('stat-recovery');
+            const changeRecovery = document.getElementById('change-recovery');
+            
+            if (readinessEl) {
+                readinessEl.textContent = `${report.readiness.score}%`;
+                readinessCircle.style.background = `conic-gradient(${report.readiness.color} 0%, ${report.readiness.color} ${report.readiness.score}%, var(--gray-700) ${report.readiness.score}%)`;
+            }
+            
+            if (readinessLabel) {
+                const levelNames = { optimal: 'Condizione Ottimale', good: 'Buona Condizione', moderate: 'Condizione Moderata', low: 'Bassa Readiness' };
+                readinessLabel.textContent = levelNames[report.readiness.level] || report.readiness.level;
+            }
+            
+            if (readinessRec) {
+                readinessRec.textContent = report.readiness.recommendation;
+            }
+            
+            if (injuryRiskValue) {
+                const riskColors = { low: '#22c55e', medium: '#eab308', high: '#ef4444' };
+                const riskLabels = { low: 'BASSO', medium: 'MEDIO', high: 'ALTO' };
+                injuryRiskValue.textContent = riskLabels[report.injuryRisk.level];
+                injuryRiskValue.style.color = riskColors[report.injuryRisk.level];
+            }
+            
+            if (recoveryEl) {
+                recoveryEl.textContent = `${report.muscleRecovery.averageRecovery}%`;
+            }
+            
+            if (changeRecovery) {
+                const fatigued = report.muscleRecovery.fatiguedMuscles;
+                if (fatigued.length === 0) {
+                    changeRecovery.innerHTML = '<i class="fas fa-check"></i> Tutto recuperato';
+                    changeRecovery.className = 'stat-change up';
+                } else {
+                    changeRecovery.innerHTML = `<i class="fas fa-exclamation"></i> ${fatigued.length} muscoli affaticati`;
+                    changeRecovery.className = 'stat-change down';
+                }
+            }
+        }
+        
+        function updateIntelligenceTab(report) {
+            // Readiness factors
+            const factorsEl = document.getElementById('readiness-factors');
+            if (factorsEl && report.readiness.factors) {
+                factorsEl.innerHTML = report.readiness.factors.map(f => `
+                    <div style="background: var(--gray-800); border-radius: 12px; padding: 16px; text-align: center;">
+                        <div style="font-size: 24px; font-weight: 800; color: ${f.value >= 80 ? '#22c55e' : f.value >= 60 ? '#eab308' : '#ef4444'};">${f.value}%</div>
+                        <div style="font-size: 12px; color: var(--gray-400); margin-top: 4px;">${f.name}</div>
+                        <div style="font-size: 10px; color: var(--gray-500);">Peso: ${f.weight}%</div>
+                    </div>
+                `).join('');
+            }
+            
+            // Muscle recovery grid
+            const muscleGrid = document.getElementById('muscle-recovery-grid');
+            if (muscleGrid && report.muscleRecovery.muscles) {
+                muscleGrid.innerHTML = Object.entries(report.muscleRecovery.muscles).map(([muscle, data]) => {
+                    const color = data.recovery >= 80 ? '#22c55e' : data.recovery >= 60 ? '#eab308' : '#ef4444';
+                    const bgColor = data.recovery >= 80 ? 'rgba(34,197,94,0.1)' : data.recovery >= 60 ? 'rgba(234,179,8,0.1)' : 'rgba(239,68,68,0.1)';
+                    return `
+                        <div style="background: ${bgColor}; border: 1px solid ${color}40; border-radius: 12px; padding: 12px; text-align: center;">
+                            <div style="font-size: 20px; font-weight: 800; color: ${color};">${data.recovery}%</div>
+                            <div style="font-size: 11px; color: var(--gray-400); text-transform: capitalize;">${muscle}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Recommendations
+            const recsEl = document.getElementById('ai-recommendations');
+            if (recsEl && report.recommendations) {
+                if (report.recommendations.length === 0) {
+                    recsEl.innerHTML = '<div style="color: var(--gray-400); text-align: center; padding: 20px;"><i class="fas fa-check-circle" style="color: #22c55e; font-size: 24px; margin-bottom: 8px; display: block;"></i>Nessuna raccomandazione - tutto OK!</div>';
+                } else {
+                    recsEl.innerHTML = report.recommendations.map(rec => {
+                        const icons = { recovery: 'fa-bed', warning: 'fa-exclamation-triangle', training: 'fa-dumbbell', motivation: 'fa-fire' };
+                        const colors = { high: '#ef4444', medium: '#eab308', low: '#22c55e' };
+                        return `
+                            <div style="background: var(--gray-800); border-radius: 10px; padding: 14px; border-left: 3px solid ${colors[rec.priority]};">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                                    <i class="fas ${icons[rec.type] || 'fa-info'}" style="color: ${colors[rec.priority]};"></i>
+                                    <span style="font-weight: 600;">${rec.title}</span>
+                                </div>
+                                <div style="font-size: 12px; color: var(--gray-400);">${rec.description}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+            
+            // Predictions
+            const predsEl = document.getElementById('ai-predictions');
+            if (predsEl && report.predictions) {
+                let html = '';
+                
+                if (report.predictions.nextWorkout) {
+                    const perf = report.predictions.nextWorkout;
+                    html += `
+                        <div style="background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(0,0,0,0) 100%); border-radius: 10px; padding: 14px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                                <i class="fas fa-chart-line" style="color: #3b82f6;"></i>
+                                <span style="font-weight: 600;">Prossimo Workout</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--gray-400);">Performance attesa: <strong style="color: #3b82f6;">${perf.expectedPerformance.toUpperCase()}</strong></div>
+                            <div style="font-size: 12px; color: var(--gray-400);">Intensità consigliata: <strong>${perf.recommendedIntensity}%</strong></div>
+                        </div>
+                    `;
+                }
+                
+                if (report.predictions.plateau?.likely) {
+                    html += `
+                        <div style="background: linear-gradient(135deg, rgba(234,179,8,0.1) 0%, rgba(0,0,0,0) 100%); border-radius: 10px; padding: 14px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                                <i class="fas fa-mountain" style="color: #eab308;"></i>
+                                <span style="font-weight: 600;">Plateau Alert</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--gray-400);">${report.predictions.plateau.message}</div>
+                        </div>
+                    `;
+                }
+                
+                if (report.predictions.deload?.recommended) {
+                    html += `
+                        <div style="background: linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(0,0,0,0) 100%); border-radius: 10px; padding: 14px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                                <i class="fas fa-pause-circle" style="color: #8b5cf6;"></i>
+                                <span style="font-weight: 600;">Deload</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--gray-400);">${report.predictions.deload.message}</div>
+                        </div>
+                    `;
+                }
+                
+                if (!html) {
+                    html = '<div style="color: var(--gray-400); text-align: center; padding: 20px;">Raccolgo dati per predizioni...</div>';
+                }
+                
+                predsEl.innerHTML = html;
+            }
+            
+            // Injury risk details
+            const injuryEl = document.getElementById('injury-risk-details');
+            if (injuryEl && report.injuryRisk) {
+                const risk = report.injuryRisk;
+                const riskColors = { low: '#22c55e', medium: '#eab308', high: '#ef4444' };
+                
+                let html = `
+                    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: ${riskColors[risk.level]}20; border: 3px solid ${riskColors[risk.level]}; display: flex; align-items: center; justify-content: center;">
+                            <span style="font-size: 24px; font-weight: 800; color: ${riskColors[risk.level]};">${risk.score}%</span>
+                        </div>
+                        <div>
+                            <div style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">Rischio ${risk.level.toUpperCase()}</div>
+                            <div style="font-size: 13px; color: var(--gray-400);">${risk.recommendation}</div>
+                        </div>
+                    </div>
+                `;
+                
+                if (risk.factors.length > 0) {
+                    html += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">';
+                    risk.factors.forEach(f => {
+                        const sevColors = { high: '#ef4444', medium: '#eab308', low: '#22c55e' };
+                        html += `
+                            <div style="background: var(--gray-800); border-radius: 10px; padding: 12px; border-left: 3px solid ${sevColors[f.severity]};">
+                                <div style="font-weight: 600; margin-bottom: 4px; text-transform: capitalize;">${f.factor.replace(/_/g, ' ')}</div>
+                                <div style="font-size: 12px; color: var(--gray-400);">${f.message}</div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<div style="color: var(--gray-400); text-align: center; padding: 12px;"><i class="fas fa-shield-alt" style="color: #22c55e; margin-right: 8px;"></i>Nessun fattore di rischio rilevato</div>';
+                }
+                
+                injuryEl.innerHTML = html;
             }
         }
     </script>

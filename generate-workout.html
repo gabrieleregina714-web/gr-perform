@@ -179,6 +179,7 @@
 </head>
 <body>
     <div class="container">
+    <link rel="icon" href="data:,">
         <header>
             <div class="logo">
                 <img src="https://cdn.shopify.com/s/files/1/0917/4204/3027/files/Frame_6.png?v=1733431122" alt="GR Perform">
@@ -207,6 +208,7 @@
                 <h2 id="programName">-</h2>
                 <p id="programDesc">-</p>
                 <span class="phase-badge" id="programPhase">-</span>
+                <div class="coach-tip" id="telemetryWhy" style="display:none;"></div>
             </div>
             
             <div id="workoutsList"></div>
@@ -223,6 +225,7 @@
     </div>
     
     <script src="js/supabase-client.js"></script>
+    <script src="js/ai-json.js"></script>
     <script src="js/ai-generator.js"></script>
     <script src="js/ai-elite.js"></script>
     <script>
@@ -386,6 +389,99 @@
             document.getElementById('programOutput').classList.add('visible');
             
             generatedProgram = { macroPlan, week1 };
+
+            // Best-effort: explain adaptation based on telemetry
+            updateTelemetryWhy().catch(() => {});
+        }
+
+        async function fetchTelemetryWhyData() {
+            const out = { sessions: [], weekly: null };
+            if (!athleteId) return out;
+
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+            const sessions = await supabase.fetch(
+                'workout_session_feedback',
+                `?athlete_id=eq.${athleteId}&completed_at=gte.${oneWeekAgo.toISOString()}&order=completed_at.desc&limit=6&select=completed_at,duration_minutes,rpe,feeling,notes`
+            );
+            out.sessions = Array.isArray(sessions) ? sessions : [];
+
+            const weeklyRows = await supabase.fetch(
+                'weekly_feedback',
+                `?athlete_id=eq.${athleteId}&order=submitted_at.desc&limit=1&select=submitted_at,week_number,readiness_score,fatigue_level,stress_level,sleep_quality,sleep_hours,motivation_level,pain_areas,pain_notes,preferences`
+            );
+            out.weekly = Array.isArray(weeklyRows) && weeklyRows.length > 0 ? weeklyRows[0] : null;
+            return out;
+        }
+
+        function formatTelemetryWhySummary(data) {
+            const sessions = Array.isArray(data?.sessions) ? data.sessions : [];
+            const weekly = data?.weekly || null;
+
+            const parts = [];
+            if (sessions.length > 0) {
+                const count = sessions.length;
+                let mins = 0;
+                let rpeSum = 0;
+                let rpeN = 0;
+                sessions.forEach(s => {
+                    mins += Number(s?.duration_minutes || 0);
+                    if (s?.rpe != null && String(s.rpe).trim() !== '') {
+                        rpeSum += Number(s.rpe);
+                        rpeN++;
+                    }
+                });
+                const avgRpe = rpeN > 0 ? (rpeSum / rpeN).toFixed(1) : null;
+                parts.push(`ultimi 7gg: ${count} session${count === 1 ? 'e' : 'i'}, ${mins}min${avgRpe ? `, RPE medio ${avgRpe}` : ''}`);
+            }
+
+            if (weekly) {
+                const wParts = [];
+                if (weekly.week_number != null && String(weekly.week_number).trim() !== '') wParts.push(`week ${weekly.week_number}`);
+                if (weekly.readiness_score != null) wParts.push(`readiness ${weekly.readiness_score}/10`);
+                if (weekly.fatigue_level != null) wParts.push(`fatigue ${weekly.fatigue_level}/10`);
+                if (weekly.stress_level != null) wParts.push(`stress ${weekly.stress_level}/10`);
+                if (weekly.sleep_quality != null) wParts.push(`sleepQ ${weekly.sleep_quality}/5`);
+                if (weekly.sleep_hours != null) wParts.push(`sleepH ${weekly.sleep_hours}`);
+                if (weekly.motivation_level != null) wParts.push(`motivation ${weekly.motivation_level}/10`);
+
+                const painAreas = Array.isArray(weekly.pain_areas) ? weekly.pain_areas.filter(Boolean) : [];
+                const painNotes = String(weekly.pain_notes || '').trim();
+
+                const pref = weekly.preferences && typeof weekly.preferences === 'object' ? weekly.preferences : null;
+                const prefFlags = [];
+                if (pref?.request_deload) prefFlags.push('scarico richiesto');
+                if (pref?.focus_mobility) prefFlags.push('focus mobilità');
+                if (pref?.increase_intensity) prefFlags.push('più intensità');
+
+                let weeklyLine = `ultimo report: ${wParts.join(', ')}`;
+                if (painAreas.length > 0) weeklyLine += ` | dolori: ${painAreas.join(', ')}`;
+                if (painNotes) weeklyLine += ` | note: ${painNotes.length > 120 ? painNotes.slice(0, 120) + '…' : painNotes}`;
+                if (prefFlags.length > 0) weeklyLine += ` | preferenze: ${prefFlags.join(', ')}`;
+                parts.push(weeklyLine);
+            }
+
+            return parts.length > 0 ? `📌 Adattato da telemetria: ${parts.join(' • ')}` : '';
+        }
+
+        async function updateTelemetryWhy() {
+            const el = document.getElementById('telemetryWhy');
+            if (!el) return;
+            try {
+                const data = await fetchTelemetryWhyData();
+                const summary = formatTelemetryWhySummary(data);
+                if (!summary) {
+                    el.style.display = 'none';
+                    el.textContent = '';
+                    return;
+                }
+                el.textContent = summary;
+                el.style.display = 'block';
+            } catch {
+                el.style.display = 'none';
+                el.textContent = '';
+            }
         }
         
         function displayProgram(program) {
@@ -426,6 +522,9 @@
             
             document.getElementById('workoutsList').innerHTML = html;
             document.getElementById('programOutput').classList.add('visible');
+
+            // Best-effort: explain adaptation based on telemetry
+            updateTelemetryWhy().catch(() => {});
         }
         
         function renderWorkoutCard(workout, index, dayNames) {
@@ -508,7 +607,7 @@
                 }
                 
                 alert('✅ Programma salvato!');
-                window.location.href = `athlete-dashboard.html?id=${athleteId}`;
+                window.location.href = `app-dashboard.html?id=${athleteId}`;
                 
             } catch (error) {
                 alert('Errore nel salvataggio');

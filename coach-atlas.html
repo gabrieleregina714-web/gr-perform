@@ -1,0 +1,4394 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GR Perform - ATLAS AI Generator</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E63946">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --red: #E63946;
+            --red-hover: #FF4D5A;
+            --black: #000;
+            --gray-900: #0A0A0A;
+            --gray-800: #111;
+            --gray-700: #1A1A1A;
+            --gray-600: #222;
+            --gray-500: #666;
+            --gray-400: #888;
+            --gray-300: #AAA;
+            --white: #FFF;
+            --green: #00D26A;
+            --yellow: #FFB800;
+            --blue: #3b82f6;
+            
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-fast: 0.2s var(--ease-out-expo);
+            --transition-medium: 0.4s var(--ease-out-expo);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--black);
+            color: var(--white);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gray-600); border-radius: 3px; }
+
+        /* SIDEBAR - Nike Style */
+        .sidebar {
+            position: fixed;
+            left: 0; top: 0;
+            width: 72px; height: 100vh;
+            background: var(--gray-900);
+            border-right: 1px solid var(--gray-600);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            z-index: 100;
+        }
+
+        .logo {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 40px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .logo img { width: 100%; height: 100%; object-fit: cover; }
+
+        .nav-item {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .nav-item:hover { background: var(--gray-700); color: var(--white); }
+        .nav-item.active { background: var(--gray-700); color: var(--white); }
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 3px;
+            height: 24px;
+            background: var(--red);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        /* MAIN */
+        .main { margin-left: 72px; min-height: 100vh; }
+
+        /* HERO - Nike Style with Image */
+        .hero {
+            position: relative;
+            height: 45vh;
+            min-height: 340px;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/4e186229-8d86-4ecf-9fe6-2a8e1601d140.jpg?v=1766936077');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, 
+                rgba(0,0,0,0.3) 0%, 
+                rgba(0,0,0,0.5) 60%,
+                rgba(0,0,0,1) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 48px 60px;
+        }
+
+        .hero-label {
+            font-size: 10px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--red);
+            margin-bottom: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-title {
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: -3px;
+            line-height: 0.95;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            color: var(--gray-400);
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* CONTENT - 3 Panel Layout */
+        .content {
+            display: grid;
+            grid-template-columns: 340px 1fr 420px;
+            gap: 0;
+            min-height: calc(100vh - 45vh);
+        }
+
+        /* LEFT PANEL - Athletes */
+        .panel-athletes {
+            background: var(--gray-900);
+            border-right: 1px solid var(--gray-700);
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 45vh);
+        }
+
+        .panel-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .panel-title {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            margin-bottom: 16px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px 14px 14px 44px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-700);
+            border-radius: 0;
+            color: var(--white);
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+        }
+
+        .athlete-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .athlete-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--gray-700);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .athlete-card:hover {
+            background: var(--gray-800);
+        }
+
+        .athlete-card.selected {
+            background: var(--gray-800);
+            border-left: 3px solid var(--red);
+        }
+
+        .athlete-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 0;
+            background: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .athlete-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .athlete-info { flex: 1; min-width: 0; }
+
+        .athlete-name {
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: -0.3px;
+            margin-bottom: 2px;
+        }
+
+        .athlete-meta {
+            font-size: 11px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .athlete-badge {
+            padding: 4px 8px;
+            background: rgba(230, 57, 70, 0.2);
+            color: var(--red);
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* CENTER PANEL - Config */
+        .panel-config {
+            background: var(--black);
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 45vh);
+            overflow: hidden;
+        }
+
+        .config-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px;
+        }
+
+        .config-empty i {
+            font-size: 64px;
+            color: var(--gray-700);
+            margin-bottom: 24px;
+        }
+
+        .config-empty h2 {
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .config-empty p {
+            color: var(--gray-500);
+            font-size: 13px;
+        }
+
+        .config-content {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .config-content.show {
+            display: flex;
+        }
+
+        .config-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--gray-700);
+            background: var(--gray-900);
+            display: flex;
+            align-items: center;
+        }
+
+        .selected-athlete {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .selected-athlete .athlete-avatar {
+            width: 56px;
+            height: 56px;
+            font-size: 18px;
+        }
+
+        .selected-athlete-info h2 {
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 4px;
+        }
+
+        .selected-athlete-info p {
+            font-size: 12px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .atlas-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--red), #c1121f);
+            padding: 10px 18px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .config-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        .config-section {
+            margin-bottom: 32px;
+        }
+
+        .config-section-title {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-section-title i {
+            color: var(--red);
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--gray-700);
+        }
+
+        .config-card {
+            background: var(--gray-900);
+            padding: 20px;
+        }
+
+        .config-card-label {
+            font-size: 10px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .config-card-value {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .config-select {
+            width: 100%;
+            padding: 14px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-700);
+            border-radius: 0;
+            color: var(--white);
+            font-size: 13px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .config-select:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+
+        /* Context Grid */
+        .context-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--gray-700);
+        }
+
+        .context-card {
+            background: var(--gray-900);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .context-icon {
+            width: 44px;
+            height: 44px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: var(--gray-800);
+            color: var(--gray-500);
+        }
+
+        .context-icon.ok { background: rgba(0, 210, 106, 0.15); color: var(--green); }
+        .context-icon.warn { background: rgba(255, 184, 0, 0.15); color: var(--yellow); }
+
+        .context-label {
+            font-size: 10px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .context-value {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* Anamnesi */
+        .anamnesi-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .anamnesi-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(255, 184, 0, 0.1);
+            border-left: 3px solid var(--yellow);
+            font-size: 12px;
+            color: var(--yellow);
+            font-weight: 600;
+        }
+
+        .anamnesi-tag.medical {
+            background: rgba(230, 57, 70, 0.1);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .anamnesi-empty {
+            color: var(--green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* 🧠 ATLAS Intelligence Widget */
+        .intelligence-widget {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--gray-800), var(--gray-900));
+            border: 1px solid var(--gray-700);
+            border-radius: 8px;
+        }
+
+        .readiness-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: conic-gradient(var(--green) var(--readiness-pct, 0%), var(--gray-700) 0%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .readiness-circle::before {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gray-900);
+        }
+
+        .readiness-value {
+            position: relative;
+            z-index: 1;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--white);
+        }
+
+        .readiness-label {
+            position: relative;
+            z-index: 1;
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--gray-400);
+        }
+
+        .intelligence-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .intel-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--gray-800);
+            border-radius: 4px;
+        }
+
+        .intel-label {
+            font-size: 11px;
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .intel-label i {
+            color: var(--red);
+            width: 14px;
+        }
+
+        .intel-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .intel-value.good { color: var(--green); }
+        .intel-value.warn { color: var(--yellow); }
+        .intel-value.bad { color: var(--red); }
+
+        .intel-recommendation {
+            grid-column: 1 / -1;
+            padding: 12px 16px;
+            background: rgba(230, 57, 70, 0.1);
+            border-left: 3px solid var(--red);
+            font-size: 12px;
+            color: var(--gray-300);
+            margin-top: 8px;
+        }
+
+        .intel-recommendation.safe {
+            background: rgba(0, 210, 106, 0.1);
+            border-color: var(--green);
+        }
+
+        .intel-recommendation.caution {
+            background: rgba(255, 184, 0, 0.1);
+            border-color: var(--yellow);
+        }
+
+        /* 🧠 ATLAS Brain Widget - Neural Visualization */
+        .brain-widget {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 1px solid #0f3460;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        .brain-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .brain-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .brain-title {
+            flex: 1;
+        }
+
+        .brain-title h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .brain-title span {
+            font-size: 11px;
+            color: #888;
+        }
+
+        .brain-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .brain-status.ready { background: rgba(0,210,106,0.2); color: #00d26a; }
+        .brain-status.thinking { background: rgba(255,184,0,0.2); color: #ffb800; }
+        .brain-status.alert { background: rgba(230,57,70,0.2); color: #e63946; }
+
+        .brain-decision {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .brain-decision-label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .brain-decision-action {
+            font-size: 18px;
+            font-weight: 900;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brain-decision-action .badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .brain-decision-action .badge.high { background: #e63946; }
+        .brain-decision-action .badge.moderate { background: #ffb800; color: #000; }
+        .brain-decision-action .badge.light { background: #00d26a; color: #000; }
+
+        .brain-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .brain-metric {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .brain-metric-value {
+            font-size: 20px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .brain-metric-value.green { color: #00d26a; }
+        .brain-metric-value.yellow { color: #ffb800; }
+        .brain-metric-value.red { color: #e63946; }
+
+        .brain-metric-label {
+            font-size: 9px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .brain-reasoning {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .brain-reasoning-title {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brain-reasoning-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .brain-reasoning-list li {
+            font-size: 12px;
+            color: #aaa;
+            padding: 4px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .brain-reasoning-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #e94560;
+        }
+
+        .brain-prediction {
+            background: linear-gradient(135deg, rgba(233,69,96,0.1), rgba(255,107,107,0.1));
+            border: 1px solid rgba(233,69,96,0.3);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .brain-prediction-title {
+            font-size: 10px;
+            color: #e94560;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brain-prediction-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .brain-pred-item {
+            text-align: center;
+        }
+
+        .brain-pred-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .brain-pred-label {
+            font-size: 9px;
+            color: #888;
+        }
+
+        /* 🧬 Learning Widget */
+        .learning-widget {
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(76, 175, 80, 0.1) 100%);
+            border: 1px solid rgba(76, 175, 80, 0.4);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .learning-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .learning-title {
+            font-weight: 600;
+            color: #4caf50;
+            font-size: 14px;
+        }
+
+        .learning-sessions {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .learning-progress {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .learning-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .learning-progress-label {
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .learning-multipliers {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .learning-mult {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+
+        .learning-mult-icon {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .learning-mult-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .learning-mult-value.positive {
+            color: #4caf50;
+        }
+
+        .learning-mult-value.negative {
+            color: #ff9800;
+        }
+
+        .learning-mult-label {
+            font-size: 9px;
+            color: #888;
+        }
+
+        .learning-insights, .learning-warnings {
+            margin-top: 12px;
+        }
+
+        .learning-insight-title, .learning-warning-title {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #4caf50;
+        }
+
+        .learning-warning-title {
+            color: #ff9800;
+        }
+
+        .learning-insight-list, .learning-warning-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .learning-insight-list li, .learning-warning-list li {
+            font-size: 11px;
+            color: #aaa;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .learning-insight-list li:last-child, .learning-warning-list li:last-child {
+            border-bottom: none;
+        }
+
+        .learning-warning-list li {
+            color: #ff9800;
+        }
+
+        /* ⚖️ Structural Balance Widget */
+        .structural-widget {
+            background: linear-gradient(135deg, rgba(22, 163, 74, 0.1), rgba(0, 0, 0, 0));
+            border: 1px solid rgba(22, 163, 74, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .structural-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .structural-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #16a34a;
+        }
+
+        .structural-score {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .structural-score-value {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .structural-score-value.good { color: #16a34a; }
+        .structural-score-value.warning { color: #f59e0b; }
+        .structural-score-value.bad { color: #ef4444; }
+
+        .structural-quality {
+            font-size: 9px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .structural-quality.estimated { background: rgba(249, 115, 22, 0.2); color: #f97316; }
+        .structural-quality.partial { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .structural-quality.good { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .structural-quality.excellent { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+
+        .structural-ratios {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .structural-ratio {
+            flex: 1 1 calc(50% - 4px);
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            padding: 10px;
+            min-width: 120px;
+        }
+
+        .structural-ratio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .structural-ratio-name {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .structural-ratio-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .structural-ratio-status.optimal { background: #22c55e; }
+        .structural-ratio-status.warning { background: #f59e0b; }
+        .structural-ratio-status.critical { background: #ef4444; }
+
+        .structural-ratio-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .structural-ratio-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .structural-ratio-fill.optimal { background: linear-gradient(90deg, #22c55e, #16a34a); }
+        .structural-ratio-fill.warning { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .structural-ratio-fill.critical { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+        .structural-ratio-value {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .structural-imbalances {
+            margin-top: 12px;
+        }
+
+        .structural-imbalance-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: #ef4444;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .structural-imbalance-item {
+            font-size: 11px;
+            color: #f59e0b;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .structural-imbalance-item:last-child {
+            border-bottom: none;
+        }
+
+        /* � Digital Twin Widget */
+        .digital-twin-widget {
+            background: linear-gradient(135deg, #0a1628 0%, #1a1a2e 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .digital-twin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .digital-twin-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .digital-twin-chart {
+            height: 100px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-end;
+            padding: 8px;
+            gap: 2px;
+            margin-bottom: 12px;
+        }
+
+        .twin-bar {
+            flex: 1;
+            background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+            border-radius: 2px 2px 0 0;
+            min-height: 4px;
+            transition: height 0.3s ease;
+        }
+
+        .twin-bar.fatigue {
+            background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+        }
+
+        .digital-twin-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .twin-stat {
+            text-align: center;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+        }
+
+        .twin-stat-value {
+            font-size: 16px;
+            font-weight: 800;
+            color: #3b82f6;
+        }
+
+        .twin-stat-label {
+            font-size: 9px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        /* 🏆 Competition Peaking Widget */
+        .competition-widget {
+            background: linear-gradient(135deg, #1a0a0a 0%, #2d1f1f 100%);
+            border: 1px solid rgba(230, 57, 70, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .competition-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .competition-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--red);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .competition-countdown {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .competition-countdown-label {
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .competition-phases {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .competition-phase {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .competition-phase.active {
+            background: var(--red);
+        }
+
+        .competition-phase.completed {
+            background: var(--green);
+        }
+
+        .competition-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #888;
+        }
+
+        .competition-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--red);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.2s;
+        }
+
+        .competition-btn:hover {
+            background: var(--red-hover);
+            transform: translateY(-1px);
+        }
+
+        /* �🛡️ Guardian Warnings */
+        .guardian-warnings {
+            margin-bottom: 16px;
+        }
+
+        .guardian-warning {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .guardian-warning.warning {
+            background: rgba(255, 184, 0, 0.15);
+            border: 1px solid var(--yellow);
+            color: var(--yellow);
+        }
+
+        .guardian-warning.critical {
+            background: rgba(230, 57, 70, 0.15);
+            border: 1px solid var(--red);
+            color: var(--red);
+        }
+
+        .guardian-warning i {
+            font-size: 18px;
+        }
+
+        /* Week Schedule */
+        .week-schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .week-day {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .week-day-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--gray-400);
+            text-align: center;
+        }
+
+        .week-day-select {
+            background: var(--gray-700);
+            border: 1px solid var(--gray-600);
+            color: var(--white);
+            font-size: 10px;
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .week-day-select:focus {
+            border-color: var(--red);
+            outline: none;
+        }
+
+        .week-schedule-info {
+            padding: 8px 12px;
+            background: rgba(230, 57, 70, 0.1);
+            border-left: 3px solid var(--red);
+            font-size: 12px;
+            color: var(--gray-300);
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .week-schedule-info.visible {
+            display: block;
+        }
+
+        .week-schedule-info.warning {
+            background: rgba(255, 184, 0, 0.1);
+            border-color: var(--yellow);
+        }
+
+        .schedule-hint {
+            font-size: 11px;
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .schedule-hint i {
+            color: var(--red);
+        }
+
+        /* Generate Button */
+        .config-footer {
+            padding: 24px 32px;
+            border-top: 1px solid var(--gray-700);
+            background: var(--gray-900);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--red), #c1121f);
+            border: none;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all var(--transition-fast);
+            font-family: inherit;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(230, 57, 70, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .generate-btn.loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* RIGHT PANEL - Workout */
+        .panel-workout {
+            background: var(--gray-900);
+            border-left: 1px solid var(--gray-700);
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 45vh);
+        }
+
+        .workout-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-700);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .workout-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .score-badge {
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .score-badge.a { background: rgba(0, 210, 106, 0.2); color: var(--green); }
+        .score-badge.b { background: rgba(230, 57, 70, 0.2); color: var(--red); }
+        .score-badge.c { background: rgba(255, 184, 0, 0.2); color: var(--yellow); }
+        
+        /* 🎯 Metodologie applicate */
+        .workout-methods {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(0, 150, 255, 0.1));
+            border-bottom: 1px solid var(--gray-700);
+        }
+        
+        .method-badge {
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(0, 150, 255, 0.3));
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            border-radius: 20px;
+            color: #e0e0ff;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .workout-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        /* Week Tabs */
+        .week-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 16px 16px 0;
+            background: var(--gray-900);
+            border-bottom: 1px solid var(--gray-700);
+            overflow-x: auto;
+        }
+
+        .week-tab {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 8px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-700);
+            color: var(--gray-400);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .week-tab:hover {
+            background: var(--gray-700);
+            color: var(--white);
+        }
+
+        .week-tab.active {
+            background: var(--red);
+            border-color: var(--red);
+            color: var(--white);
+        }
+
+        .tab-day {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-focus {
+            font-size: 9px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .week-content {
+            padding: 0;
+        }
+
+        .day-workout {
+            display: none;
+        }
+
+        .day-workout.active {
+            display: block;
+        }
+
+        .session-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--gray-800), var(--gray-900));
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .session-title {
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .session-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--gray-400);
+        }
+
+        .session-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .session-meta .session-score {
+            color: var(--green);
+            font-weight: 600;
+        }
+        
+        /* 🎯 Metodologie nella sessione */
+        .session-methods {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .workout-empty {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--gray-500);
+            padding: 40px;
+        }
+
+        .workout-empty i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--gray-700);
+        }
+
+        .workout-empty h3 {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            color: var(--white);
+        }
+
+        .exercise-section {
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .exercise-section-title {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            padding: 16px 24px;
+            background: var(--gray-800);
+            border-bottom: 1px solid var(--gray-700);
+        }
+        
+        /* ═══════════════════════════════════════════════════════════════════
+           RAMP WARMUP BADGE
+           ═══════════════════════════════════════════════════════════════════ */
+        
+        .ramp-badge {
+            background: linear-gradient(135deg, #ff6b35, #9C27B0);
+            color: white;
+            font-size: 8px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            letter-spacing: 1px;
+            margin-left: 8px;
+        }
+
+        .exercise-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--gray-700);
+        }
+
+        .exercise-card.rehab {
+            background: rgba(0, 210, 106, 0.05);
+            border-left: 3px solid var(--green);
+        }
+
+        .exercise-order {
+            width: 32px;
+            height: 32px;
+            background: var(--red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .exercise-card.rehab .exercise-order {
+            background: var(--green);
+        }
+
+        .exercise-info { flex: 1; }
+
+        .exercise-name {
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: -0.3px;
+            margin-bottom: 2px;
+        }
+
+        .exercise-details {
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+
+        .exercise-badge {
+            padding: 4px 8px;
+            background: rgba(255, 184, 0, 0.2);
+            color: var(--yellow);
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: help;
+        }
+
+        .exercise-card.adjusted {
+            border-left: 2px solid var(--yellow);
+        }
+
+        .exercise-card.adjusted .exercise-order {
+            background: var(--yellow);
+            color: var(--black);
+        }
+        
+        /* 🔁 Circuit Exercise Styling */
+        .exercise-card.circuit-exercise {
+            border-left: 3px solid #00d4ff;
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.1), transparent);
+        }
+        
+        .exercise-card.circuit-exercise .exercise-order {
+            background: linear-gradient(135deg, #00d4ff, #0096c7);
+            font-size: 0;
+        }
+        
+        .exercise-card.circuit-exercise .exercise-order::before {
+            content: '🔁';
+            font-size: 14px;
+        }
+        
+        /* ⏰ EMOM Exercise Styling */
+        .exercise-card.emom-exercise {
+            border-left: 3px solid #ffc300;
+            background: linear-gradient(90deg, rgba(255, 195, 0, 0.1), transparent);
+        }
+        
+        .exercise-card.emom-exercise .exercise-order {
+            background: linear-gradient(135deg, #ffc300, #ff9500);
+            font-size: 0;
+        }
+        
+        .exercise-card.emom-exercise .exercise-order::before {
+            content: '⏰';
+            font-size: 14px;
+        }
+        
+        /* 🔥 Tabata Exercise Styling */
+        .exercise-card.tabata-exercise {
+            border-left: 3px solid #ff4500;
+            background: linear-gradient(90deg, rgba(255, 69, 0, 0.1), transparent);
+        }
+        
+        .exercise-card.tabata-exercise .exercise-order {
+            background: linear-gradient(135deg, #ff4500, #ff0000);
+            font-size: 0;
+        }
+        
+        .exercise-card.tabata-exercise .exercise-order::before {
+            content: '🔥';
+            font-size: 14px;
+        }
+        
+        /* Method Note Banner */
+        .method-note {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(0, 150, 255, 0.2));
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            border-radius: 8px;
+            margin: 8px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #e0e0ff;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        
+        /* 🦾 Giant Set Exercise Styling */
+        .exercise-card.giant-set-exercise {
+            border-left: 3px solid #9b59b6;
+            background: linear-gradient(90deg, rgba(155, 89, 182, 0.1), transparent);
+        }
+        
+        .exercise-card.giant-set-exercise .exercise-order {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            font-size: 0;
+        }
+        
+        .exercise-card.giant-set-exercise .exercise-order::before {
+            content: '🦾';
+            font-size: 14px;
+        }
+        
+        /* 🔗 Cluster Set Exercise Styling */
+        .exercise-card.cluster-exercise {
+            border-left: 3px solid #27ae60;
+            background: linear-gradient(90deg, rgba(39, 174, 96, 0.1), transparent);
+        }
+        
+        .exercise-card.cluster-exercise .exercise-order {
+            background: linear-gradient(135deg, #27ae60, #1e8449);
+        }
+        
+        .exercise-card.cluster-exercise .exercise-order::before {
+            content: '🔗';
+            font-size: 14px;
+        }
+        
+        /* ⚡ Contrast/PAP Exercise Styling */
+        .exercise-card.contrast-exercise {
+            border-left: 3px solid #e67e22;
+            background: linear-gradient(90deg, rgba(230, 126, 34, 0.1), transparent);
+        }
+        
+        .exercise-card.contrast-exercise .exercise-order {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            font-size: 0;
+        }
+        
+        .exercise-card.contrast-exercise .exercise-order::before {
+            content: '⚡';
+            font-size: 14px;
+        }
+
+        .exercise-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .video-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(230, 57, 70, 0.15);
+            border-radius: 50%;
+            color: var(--red);
+            font-size: 14px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .video-btn:hover {
+            background: var(--red);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        /* Workout Actions */
+        .workout-actions {
+            display: none;
+            padding: 20px 24px;
+            gap: 12px;
+            border-top: 1px solid var(--gray-700);
+        }
+
+        .workout-actions.show {
+            display: flex;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 16px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all var(--transition-fast);
+            font-family: inherit;
+            border: none;
+        }
+
+        .action-btn.primary {
+            background: var(--green);
+            color: var(--black);
+        }
+
+        .action-btn.secondary {
+            background: var(--gray-800);
+            border: 1px solid var(--gray-700);
+            color: var(--white);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .content {
+                grid-template-columns: 300px 1fr 380px;
+            }
+            .config-grid, .context-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            .panel-athletes, .panel-workout {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <a href="coach-dashboard.html" class="logo" style="overflow:hidden;border-radius:12px;">
+            <img src="https://cdn.shopify.com/s/files/1/0969/1801/2243/files/Black_White_Bold_Modern_Clothing_Brand_Logo_97389bbf-665b-4465-82ec-d71a0fa4b35e.png?v=1758700090" alt="GR" style="width:100%;height:100%;object-fit:cover;">
+        </a>
+        <a href="coach-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i></a>
+        <a href="coach-clients.html" class="nav-item"><i class="fas fa-users"></i></a>
+        <a href="coach-atlas.html" class="nav-item active" title="ATLAS AI"><i class="fas fa-brain"></i></a>
+        <div class="nav-spacer"></div>
+        <a href="#" onclick="coachLogout(event)" class="nav-item"><i class="fas fa-sign-out-alt"></i></a>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+        <!-- HERO -->
+        <section class="hero">
+            <div class="hero-bg"></div>
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <p class="hero-label">
+                    <i class="fas fa-brain"></i>
+                    ATLAS AI Engine v2.0
+                </p>
+                <h1 class="hero-title">Workout<br>Generator</h1>
+                <p class="hero-subtitle">Generazione intelligente con periodizzazione automatica, gestione infortuni e progressione scientifica</p>
+            </div>
+        </section>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- LEFT: Athletes -->
+            <div class="panel-athletes">
+                <div class="panel-header">
+                    <div class="panel-title">Seleziona Atleta</div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="athleteSearch" placeholder="Cerca atleta...">
+                    </div>
+                </div>
+                <div class="athlete-list" id="athleteList">
+                    <div style="padding:40px;text-align:center;color:var(--gray-500);">Caricamento...</div>
+                </div>
+            </div>
+
+            <!-- CENTER: Config -->
+            <div class="panel-config">
+                <div class="config-empty" id="configEmpty">
+                    <i class="fas fa-user-plus"></i>
+                    <h2>Seleziona un Atleta</h2>
+                    <p>Scegli un atleta dalla lista per iniziare</p>
+                </div>
+
+                <div class="config-content" id="configContent">
+                    <div class="config-header">
+                        <div class="selected-athlete" id="selectedAthleteDisplay"></div>
+                        <div class="atlas-badge">
+                            <i class="fas fa-brain"></i>
+                            ATLAS AI
+                        </div>
+                    </div>
+
+                    <div class="config-body">
+                        <!-- Periodization -->
+                        <div class="config-section">
+                            <div class="config-section-title">
+                                <i class="fas fa-calendar-alt"></i>
+                                Periodizzazione
+                            </div>
+                            <div class="config-grid">
+                                <div class="config-card">
+                                    <div class="config-card-label">Settimana</div>
+                                    <div class="config-card-value" id="cfgWeek">1/12</div>
+                                </div>
+                                <div class="config-card">
+                                    <div class="config-card-label">Fase</div>
+                                    <div class="config-card-value" id="cfgPhase">Accumulo</div>
+                                </div>
+                                <div class="config-card">
+                                    <div class="config-card-label">Goal</div>
+                                    <select class="config-select" id="cfgGoal">
+                                        <option value="ipertrofia">Ipertrofia</option>
+                                        <option value="forza">Forza</option>
+                                        <option value="potenza">Potenza</option>
+                                    </select>
+                                </div>
+                                <div class="config-card">
+                                    <div class="config-card-label">Intensità</div>
+                                    <select class="config-select" id="cfgIntensity">
+                                        <option value="normal">Normale</option>
+                                        <option value="light">Deload</option>
+                                        <option value="high">Alta</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Context -->
+                        <div class="config-section">
+                            <div class="config-section-title">
+                                <i class="fas fa-database"></i>
+                                Contesto Caricato
+                            </div>
+                            <div class="context-grid">
+                                <div class="context-card">
+                                    <div class="context-icon" id="ctxHistoryIcon"><i class="fas fa-history"></i></div>
+                                    <div class="context-label">Storico</div>
+                                    <div class="context-value" id="ctxHistoryValue">--</div>
+                                </div>
+                                <div class="context-card">
+                                    <div class="context-icon" id="ctxScheduleIcon"><i class="fas fa-calendar-week"></i></div>
+                                    <div class="context-label">Calendario</div>
+                                    <div class="context-value" id="ctxScheduleValue">--</div>
+                                </div>
+                                <div class="context-card">
+                                    <div class="context-icon" id="ctxFeedbackIcon"><i class="fas fa-comment"></i></div>
+                                    <div class="context-label">Feedback</div>
+                                    <div class="context-value" id="ctxFeedbackValue">--</div>
+                                </div>
+                                <div class="context-card">
+                                    <div class="context-icon" id="ctxWearableIcon"><i class="fas fa-watch"></i></div>
+                                    <div class="context-label">Wearable</div>
+                                    <div class="context-value" id="ctxWearableValue">--</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 🧠 ATLAS INTELLIGENCE WIDGET -->
+                        <div class="config-section" id="intelligenceSection" style="display:none;">
+                            <div class="config-section-title">
+                                <i class="fas fa-shield-alt"></i>
+                                ATLAS Guardian - Stato Sistema
+                            </div>
+                            <div class="intelligence-widget">
+                                <div class="readiness-circle" id="readinessCircle">
+                                    <div class="readiness-value" id="readinessValue">--</div>
+                                    <div class="readiness-label">READINESS</div>
+                                </div>
+                                <div class="intelligence-details">
+                                    <div class="intel-row">
+                                        <span class="intel-label"><i class="fas fa-brain"></i> CNS</span>
+                                        <span class="intel-value" id="intelCNS">--</span>
+                                    </div>
+                                    <div class="intel-row">
+                                        <span class="intel-label"><i class="fas fa-heartbeat"></i> Recovery</span>
+                                        <span class="intel-value" id="intelRecovery">--</span>
+                                    </div>
+                                    <div class="intel-row">
+                                        <span class="intel-label"><i class="fas fa-exclamation-triangle"></i> Risk</span>
+                                        <span class="intel-value" id="intelRisk">--</span>
+                                    </div>
+                                </div>
+                                <div class="intel-recommendation" id="intelRecommendation">
+                                    Seleziona un atleta per l'analisi
+                                </div>
+                            </div>
+                            
+                            <!-- 🧠 ATLAS BRAIN WIDGET -->
+                            <div class="brain-widget" id="brainWidget" style="display:none;">
+                                <div class="brain-header">
+                                    <div class="brain-icon">🧠</div>
+                                    <div class="brain-title">
+                                        <h4>ATLAS Neural Cortex</h4>
+                                        <span id="brainProcessingTime">Sistema Cerebrale v1.0</span>
+                                    </div>
+                                    <div class="brain-status ready" id="brainStatus">READY</div>
+                                </div>
+                                
+                                <div class="brain-decision" id="brainDecision">
+                                    <div class="brain-decision-label">Decisione Strategica</div>
+                                    <div class="brain-decision-action" id="brainAction">
+                                        <span id="brainActionText">In attesa...</span>
+                                        <span class="badge moderate" id="brainIntensityBadge">--</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="brain-metrics" id="brainMetrics">
+                                    <div class="brain-metric">
+                                        <div class="brain-metric-value green" id="brainConfidence">--%</div>
+                                        <div class="brain-metric-label">Confidenza</div>
+                                    </div>
+                                    <div class="brain-metric">
+                                        <div class="brain-metric-value" id="brainRPE">--</div>
+                                        <div class="brain-metric-label">RPE Target</div>
+                                    </div>
+                                    <div class="brain-metric">
+                                        <div class="brain-metric-value" id="brainRisk">--%</div>
+                                        <div class="brain-metric-label">Rischio</div>
+                                    </div>
+                                    <div class="brain-metric">
+                                        <div class="brain-metric-value" id="brainMuscles">--</div>
+                                        <div class="brain-metric-label">Muscoli</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="brain-reasoning" id="brainReasoningSection">
+                                    <div class="brain-reasoning-title">
+                                        <i class="fas fa-lightbulb"></i> Reasoning
+                                    </div>
+                                    <ul class="brain-reasoning-list" id="brainReasoningList">
+                                        <li>In attesa di analisi...</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="brain-prediction" id="brainPredictionSection" style="display:none;">
+                                    <div class="brain-prediction-title">
+                                        <i class="fas fa-crystal-ball"></i> 🔮 Previsione Post-Workout
+                                    </div>
+                                    <div class="brain-prediction-grid">
+                                        <div class="brain-pred-item">
+                                            <div class="brain-pred-value" id="brainPredCNS">--%</div>
+                                            <div class="brain-pred-label">CNS Dopo</div>
+                                        </div>
+                                        <div class="brain-pred-item">
+                                            <div class="brain-pred-value" id="brainPredReadiness">--%</div>
+                                            <div class="brain-pred-label">Readiness Domani</div>
+                                        </div>
+                                        <div class="brain-pred-item">
+                                            <div class="brain-pred-value" id="brainPredDOMS">--</div>
+                                            <div class="brain-pred-label">DOMS Attesi</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Learning Widget -->
+                        <div class="learning-widget" id="learningWidget" style="display:none;">
+                            <div class="learning-header">
+                                <div class="learning-title">
+                                    <i class="fas fa-graduation-cap"></i> 🧬 Apprendimento Atleta
+                                </div>
+                                <div class="learning-sessions" id="learningSessions">0 sessioni</div>
+                            </div>
+                            
+                            <div class="learning-progress" id="learningProgress">
+                                <div class="learning-progress-bar" id="learningProgressBar" style="width:0%"></div>
+                            </div>
+                            <div class="learning-progress-label" id="learningProgressLabel">Completa 3 sessioni per attivare l'apprendimento</div>
+                            
+                            <div class="learning-multipliers" id="learningMultipliers" style="display:none;">
+                                <div class="learning-mult">
+                                    <div class="learning-mult-icon">💪</div>
+                                    <div class="learning-mult-value" id="learnIntensity">1.00×</div>
+                                    <div class="learning-mult-label">Intensità</div>
+                                </div>
+                                <div class="learning-mult">
+                                    <div class="learning-mult-icon">📊</div>
+                                    <div class="learning-mult-value" id="learnVolume">1.00×</div>
+                                    <div class="learning-mult-label">Volume</div>
+                                </div>
+                                <div class="learning-mult">
+                                    <div class="learning-mult-icon">🔄</div>
+                                    <div class="learning-mult-value" id="learnRecovery">1.00×</div>
+                                    <div class="learning-mult-label">Recupero</div>
+                                </div>
+                                <div class="learning-mult">
+                                    <div class="learning-mult-icon">🎯</div>
+                                    <div class="learning-mult-value" id="learnRPE">0</div>
+                                    <div class="learning-mult-label">RPE Bias</div>
+                                </div>
+                            </div>
+                            
+                            <div class="learning-insights" id="learningInsights" style="display:none;">
+                                <div class="learning-insight-title">💡 Insights Appresi</div>
+                                <ul class="learning-insight-list" id="learningInsightList">
+                                </ul>
+                            </div>
+                            
+                            <div class="learning-warnings" id="learningWarnings" style="display:none;">
+                                <div class="learning-warning-title">⚠️ Attenzione</div>
+                                <ul class="learning-warning-list" id="learningWarningList">
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Structural Balance Widget -->
+                        <div class="structural-widget" id="structuralWidget" style="display:none;">
+                            <div class="structural-header">
+                                <div class="structural-title">
+                                    ⚖️ Bilancio Strutturale
+                                </div>
+                                <div class="structural-score">
+                                    <span class="structural-score-value good" id="structuralScore">--</span>
+                                    <span class="structural-quality estimated" id="structuralQuality">Stimato</span>
+                                </div>
+                            </div>
+                            
+                            <div class="structural-ratios" id="structuralRatios">
+                                <div class="structural-ratio">
+                                    <div class="structural-ratio-header">
+                                        <span class="structural-ratio-name">H/Q</span>
+                                        <span class="structural-ratio-status optimal"></span>
+                                    </div>
+                                    <div class="structural-ratio-bar">
+                                        <div class="structural-ratio-fill optimal" style="width:70%"></div>
+                                    </div>
+                                    <div class="structural-ratio-value">--</div>
+                                </div>
+                                <div class="structural-ratio">
+                                    <div class="structural-ratio-header">
+                                        <span class="structural-ratio-name">Pull/Push</span>
+                                        <span class="structural-ratio-status optimal"></span>
+                                    </div>
+                                    <div class="structural-ratio-bar">
+                                        <div class="structural-ratio-fill optimal" style="width:70%"></div>
+                                    </div>
+                                    <div class="structural-ratio-value">--</div>
+                                </div>
+                            </div>
+                            
+                            <div class="structural-imbalances" id="structuralImbalances" style="display:none;">
+                                <div class="structural-imbalance-title">🚨 Squilibri Rilevati</div>
+                                <div id="structuralImbalanceList"></div>
+                            </div>
+                        </div>
+
+                        <!-- 🔮 Digital Twin Widget -->
+                        <div class="digital-twin-widget" id="digitalTwinWidget" style="display:none;">
+                            <div class="digital-twin-header">
+                                <div class="digital-twin-title">
+                                    <i class="fas fa-clone"></i> 🔮 Digital Twin
+                                </div>
+                                <span style="font-size:10px;color:#3b82f6;">Simulazione Banister</span>
+                            </div>
+                            
+                            <div class="digital-twin-chart" id="twinChart">
+                                <canvas id="digitalTwinCanvas" style="width:100%;height:120px;"></canvas>
+                            </div>
+                            
+                            <div class="digital-twin-stats">
+                                <div class="twin-stat">
+                                    <div class="twin-stat-value" id="twinFitness">--</div>
+                                    <div class="twin-stat-label">Fitness</div>
+                                </div>
+                                <div class="twin-stat">
+                                    <div class="twin-stat-value" id="twinFatigue" style="color:#ef4444;">--</div>
+                                    <div class="twin-stat-label">Fatica</div>
+                                </div>
+                                <div class="twin-stat">
+                                    <div class="twin-stat-value" id="twinPerformance" style="color:#22c55e;">--</div>
+                                    <div class="twin-stat-label">Perf.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 🏆 Competition Peaking Widget -->
+                        <div class="competition-widget" id="competitionWidget" style="display:none;">
+                            <div class="competition-header">
+                                <div class="competition-title">
+                                    <i class="fas fa-trophy"></i> 🏆 Prossima Gara
+                                </div>
+                            </div>
+                            
+                            <div class="competition-countdown" id="compCountdown">--</div>
+                            <div class="competition-countdown-label">giorni alla gara</div>
+                            
+                            <div class="competition-phases" id="compPhases">
+                                <div class="competition-phase completed"></div>
+                                <div class="competition-phase completed"></div>
+                                <div class="competition-phase active"></div>
+                                <div class="competition-phase"></div>
+                            </div>
+                            
+                            <div class="competition-info">
+                                <span id="compPhaseLabel">Fase: Taper</span>
+                                <span id="compReadiness">Readiness: 82%</span>
+                            </div>
+                            
+                            <button class="competition-btn" onclick="openCompetitionModal()">
+                                <i class="fas fa-calendar-plus"></i> Pianifica Gara
+                            </button>
+                        </div>
+
+                        <!-- Weekly Schedule -->
+                        <div class="config-section">
+                            <div class="config-section-title">
+                                <i class="fas fa-calendar-week"></i>
+                                Calendario Settimanale
+                            </div>
+                            <div class="week-schedule-grid" id="weekScheduleGrid">
+                                <div class="week-day" data-day="monday">
+                                    <span class="week-day-label">LUN</span>
+                                    <select class="week-day-select">
+                                        <option value="">-</option>
+                                        <option value="gr_perform">🏋️ GR Perform</option>
+                                        <option value="team_training">⚽ Squadra</option>
+                                        <option value="technical">🎯 Tecnica</option>
+                                        <option value="match">🏆 Partita</option>
+                                        <option value="rest">😴 Riposo</option>
+                                    </select>
+                                </div>
+                                <div class="week-day" data-day="tuesday">
+                                    <span class="week-day-label">MAR</span>
+                                    <select class="week-day-select">
+                                        <option value="">-</option>
+                                        <option value="gr_perform">🏋️ GR Perform</option>
+                                        <option value="team_training">⚽ Squadra</option>
+                                        <option value="technical">🎯 Tecnica</option>
+                                        <option value="match">🏆 Partita</option>
+                                        <option value="rest">😴 Riposo</option>
+                                    </select>
+                                </div>
+                                <div class="week-day" data-day="wednesday">
+                                    <span class="week-day-label">MER</span>
+                                    <select class="week-day-select">
+                                        <option value="">-</option>
+                                        <option value="gr_perform">🏋️ GR Perform</option>
+                                        <option value="team_training">⚽ Squadra</option>
+                                        <option value="technical">🎯 Tecnica</option>
+                                        <option value="match">🏆 Partita</option>
+                                        <option value="rest">😴 Riposo</option>
+                                    </select>
+                                </div>
+                                <div class="week-day" data-day="thursday">
+                                    <span class="week-day-label">GIO</span>
+                                    <select class="week-day-select">
+                                        <option value="">-</option>
+                                        <option value="gr_perform">🏋️ GR Perform</option>
+                                        <option value="team_training">⚽ Squadra</option>
+                                        <option value="technical">🎯 Tecnica</option>
+                                        <option value="match">🏆 Partita</option>
+                                        <option value="rest">😴 Riposo</option>
+                                    </select>
+                                </div>
+                                <div class="week-day" data-day="friday">
+                                    <span class="week-day-label">VEN</span>
+                                    <select class="week-day-select">
+                                        <option value="">-</option>
+                                        <option value="gr_perform">🏋️ GR Perform</option>
+                                        <option value="team_training">⚽ Squadra</option>
+                                        <option value="technical">🎯 Tecnica</option>
+                                        <option value="match">🏆 Partita</option>
+                                        <option value="rest">😴 Riposo</option>
+                                    </select>
+                                </div>
+                                <div class="week-day" data-day="saturday">
+                                    <span class="week-day-label">SAB</span>
+                                    <select class="week-day-select">
+                                        <option value="">-</option>
+                                        <option value="gr_perform">🏋️ GR Perform</option>
+                                        <option value="team_training">⚽ Squadra</option>
+                                        <option value="technical">🎯 Tecnica</option>
+                                        <option value="match">🏆 Partita</option>
+                                        <option value="rest">😴 Riposo</option>
+                                    </select>
+                                </div>
+                                <div class="week-day" data-day="sunday">
+                                    <span class="week-day-label">DOM</span>
+                                    <select class="week-day-select">
+                                        <option value="">-</option>
+                                        <option value="gr_perform">🏋️ GR Perform</option>
+                                        <option value="team_training">⚽ Squadra</option>
+                                        <option value="technical">🎯 Tecnica</option>
+                                        <option value="match">🏆 Partita</option>
+                                        <option value="rest">😴 Riposo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="week-schedule-info" id="scheduleInfo"></div>
+                            <p class="schedule-hint">
+                                <i class="fas fa-info-circle"></i>
+                                Seleziona i giorni 🏋️ GR Perform per generare gli allenamenti della settimana
+                            </p>
+                        </div>
+
+                        <!-- Anamnesi -->
+                        <div class="config-section">
+                            <div class="config-section-title">
+                                <i class="fas fa-notes-medical"></i>
+                                Anamnesi & Limitazioni
+                            </div>
+                            <div class="anamnesi-list" id="anamnesiList">
+                                <div class="anamnesi-empty">
+                                    <i class="fas fa-check-circle"></i>
+                                    Nessuna limitazione registrata
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-footer">
+                        <button class="generate-btn" id="generateBtn" onclick="generateWeekPlan()">
+                            <i class="fas fa-calendar-week"></i>
+                            Genera Piano Settimanale
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Workout -->
+            <div class="panel-workout">
+                <div class="workout-header">
+                    <div class="workout-title" id="workoutTitle">Workout Preview</div>
+                    <div class="workout-meta-info" id="workoutMetaInfo" style="display:none; gap: 10px; align-items: center; font-size: 0.9em; color: #666;">
+                        <span id="workoutDuration"><i class="fas fa-clock"></i> -- min</span>
+                        <span id="workoutExerciseCount"><i class="fas fa-dumbbell"></i> -- esercizi</span>
+                    </div>
+                    <div id="workoutScore" style="display:none;">
+                        <span class="score-badge b" id="scoreBadge">B 83%</span>
+                    </div>
+                </div>
+                
+                <!-- 🎯 Metodologie applicate -->
+                <div id="workoutMethods" class="workout-methods" style="display:none;"></div>
+
+                <div class="workout-body" id="workoutBody">
+                    <div class="workout-empty">
+                        <i class="fas fa-dumbbell"></i>
+                        <h3>Nessun Workout</h3>
+                        <p>Seleziona un atleta e genera</p>
+                    </div>
+                </div>
+
+                <div class="workout-actions" id="workoutActions">
+                    <button class="action-btn secondary" onclick="exportWorkoutPDF()" title="Esporta PDF">
+                        <i class="fas fa-file-pdf"></i>
+                        Esporta PDF
+                    </button>
+                    <button class="action-btn secondary" onclick="generateWeekPlan()">
+                        <i class="fas fa-sync"></i>
+                        Rigenera Settimana
+                    </button>
+                    <button class="action-btn primary" onclick="saveWorkout()">
+                        <i class="fas fa-save"></i>
+                        Salva Tutti i Workout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/atlas-error-handler.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/scientific-workout-validator.js"></script>
+    <script src="js/atlas-core.js"></script>
+    <script src="js/atlas-memory.js"></script>
+    <script src="js/atlas-temporal.js"></script>
+    <script src="js/atlas-science.js"></script>
+    <script src="js/atlas-principles.js"></script>
+    <script src="js/atlas-templates.js"></script>
+    <script src="js/atlas-periodization.js"></script>
+    <script src="js/atlas-anamnesi.js"></script>
+    <script src="js/atlas-progression.js"></script>
+    <script src="js/atlas-feedback.js"></script>
+    <script src="js/atlas-athlete-learning.js"></script>
+    <script src="js/atlas-recovery.js"></script>
+    <script src="js/atlas-videos.js"></script>
+    <script src="js/atlas-exercise-guides.js"></script>
+    <script src="js/atlas-warmup-intelligence.js"></script>
+    
+    <!-- ATLAS Sports-Specific Modules -->
+    <script src="js/atlas-sports-master.js"></script>
+    <script src="js/atlas-boxing.js"></script>
+    <script src="js/atlas-soccer.js"></script>
+    <script src="js/atlas-basketball.js"></script>
+    <script src="js/atlas-mma.js"></script>
+    <script src="js/atlas-tennis.js"></script>
+    <script src="js/atlas-running.js"></script>
+    <script src="js/atlas-crossfit.js"></script>
+    <script src="js/atlas-cycling.js"></script>
+    <script src="js/atlas-swimming.js"></script>
+    
+    <!-- Training Methods Library -->
+    <script src="js/training-methods.js?v=3"></script>
+    <script src="js/training-methods-advanced.js?v=2"></script>
+    
+    <!-- ATLAS v2.0 NASA-Level Modules -->
+    <script src="js/atlas-macro-planner.js?v=1"></script>
+    <script src="js/atlas-progress-tracker.js?v=1"></script>
+    <script src="js/atlas-week-generator.js?v=1"></script>
+    <script src="js/atlas-auto-adjuster.js?v=1"></script>
+    <script src="js/atlas-structural-balance.js?v=1"></script>
+    
+    <!-- 🛡️ ATLAS Autonomous System - "A Prova di Bomba" -->
+    <script src="js/atlas-athlete-intelligence.js?v=1"></script>
+    <script src="js/atlas-guardian.js?v=1"></script>
+    <script src="js/atlas-autonomous-team.js?v=2"></script>
+    
+    <!-- 🧠 ATLAS Neural Cortex - Sistema Cerebrale -->
+    <script src="js/atlas-neural-cortex.js?v=1"></script>
+    <script src="js/atlas-synaptic-links.js?v=1"></script>
+    <script src="js/atlas-predictive-engine.js?v=1"></script>
+    <script src="js/atlas-brain.js?v=1"></script>
+    
+    <!-- 🧠 ATLAS Exercise Intelligence -->
+    <script src="js/atlas-exercise-intelligence.js?v=1"></script>
+    
+    <!-- 🧬 ATLAS Readiness Engine -->
+    <script src="js/atlas-readiness.js?v=1"></script>
+    
+    <!-- 🆕 ATLAS v2.0 Advanced Modules -->
+    <script src="js/atlas-digital-twin.js?v=1"></script>
+    <script src="js/atlas-competition-peaking.js?v=1"></script>
+    <script src="js/atlas-security.js?v=1"></script>
+    <script src="js/atlas-pdf-export.js?v=1"></script>
+    
+    <script src="js/atlas-complete.js?v=10"></script>
+    
+    <script>
+        // ========================================
+        // STATE
+        // ========================================
+        let athletes = [];
+        let selectedAthlete = null;
+        let athleteContext = {
+            workoutHistory: [],
+            weeklySchedule: null,
+            wearableData: null,
+            feedback: [],
+            anamnesi: { injuries: [], medicalConditions: [] },
+            currentWeek: 1,
+            totalWeeks: 12,
+            phase: 'Accumulazione'
+        };
+        let currentWorkout = null;
+        let currentValidation = null;
+
+        // ========================================
+        // INIT
+        // ========================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Debug: Check if modules loaded
+            console.log('📊 ATLAS Modules Check:');
+            console.log('   ATLASComplete:', typeof ATLASComplete !== 'undefined' ? '✅' : '❌');
+            console.log('   ATLASRecovery:', typeof ATLASRecovery !== 'undefined' ? '✅' : '❌');
+            console.log('   ATLASVideos:', typeof ATLASVideos !== 'undefined' ? '✅' : '❌');
+            console.log('   ATLASExerciseGuides:', typeof ATLASExerciseGuides !== 'undefined' ? '✅' : '❌');
+            console.log('   ATLASNeuralCortex:', typeof ATLASNeuralCortex !== 'undefined' ? '✅' : '❌');
+            console.log('   ATLASAthleteLearning:', typeof ATLASAthleteLearning !== 'undefined' ? '✅' : '❌');
+            console.log('   AtlasStructuralBalance:', typeof AtlasStructuralBalance !== 'undefined' ? '✅' : '❌');
+            if (typeof ATLASComplete !== 'undefined') {
+                console.log('   generateWeeklyPlan:', typeof ATLASComplete.generateWeeklyPlan === 'function' ? '✅' : '❌');
+            }
+            
+            // Initialize exercise guides
+            if (typeof ATLASExerciseGuides !== 'undefined') {
+                ATLASExerciseGuides.init();
+            }
+            
+            await loadAthletes();
+            setupSearch();
+            checkUrlParams();
+            initScheduleListeners();
+        });
+
+        async function loadAthletes() {
+            try {
+                athletes = await supabase.fetch('athletes', '?select=*&order=first_name.asc');
+                renderAthleteList(athletes);
+            } catch (error) {
+                console.error('Error loading athletes:', error);
+            }
+        }
+
+        function setupSearch() {
+            document.getElementById('athleteSearch').addEventListener('input', (e) => {
+                const q = e.target.value.toLowerCase();
+                const filtered = athletes.filter(a => 
+                    `${a.first_name} ${a.last_name}`.toLowerCase().includes(q) ||
+                    (a.sport || '').toLowerCase().includes(q)
+                );
+                renderAthleteList(filtered);
+            });
+        }
+
+        function checkUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const athleteId = params.get('athlete');
+            if (athleteId) {
+                setTimeout(() => selectAthlete(athleteId), 100);
+            }
+        }
+
+        function renderAthleteList(list) {
+            const container = document.getElementById('athleteList');
+            if (!list.length) {
+                container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--gray-500);">Nessun atleta</div>';
+                return;
+            }
+
+            container.innerHTML = list.map(a => {
+                const initials = (a.first_name?.[0] || '') + (a.last_name?.[0] || '');
+                const isSelected = selectedAthlete?.id === a.id;
+                return `
+                    <div class="athlete-card ${isSelected ? 'selected' : ''}" onclick="selectAthlete('${a.id}')">
+                        <div class="athlete-avatar">
+                            ${a.profile_photo ? `<img src="${a.profile_photo}" alt="">` : initials}
+                        </div>
+                        <div class="athlete-info">
+                            <div class="athlete-name">${a.first_name} ${a.last_name}</div>
+                            <div class="athlete-meta">${a.sport || 'N/A'} • ${a.goal || 'N/A'}</div>
+                        </div>
+                        <span class="athlete-badge">${(a.sport || 'FIT').substring(0, 3).toUpperCase()}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ========================================
+        // ATHLETE SELECTION
+        // ========================================
+        async function selectAthlete(id) {
+            selectedAthlete = athletes.find(a => a.id === id);
+            if (!selectedAthlete) return;
+
+            renderAthleteList(athletes);
+            document.getElementById('configEmpty').style.display = 'none';
+            document.getElementById('configContent').classList.add('show');
+
+            const initials = (selectedAthlete.first_name?.[0] || '') + (selectedAthlete.last_name?.[0] || '');
+            document.getElementById('selectedAthleteDisplay').innerHTML = `
+                <div class="athlete-avatar">
+                    ${selectedAthlete.profile_photo ? `<img src="${selectedAthlete.profile_photo}" alt="">` : initials}
+                </div>
+                <div class="selected-athlete-info">
+                    <h2>${selectedAthlete.first_name} ${selectedAthlete.last_name}</h2>
+                    <p>${selectedAthlete.sport || 'Sport N/A'} • ${selectedAthlete.goal || 'Goal N/A'} • ${selectedAthlete.experience_level || 'Intermediate'}</p>
+                </div>
+            `;
+
+            const goalMap = { 'massa': 'ipertrofia', 'ipertrofia': 'ipertrofia', 'forza': 'forza', 'potenza': 'potenza' };
+            document.getElementById('cfgGoal').value = goalMap[(selectedAthlete.goal || '').toLowerCase()] || 'ipertrofia';
+
+            await loadAthleteContext();
+        }
+
+        async function loadAthleteContext() {
+            const id = selectedAthlete.id;
+
+            try {
+                // Workout History
+                const sixMonthsAgo = new Date();
+                sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+                const workouts = await supabase.fetch('workouts', 
+                    `?athlete_id=eq.${id}&created_at=gte.${sixMonthsAgo.toISOString().slice(0,10)}&select=*&order=created_at.desc`
+                ).catch(() => []);
+                athleteContext.workoutHistory = Array.isArray(workouts) ? workouts : [];
+
+                // Weekly Schedule
+                const schedule = await supabase.fetch('weekly_schedule', `?athlete_id=eq.${id}`).then(r => r?.[0]).catch(() => null);
+                athleteContext.weeklySchedule = schedule;
+
+                // Wearable - tabella non disponibile, usa null
+                athleteContext.wearableData = null;
+
+                // Feedback
+                const feedback = await supabase.fetch('workout_session_feedback', `?athlete_id=eq.${id}&order=completed_at.desc&limit=20`).catch(() => []);
+                athleteContext.feedback = Array.isArray(feedback) ? feedback : [];
+
+                // Anamnesi
+                athleteContext.anamnesi = {
+                    injuries: parseArray(selectedAthlete.injuries),
+                    medicalConditions: parseArray(selectedAthlete.medical_conditions)
+                };
+
+                // Week/Phase
+                const completed = athleteContext.workoutHistory.filter(w => w.status === 'completed').length;
+                athleteContext.currentWeek = selectedAthlete.current_week || Math.min(12, Math.max(1, Math.ceil((completed + 1) / 3)));
+                athleteContext.totalWeeks = selectedAthlete.program_weeks || 12;
+                athleteContext.phase = calcPhase(athleteContext.currentWeek, athleteContext.totalWeeks);
+
+                updateContextUI();
+                updateAnamnesiUI();
+                populateWeeklyScheduleUI(athleteContext.weeklySchedule);
+
+            } catch (err) {
+                console.error('Context error:', err);
+            }
+        }
+
+        function parseArray(v) {
+            if (!v) return [];
+            if (Array.isArray(v)) return v;
+            try { return JSON.parse(v); } catch { return String(v).split(',').map(s => s.trim()).filter(Boolean); }
+        }
+
+        function calcPhase(w, t) {
+            const p = w / t;
+            if (p <= 0.4) return 'Accumulazione';
+            if (p <= 0.7) return 'Intensificazione';
+            if (p <= 0.9) return 'Peaking';
+            return 'Deload';
+        }
+
+        function updateContextUI() {
+            document.getElementById('cfgWeek').textContent = `${athleteContext.currentWeek}/${athleteContext.totalWeeks}`;
+            document.getElementById('cfgPhase').textContent = athleteContext.phase;
+
+            const hc = athleteContext.workoutHistory.length;
+            document.getElementById('ctxHistoryIcon').className = `context-icon ${hc > 0 ? 'ok' : ''}`;
+            document.getElementById('ctxHistoryValue').textContent = hc > 0 ? `${hc} workout` : 'Nessuno';
+
+            const hasS = !!athleteContext.weeklySchedule;
+            const days = hasS ? countTrainingDays() : 0;
+            document.getElementById('ctxScheduleIcon').className = `context-icon ${hasS ? 'ok' : ''}`;
+            document.getElementById('ctxScheduleValue').textContent = hasS ? `${days}gg/sett` : 'N/A';
+
+            const fc = athleteContext.feedback.length;
+            document.getElementById('ctxFeedbackIcon').className = `context-icon ${fc > 0 ? 'ok' : ''}`;
+            document.getElementById('ctxFeedbackValue').textContent = fc > 0 ? `${fc} sessioni` : 'Nessuno';
+
+            const hasW = !!athleteContext.wearableData;
+            document.getElementById('ctxWearableIcon').className = `context-icon ${hasW ? 'ok' : ''}`;
+            document.getElementById('ctxWearableValue').textContent = hasW ? 'Connesso' : 'N/A';
+            
+            // Update Intelligence Widget
+            updateIntelligenceWidget();
+            
+            // Update Brain Widget (Neural Cortex)
+            updateBrainWidget();
+        }
+        
+        /**
+         * 🧠 Aggiorna widget ATLAS Intelligence
+         */
+        function updateIntelligenceWidget() {
+            const section = document.getElementById('intelligenceSection');
+            if (!section) return;
+            
+            // Mostra la sezione
+            section.style.display = 'block';
+            
+            // Check se moduli disponibili
+            if (typeof ATLASAthleteIntelligence === 'undefined') {
+                document.getElementById('intelRecommendation').textContent = 
+                    'Modulo Intelligence non caricato';
+                return;
+            }
+            
+            try {
+                // Genera report intelligence
+                const report = ATLASAthleteIntelligence.getFullAthleteReport(
+                    selectedAthlete.id,
+                    athleteContext.workoutHistory || [],
+                    athleteContext.feedback || []
+                );
+                
+                // Readiness Circle
+                const readinessScore = report.readiness?.score || 75;
+                const readinessCircle = document.getElementById('readinessCircle');
+                readinessCircle.style.setProperty('--readiness-pct', `${readinessScore}%`);
+                
+                // Cambia colore in base al livello
+                const readinessColor = readinessScore >= 80 ? 'var(--green)' : 
+                                       readinessScore >= 60 ? 'var(--yellow)' : 'var(--red)';
+                readinessCircle.style.background = 
+                    `conic-gradient(${readinessColor} ${readinessScore}%, var(--gray-700) 0%)`;
+                
+                document.getElementById('readinessValue').textContent = readinessScore + '%';
+                
+                // CNS Status
+                const cnsEl = document.getElementById('intelCNS');
+                const cnsStatus = report.cns?.status || 'moderate';
+                cnsEl.textContent = cnsStatus === 'fresh' ? 'Fresco' : 
+                                    cnsStatus === 'moderate' ? 'Moderato' : 
+                                    cnsStatus === 'fatigued' ? 'Affaticato' : 'Esausto';
+                cnsEl.className = 'intel-value ' + (cnsStatus === 'fresh' ? 'good' : 
+                                                     cnsStatus === 'moderate' ? '' : 
+                                                     cnsStatus === 'fatigued' ? 'warn' : 'bad');
+                
+                // Recovery Status
+                const recoveryEl = document.getElementById('intelRecovery');
+                const recoveryPct = report.muscleRecovery?.averageRecovery || 80;
+                recoveryEl.textContent = recoveryPct + '%';
+                recoveryEl.className = 'intel-value ' + (recoveryPct >= 80 ? 'good' : 
+                                                          recoveryPct >= 60 ? '' : 
+                                                          recoveryPct >= 40 ? 'warn' : 'bad');
+                
+                // Injury Risk
+                const riskEl = document.getElementById('intelRisk');
+                const riskLevel = report.injuryRisk?.level || 'low';
+                riskEl.textContent = riskLevel === 'low' ? 'Basso' : 
+                                     riskLevel === 'medium' ? 'Medio' : 'Alto';
+                riskEl.className = 'intel-value ' + (riskLevel === 'low' ? 'good' : 
+                                                      riskLevel === 'medium' ? 'warn' : 'bad');
+                
+                // Recommendation
+                const recEl = document.getElementById('intelRecommendation');
+                const recommendation = report.readiness?.recommendation || 
+                    report.recommendations?.[0]?.description || 
+                    'Sistema pronto per generare workout';
+                recEl.textContent = '💡 ' + recommendation;
+                
+                // Stile recommendation box
+                recEl.className = 'intel-recommendation ' + (
+                    readinessScore >= 80 ? 'safe' : 
+                    readinessScore >= 60 ? '' : 'caution'
+                );
+                
+                console.log('🧠 Intelligence widget updated:', {
+                    readiness: readinessScore,
+                    cns: cnsStatus,
+                    recovery: recoveryPct,
+                    risk: riskLevel
+                });
+                
+            } catch (err) {
+                console.error('Intelligence widget error:', err);
+                document.getElementById('intelRecommendation').textContent = 
+                    '⚠️ Errore analisi: ' + err.message;
+            }
+        }
+
+        /**
+         * 🧠 Aggiorna Brain Widget con output Neural Cortex
+         */
+        function updateBrainWidget() {
+            const widget = document.getElementById('brainWidget');
+            if (!widget) return;
+            
+            // Verifica che ATLASBrain sia disponibile
+            if (typeof ATLASBrain === 'undefined') {
+                console.log('ATLASBrain not loaded yet');
+                return;
+            }
+            
+            // Mostra widget
+            widget.style.display = 'block';
+            
+            // Imposta status "thinking"
+            const statusEl = document.getElementById('brainStatus');
+            statusEl.textContent = 'THINKING';
+            statusEl.className = 'brain-status thinking';
+            
+            try {
+                // Prepara profilo per Brain
+                const profile = {
+                    ...selectedAthlete,
+                    quickCheck: athleteContext.quickCheck || {
+                        energy: 7,
+                        soreness: 4,
+                        motivation: 7,
+                        sleep: 6
+                    },
+                    weekly_schedule: athleteContext.weeklySchedule || getWeeklyScheduleFromUI(),
+                    injuries: athleteContext.anamnesi?.injuries || [],
+                    phase: athleteContext.phase || 'accumulo'
+                };
+                
+                // Ottieni giorno corrente
+                const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+                const today = days[new Date().getDay()];
+                
+                // Esegui Brain processing
+                const result = ATLASBrain.think(profile, {
+                    history: athleteContext.workoutHistory || [],
+                    targetDay: today,
+                    phase: athleteContext.phase
+                });
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Brain processing failed');
+                }
+                
+                // Aggiorna status
+                if (result.emergency) {
+                    statusEl.textContent = 'EMERGENCY';
+                    statusEl.className = 'brain-status alert';
+                } else if (result.decision.risk?.level > 0.5) {
+                    statusEl.textContent = 'ALERT';
+                    statusEl.className = 'brain-status alert';
+                } else {
+                    statusEl.textContent = 'READY';
+                    statusEl.className = 'brain-status ready';
+                }
+                
+                // Processing time
+                document.getElementById('brainProcessingTime').textContent = 
+                    `Processato in ${result.meta?.processingTime || 0}ms`;
+                
+                // Decision action
+                const actionMap = {
+                    'NORMAL_WORKOUT': '💪 Workout Normale',
+                    'RECOVERY_FOCUS': '🧘 Focus Recupero',
+                    'REST_DAY': '😴 Giorno Riposo',
+                    'DELOAD': '📉 Deload',
+                    'PRE_COMPETITION': '🏆 Pre-Gara',
+                    'MINIMAL_SESSION': '🎯 Sessione Minima'
+                };
+                document.getElementById('brainActionText').textContent = 
+                    actionMap[result.decision.action] || result.decision.action;
+                
+                // Intensity badge
+                const intensityBadge = document.getElementById('brainIntensityBadge');
+                intensityBadge.textContent = (result.decision.intensity || 'moderate').toUpperCase();
+                intensityBadge.className = 'badge ' + (result.decision.intensity || 'moderate');
+                
+                // Metrics
+                const confidence = Math.round((result.confidence?.value || 0.7) * 100);
+                const confEl = document.getElementById('brainConfidence');
+                confEl.textContent = confidence + '%';
+                confEl.className = 'brain-metric-value ' + (confidence >= 70 ? 'green' : confidence >= 50 ? 'yellow' : 'red');
+                
+                document.getElementById('brainRPE').textContent = 
+                    result.decision.parameters?.targetRPE || '--';
+                
+                const risk = Math.round((result.decision.risk?.level || 0) * 100);
+                const riskEl = document.getElementById('brainRisk');
+                riskEl.textContent = risk + '%';
+                riskEl.className = 'brain-metric-value ' + (risk <= 30 ? 'green' : risk <= 60 ? 'yellow' : 'red');
+                
+                const muscles = result.decision.targets?.muscles || [];
+                document.getElementById('brainMuscles').textContent = muscles.length;
+                
+                // Reasoning
+                const reasoningList = document.getElementById('brainReasoningList');
+                const reasoning = result.reasoning || [];
+                if (reasoning.length > 0) {
+                    reasoningList.innerHTML = reasoning.slice(0, 5).map(r => `<li>${r}</li>`).join('');
+                } else {
+                    reasoningList.innerHTML = '<li>Analisi standard completata</li>';
+                }
+                
+                // Prediction
+                const predSection = document.getElementById('brainPredictionSection');
+                if (result.prediction) {
+                    predSection.style.display = 'block';
+                    document.getElementById('brainPredCNS').textContent = 
+                        (result.prediction.cnsAfter || '--') + '%';
+                    document.getElementById('brainPredReadiness').textContent = 
+                        (result.prediction.readinessTomorrow || '--') + '%';
+                    document.getElementById('brainPredDOMS').textContent = 
+                        result.prediction.domsExpected || '--';
+                } else {
+                    predSection.style.display = 'none';
+                }
+                
+                // Salva risultato per uso in generazione
+                window.lastBrainResult = result;
+                
+                console.log('🧠 Brain widget updated:', result.decision.action);
+                
+                // Aggiorna anche Learning Widget
+                updateLearningWidget();
+                
+                // Aggiorna Structural Balance Widget
+                updateStructuralWidget();
+                
+                // Aggiorna Digital Twin Widget
+                updateDigitalTwinWidget();
+                
+                // Aggiorna Competition Widget
+                updateCompetitionWidget();
+                
+            } catch (err) {
+                console.error('Brain widget error:', err);
+                statusEl.textContent = 'ERROR';
+                statusEl.className = 'brain-status alert';
+                document.getElementById('brainActionText').textContent = '⚠️ Errore: ' + err.message;
+            }
+        }
+
+        /**
+         * 🧬 Aggiorna Learning Widget con dati da ATLASAthleteLearning
+         */
+        function updateLearningWidget() {
+            const widget = document.getElementById('learningWidget');
+            if (!widget) return;
+            
+            // Verifica che ATLASAthleteLearning sia disponibile
+            if (typeof ATLASAthleteLearning === 'undefined') {
+                console.log('ATLASAthleteLearning not loaded yet');
+                return;
+            }
+            
+            if (!selectedAthlete?.id) return;
+            
+            // Mostra widget
+            widget.style.display = 'block';
+            
+            try {
+                const stats = ATLASAthleteLearning.getStats(selectedAthlete.id);
+                const model = ATLASAthleteLearning.getModel(selectedAthlete.id);
+                
+                // Sessions
+                document.getElementById('learningSessions').textContent = 
+                    `${stats.sessionsAnalyzed} sessioni`;
+                
+                // Progress bar (3 = minimo, 20 = maturo)
+                const progress = Math.min(100, (stats.sessionsAnalyzed / 20) * 100);
+                document.getElementById('learningProgressBar').style.width = progress + '%';
+                
+                // Progress label
+                const progressLabel = document.getElementById('learningProgressLabel');
+                if (stats.sessionsAnalyzed < 3) {
+                    progressLabel.textContent = `Completa ${3 - stats.sessionsAnalyzed} sessioni per attivare l'apprendimento`;
+                } else if (stats.sessionsAnalyzed < 10) {
+                    progressLabel.textContent = `Profilo in costruzione (${stats.sessionsAnalyzed}/10)`;
+                } else if (stats.sessionsAnalyzed < 20) {
+                    progressLabel.textContent = `Profilo avanzato (${stats.sessionsAnalyzed}/20)`;
+                } else {
+                    progressLabel.textContent = `✅ Profilo maturo - Apprendimento attivo`;
+                }
+                
+                // Mostra multipliers se abbiamo abbastanza dati
+                const multipliersSection = document.getElementById('learningMultipliers');
+                if (stats.sessionsAnalyzed >= 3) {
+                    multipliersSection.style.display = 'grid';
+                    
+                    // Intensity
+                    const intEl = document.getElementById('learnIntensity');
+                    const intVal = parseFloat(stats.intensityMultiplier);
+                    intEl.textContent = stats.intensityMultiplier + '×';
+                    intEl.className = 'learning-mult-value ' + (intVal > 1.05 ? 'positive' : intVal < 0.95 ? 'negative' : '');
+                    
+                    // Volume
+                    const volEl = document.getElementById('learnVolume');
+                    const volVal = parseFloat(stats.volumeMultiplier);
+                    volEl.textContent = stats.volumeMultiplier + '×';
+                    volEl.className = 'learning-mult-value ' + (volVal > 1.05 ? 'positive' : volVal < 0.95 ? 'negative' : '');
+                    
+                    // Recovery
+                    const recEl = document.getElementById('learnRecovery');
+                    const recVal = parseFloat(stats.recoveryMultiplier);
+                    recEl.textContent = stats.recoveryMultiplier + '×';
+                    recEl.className = 'learning-mult-value ' + (recVal > 1.1 ? 'negative' : recVal < 0.9 ? 'positive' : '');
+                    
+                    // RPE Bias
+                    const rpeEl = document.getElementById('learnRPE');
+                    const rpeBias = parseFloat(stats.rpeBias);
+                    rpeEl.textContent = (rpeBias > 0 ? '+' : '') + stats.rpeBias;
+                    rpeEl.className = 'learning-mult-value ' + (Math.abs(rpeBias) > 0.5 ? 'negative' : '');
+                } else {
+                    multipliersSection.style.display = 'none';
+                }
+                
+                // Insights
+                const insightsSection = document.getElementById('learningInsights');
+                const insightsList = document.getElementById('learningInsightList');
+                const recommendations = ATLASAthleteLearning.getRecommendations(selectedAthlete.id);
+                
+                const insights = recommendations.filter(r => r.type !== 'pain_prevention' && r.type !== 'info');
+                if (insights.length > 0) {
+                    insightsSection.style.display = 'block';
+                    insightsList.innerHTML = insights.slice(0, 4).map(r => `<li>${r.message}</li>`).join('');
+                } else {
+                    insightsSection.style.display = 'none';
+                }
+                
+                // Warnings
+                const warningsSection = document.getElementById('learningWarnings');
+                const warningsList = document.getElementById('learningWarningList');
+                
+                const warnings = [];
+                if (stats.bannedExercises > 0) {
+                    warnings.push(`${stats.bannedExercises} esercizi bannati per feedback negativo`);
+                }
+                if (stats.chronicPainAreas > 0) {
+                    warnings.push(`${stats.chronicPainAreas} aree con dolore cronico`);
+                }
+                recommendations.filter(r => r.type === 'pain_prevention').forEach(r => {
+                    warnings.push(r.message);
+                });
+                
+                if (warnings.length > 0) {
+                    warningsSection.style.display = 'block';
+                    warningsList.innerHTML = warnings.slice(0, 3).map(w => `<li>${w}</li>`).join('');
+                } else {
+                    warningsSection.style.display = 'none';
+                }
+                
+                console.log('🧬 Learning widget updated:', stats.sessionsAnalyzed, 'sessions');
+                
+            } catch (err) {
+                console.error('Learning widget error:', err);
+                widget.style.display = 'none';
+            }
+        }
+
+        /**
+         * ⚖️ Aggiorna Structural Balance Widget
+         */
+        function updateStructuralWidget() {
+            const widget = document.getElementById('structuralWidget');
+            if (!widget) return;
+            
+            // Verifica che AtlasStructuralBalance sia disponibile
+            if (typeof AtlasStructuralBalance === 'undefined') {
+                console.log('AtlasStructuralBalance not loaded yet');
+                return;
+            }
+            
+            if (!selectedAthlete?.id) return;
+            
+            // Mostra widget
+            widget.style.display = 'block';
+            
+            try {
+                // Crea profilo per stima iniziale se necessario
+                const profile = {
+                    weight: selectedAthlete.weight || selectedAthlete.peso || 75,
+                    gender: selectedAthlete.gender || selectedAthlete.sesso || 'M',
+                    age: selectedAthlete.age || selectedAthlete.eta || 30,
+                    level: selectedAthlete.level || selectedAthlete.experience || selectedAthlete.livello || 'intermedio'
+                };
+                
+                const analysis = AtlasStructuralBalance.getFullAnalysis(selectedAthlete.id, profile);
+                
+                // Score
+                const scoreEl = document.getElementById('structuralScore');
+                const score = analysis.analysis?.balance_score?.score || 50;
+                scoreEl.textContent = score + '/100';
+                scoreEl.className = 'structural-score-value ' + 
+                    (score >= 80 ? 'good' : score >= 60 ? 'warning' : 'bad');
+                
+                // Data quality
+                const qualityEl = document.getElementById('structuralQuality');
+                const quality = analysis.dataQuality || 'estimated';
+                qualityEl.textContent = {
+                    'estimated': 'Stimato',
+                    'partial': 'Parziale',
+                    'good': 'Buono',
+                    'excellent': 'Ottimo'
+                }[quality] || 'Stimato';
+                qualityEl.className = 'structural-quality ' + quality;
+                
+                // Ratios
+                const ratiosEl = document.getElementById('structuralRatios');
+                const ratios = analysis.analysis?.detailed_ratios || {};
+                
+                // Build ratios HTML
+                const ratioHTML = [];
+                
+                // Hamstring/Quad
+                if (ratios.hamstring_quad) {
+                    const r = ratios.hamstring_quad;
+                    const status = r.status || 'optimal';
+                    const value = (r.current * 100).toFixed(0);
+                    const fillWidth = Math.min(100, (r.current / r.ideal) * 100);
+                    ratioHTML.push(`
+                        <div class="structural-ratio">
+                            <div class="structural-ratio-header">
+                                <span class="structural-ratio-name">H/Q</span>
+                                <span class="structural-ratio-status ${status}"></span>
+                            </div>
+                            <div class="structural-ratio-bar">
+                                <div class="structural-ratio-fill ${status}" style="width:${fillWidth}%"></div>
+                            </div>
+                            <div class="structural-ratio-value">${value}%</div>
+                        </div>
+                    `);
+                }
+                
+                // Pull/Push
+                if (ratios.pull_push) {
+                    const r = ratios.pull_push;
+                    const status = r.status || 'optimal';
+                    const value = (r.current * 100).toFixed(0);
+                    const fillWidth = Math.min(100, (r.current / r.ideal) * 100);
+                    ratioHTML.push(`
+                        <div class="structural-ratio">
+                            <div class="structural-ratio-header">
+                                <span class="structural-ratio-name">Pull/Push</span>
+                                <span class="structural-ratio-status ${status}"></span>
+                            </div>
+                            <div class="structural-ratio-bar">
+                                <div class="structural-ratio-fill ${status}" style="width:${fillWidth}%"></div>
+                            </div>
+                            <div class="structural-ratio-value">${value}%</div>
+                        </div>
+                    `);
+                }
+                
+                // External/Internal
+                if (ratios.external_internal_rotation) {
+                    const r = ratios.external_internal_rotation;
+                    const status = r.status || 'optimal';
+                    const value = (r.current * 100).toFixed(0);
+                    const fillWidth = Math.min(100, (r.current / r.ideal) * 100);
+                    ratioHTML.push(`
+                        <div class="structural-ratio">
+                            <div class="structural-ratio-header">
+                                <span class="structural-ratio-name">Ext/Int Rot</span>
+                                <span class="structural-ratio-status ${status}"></span>
+                            </div>
+                            <div class="structural-ratio-bar">
+                                <div class="structural-ratio-fill ${status}" style="width:${fillWidth}%"></div>
+                            </div>
+                            <div class="structural-ratio-value">${value}%</div>
+                        </div>
+                    `);
+                }
+                
+                // Front/Back Squat
+                if (ratios.front_back_squat) {
+                    const r = ratios.front_back_squat;
+                    const status = r.status || 'optimal';
+                    const value = (r.current * 100).toFixed(0);
+                    const fillWidth = Math.min(100, (r.current / r.ideal) * 100);
+                    ratioHTML.push(`
+                        <div class="structural-ratio">
+                            <div class="structural-ratio-header">
+                                <span class="structural-ratio-name">Front/Back</span>
+                                <span class="structural-ratio-status ${status}"></span>
+                            </div>
+                            <div class="structural-ratio-bar">
+                                <div class="structural-ratio-fill ${status}" style="width:${fillWidth}%"></div>
+                            </div>
+                            <div class="structural-ratio-value">${value}%</div>
+                        </div>
+                    `);
+                }
+                
+                if (ratioHTML.length > 0) {
+                    ratiosEl.innerHTML = ratioHTML.join('');
+                }
+                
+                // Imbalances
+                const imbalancesSection = document.getElementById('structuralImbalances');
+                const imbalancesList = document.getElementById('structuralImbalanceList');
+                const issues = analysis.analysis?.issues || [];
+                
+                if (issues.length > 0) {
+                    imbalancesSection.style.display = 'block';
+                    imbalancesList.innerHTML = issues.slice(0, 3).map(i => 
+                        `<div class="structural-imbalance-item">
+                            ${i.type === 'critical' ? '🔴' : '🟡'} ${i.message}
+                        </div>`
+                    ).join('');
+                } else {
+                    imbalancesSection.style.display = 'none';
+                }
+                
+                console.log('⚖️ Structural widget updated:', analysis.dataQuality);
+                
+            } catch (err) {
+                console.error('Structural widget error:', err);
+                widget.style.display = 'none';
+            }
+        }
+
+        /**
+         * 🔮 Aggiorna Digital Twin Widget
+         */
+        // Global Chart instance for Digital Twin
+        let digitalTwinChartInstance = null;
+        
+        function updateDigitalTwinWidget() {
+            const widget = document.getElementById('digitalTwinWidget');
+            if (!widget) return;
+            
+            try {
+                if (typeof ATLASDigitalTwin === 'undefined' || !selectedAthlete) {
+                    widget.style.display = 'none';
+                    return;
+                }
+                
+                widget.style.display = 'block';
+                
+                // Crea o aggiorna twin
+                const twin = ATLASDigitalTwin.create(selectedAthlete.id, {
+                    age: selectedAthlete.eta || 25,
+                    weight: selectedAthlete.peso || 75,
+                    trainingAge: 2
+                });
+                
+                // Simula ultimi 14 giorni
+                const history = athleteContext.workoutHistory || [];
+                const simulation = ATLASDigitalTwin.simulate(selectedAthlete.id, history, 14);
+                
+                // Aggiorna chart con Chart.js
+                const canvas = document.getElementById('digitalTwinCanvas');
+                if (canvas && simulation.timeline) {
+                    const ctx = canvas.getContext('2d');
+                    const data = simulation.timeline.slice(-14);
+                    
+                    // Destroy previous chart if exists
+                    if (digitalTwinChartInstance) {
+                        digitalTwinChartInstance.destroy();
+                    }
+                    
+                    digitalTwinChartInstance = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.map((_, i) => `D${i + 1}`),
+                            datasets: [
+                                {
+                                    label: 'Fitness',
+                                    data: data.map(d => d.fitness),
+                                    borderColor: '#3b82f6',
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 2
+                                },
+                                {
+                                    label: 'Fatica',
+                                    data: data.map(d => d.fatigue),
+                                    borderColor: '#ef4444',
+                                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointRadius: 2
+                                },
+                                {
+                                    label: 'Performance',
+                                    data: data.map(d => d.performance),
+                                    borderColor: '#22c55e',
+                                    backgroundColor: 'transparent',
+                                    borderWidth: 2,
+                                    borderDash: [5, 5],
+                                    tension: 0.4,
+                                    pointRadius: 0
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                x: { 
+                                    display: false
+                                },
+                                y: { 
+                                    display: false,
+                                    min: 0
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Aggiorna stats
+                const current = simulation.timeline?.[simulation.timeline.length - 1] || { fitness: 0, fatigue: 0, performance: 0 };
+                document.getElementById('twinFitness').textContent = current.fitness?.toFixed(0) || '--';
+                document.getElementById('twinFatigue').textContent = current.fatigue?.toFixed(0) || '--';
+                document.getElementById('twinPerformance').textContent = current.performance?.toFixed(0) || '--';
+                
+                console.log('🔮 Digital Twin Chart updated:', current);
+                
+            } catch (err) {
+                console.error('Digital Twin widget error:', err);
+                widget.style.display = 'none';
+            }
+        }
+
+        /**
+         * 🏆 Aggiorna Competition Widget
+         */
+        function updateCompetitionWidget() {
+            const widget = document.getElementById('competitionWidget');
+            if (!widget) return;
+            
+            try {
+                if (typeof ATLASCompetitionPeaking === 'undefined') {
+                    widget.style.display = 'none';
+                    return;
+                }
+                
+                // Controlla se c'è una gara pianificata
+                const savedComp = localStorage.getItem(`atlas_competition_${selectedAthlete?.id}`);
+                
+                if (!savedComp) {
+                    // Mostra widget vuoto con pulsante
+                    widget.style.display = 'block';
+                    document.getElementById('compCountdown').textContent = '--';
+                    document.getElementById('compPhaseLabel').textContent = 'Nessuna gara';
+                    document.getElementById('compReadiness').textContent = '';
+                    return;
+                }
+                
+                const competition = JSON.parse(savedComp);
+                const daysToComp = Math.ceil((new Date(competition.date) - new Date()) / (1000 * 60 * 60 * 24));
+                
+                widget.style.display = 'block';
+                document.getElementById('compCountdown').textContent = daysToComp > 0 ? daysToComp : 'OGGI!';
+                
+                // Determina fase corrente
+                let currentPhase = 'preparation';
+                if (daysToComp <= 7) currentPhase = 'taper';
+                else if (daysToComp <= 14) currentPhase = 'intensification';
+                else if (daysToComp <= 21) currentPhase = 'volume';
+                
+                const phaseLabels = {
+                    preparation: 'Preparazione',
+                    volume: 'Volume',
+                    intensification: 'Intensificazione',
+                    taper: 'Taper'
+                };
+                
+                document.getElementById('compPhaseLabel').textContent = `Fase: ${phaseLabels[currentPhase] || currentPhase}`;
+                
+                // Calcola readiness
+                const readiness = ATLASCompetitionPeaking.assessReadiness(selectedAthlete?.id, athleteContext.workoutHistory || []);
+                document.getElementById('compReadiness').textContent = `Readiness: ${readiness.overall}%`;
+                
+                // Aggiorna fasi visuali
+                const phases = ['preparation', 'volume', 'intensification', 'taper'];
+                const currentIdx = phases.indexOf(currentPhase);
+                const phaseEls = document.querySelectorAll('#compPhases .competition-phase');
+                phaseEls.forEach((el, i) => {
+                    el.className = 'competition-phase';
+                    if (i < currentIdx) el.classList.add('completed');
+                    if (i === currentIdx) el.classList.add('active');
+                });
+                
+                console.log('🏆 Competition widget updated:', daysToComp, 'days');
+                
+            } catch (err) {
+                console.error('Competition widget error:', err);
+                widget.style.display = 'none';
+            }
+        }
+
+        /**
+         * 🏆 Apri modal pianificazione gara
+         */
+        function openCompetitionModal() {
+            const date = prompt('📅 Data della gara (YYYY-MM-DD):');
+            if (!date) return;
+            
+            const name = prompt('🏆 Nome della competizione:') || 'Gara';
+            const category = prompt('📊 Categoria peso (opzionale, es: 75):');
+            
+            try {
+                const competition = {
+                    date: date,
+                    name: name,
+                    weightCategory: category ? parseFloat(category) : null,
+                    createdAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem(`atlas_competition_${selectedAthlete?.id}`, JSON.stringify(competition));
+                
+                // Genera piano se disponibile
+                if (typeof ATLASCompetitionPeaking !== 'undefined') {
+                    const plan = ATLASCompetitionPeaking.createPlan({
+                        athleteId: selectedAthlete?.id,
+                        competitionDate: date,
+                        competitionName: name,
+                        currentWeight: selectedAthlete?.peso,
+                        targetWeight: category ? parseFloat(category) : null,
+                        sport: selectedAthlete?.sport || 'powerlifting'
+                    });
+                    console.log('🏆 Competition plan created:', plan);
+                }
+                
+                updateCompetitionWidget();
+                alert(`✅ Gara "${name}" pianificata per ${date}`);
+                
+            } catch (err) {
+                console.error('Error creating competition:', err);
+                alert('❌ Errore nella creazione del piano');
+            }
+        }
+
+        function countTrainingDays() {
+            if (!athleteContext.weeklySchedule) return 0;
+            return ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].filter(d => {
+                const v = String(athleteContext.weeklySchedule[d] || '').toLowerCase();
+                return ['gr_available','gr_perform','both','training'].includes(v);
+            }).length;
+        }
+
+        function updateAnamnesiUI() {
+            const c = document.getElementById('anamnesiList');
+            const { injuries, medicalConditions } = athleteContext.anamnesi;
+
+            if (!injuries.length && !medicalConditions.length) {
+                c.innerHTML = '<div class="anamnesi-empty"><i class="fas fa-check-circle"></i> Nessuna limitazione</div>';
+                return;
+            }
+
+            c.innerHTML = [
+                ...injuries.map(i => `<span class="anamnesi-tag"><i class="fas fa-band-aid"></i> ${i.replace(/_/g, ' ')}</span>`),
+                ...medicalConditions.map(m => `<span class="anamnesi-tag medical"><i class="fas fa-heartbeat"></i> ${m.replace(/_/g, ' ')}</span>`)
+            ].join('');
+        }
+
+        // ========================================
+        // GENERATION
+        // ========================================
+        
+        let currentWeekPlan = null;
+        let selectedDayIndex = 0;
+        
+        async function generateWeekPlan() {
+            if (!selectedAthlete) return;
+
+            const btn = document.getElementById('generateBtn');
+            const orig = btn.innerHTML;
+
+            try {
+                btn.classList.add('loading');
+                btn.innerHTML = '<i class="fas fa-spinner"></i> Generazione Settimana...';
+                btn.disabled = true;
+
+                // Collect weekly schedule from UI
+                const weeklySchedule = getWeeklyScheduleFromUI();
+
+                const profile = {
+                    athleteId: selectedAthlete.id,
+                    sport: mapSport(selectedAthlete.sport),
+                    goal: document.getElementById('cfgGoal').value,
+                    level: selectedAthlete.experience_level || 'intermediate',
+                    equipment: selectedAthlete.equipment || 'full_gym',
+                    name: selectedAthlete.first_name,
+                    weekNumber: athleteContext.currentWeek,
+                    totalWeeks: athleteContext.totalWeeks,
+                    phase: athleteContext.phase,
+                    injuries: athleteContext.anamnesi.injuries,
+                    medicalConditions: athleteContext.anamnesi.medicalConditions,
+                    anamnesi: athleteContext.anamnesi,
+                    readiness: getReadiness(),
+                    intensity: document.getElementById('cfgIntensity').value
+                };
+
+                // Generate FULL WEEK plan
+                if (typeof ATLASComplete === 'undefined') {
+                    throw new Error('ATLASComplete non caricato. Ricarica la pagina.');
+                }
+                
+                // 🛡️ GUARDIAN CHECK - Prima di generare
+                let guardianWarnings = [];
+                if (typeof ATLASGuardian !== 'undefined') {
+                    const guardianCheck = ATLASGuardian.quickReadinessCheck({
+                        cnsRecovery: 80, // Default se non disponibile
+                        consecutiveTrainingDays: athleteContext.workoutHistory.length > 0 ? 
+                            Math.min(6, athleteContext.workoutHistory.filter(w => {
+                                const d = new Date(w.created_at);
+                                return (Date.now() - d.getTime()) < 7 * 24 * 60 * 60 * 1000;
+                            }).length) : 0,
+                        lastSleepScore: athleteContext.feedback[0]?.sleep || 7,
+                        currentPain: Math.max(...(athleteContext.feedback.slice(0, 3).map(f => f.pain_level || 0)), 0)
+                    });
+                    
+                    console.log('🛡️ Guardian Check:', guardianCheck);
+                    
+                    if (!guardianCheck.canTrain) {
+                        guardianWarnings.push({
+                            type: 'critical',
+                            message: guardianCheck.recommendation
+                        });
+                    } else if (guardianCheck.level === 'caution') {
+                        guardianWarnings.push({
+                            type: 'warning',
+                            message: guardianCheck.recommendation
+                        });
+                        // Forza deload se caution
+                        profile.intensity = 'light';
+                    }
+                    
+                    profile.guardianCheck = guardianCheck;
+                }
+                
+                if (typeof ATLASComplete.generateWeeklyPlan !== 'function') {
+                    console.warn('generateWeeklyPlan not available, falling back to single workout');
+                    // Fallback to single workout generation
+                    const singleWorkout = ATLASComplete.generateWorkout(profile);
+                    currentWeekPlan = {
+                        success: true,
+                        workouts: [{ ...singleWorkout, dayName: 'Workout', dayOfWeek: 'today' }],
+                        split: { name: 'Single Workout' }
+                    };
+                    renderWeekPlan(currentWeekPlan);
+                    return;
+                }
+                
+                const weekPlan = ATLASComplete.generateWeeklyPlan(
+                    profile, 
+                    weeklySchedule, 
+                    athleteContext.workoutHistory
+                );
+
+                if (!weekPlan.success) {
+                    alert(weekPlan.error || 'Errore nella generazione');
+                    return;
+                }
+
+                currentWeekPlan = weekPlan;
+                selectedDayIndex = 0;
+
+                // Aggiorna statistiche globali ATLAS
+                updateGlobalATLASStats(weekPlan);
+
+                // Render the week plan with guardian warnings
+                renderWeekPlan(weekPlan, guardianWarnings);
+
+            } catch (err) {
+                console.error('Gen error:', err);
+                alert('Errore: ' + err.message);
+            } finally {
+                btn.innerHTML = orig;
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        // Alias for backward compatibility
+        async function generateWorkout() {
+            return generateWeekPlan();
+        }
+
+        /**
+         * 📊 Aggiorna statistiche globali ATLAS per dashboard
+         */
+        function updateGlobalATLASStats(weekPlan) {
+            try {
+                const stats = JSON.parse(localStorage.getItem('atlas_global_stats') || '{}');
+                
+                // Incrementa contatore workout
+                stats.totalWorkouts = (stats.totalWorkouts || 0) + (weekPlan.workouts?.length || 1);
+                
+                // Calcola score medio
+                const scores = weekPlan.workouts?.map(w => w.validation?.score || 0).filter(s => s > 0) || [];
+                if (scores.length > 0) {
+                    const avgNew = scores.reduce((a, b) => a + b, 0) / scores.length;
+                    const prevAvg = stats.averageScore || avgNew;
+                    const prevCount = stats.scoreCount || 0;
+                    stats.averageScore = ((prevAvg * prevCount) + (avgNew * scores.length)) / (prevCount + scores.length);
+                    stats.scoreCount = prevCount + scores.length;
+                }
+                
+                // Last generation
+                stats.lastGeneration = new Date().toISOString();
+                
+                localStorage.setItem('atlas_global_stats', JSON.stringify(stats));
+                console.log('📊 ATLAS stats updated:', stats);
+                
+            } catch (err) {
+                console.error('Error updating ATLAS stats:', err);
+            }
+        }
+
+        function renderWeekPlan(weekPlan, guardianWarnings = []) {
+            const workouts = weekPlan.workouts;
+            
+            // Update title
+            document.getElementById('workoutTitle').textContent = `Piano Settimanale - ${weekPlan.split.name}`;
+            
+            // Show score
+            const scoreEl = document.getElementById('workoutScore');
+            const badgeEl = document.getElementById('scoreBadge');
+            scoreEl.style.display = 'block';
+            badgeEl.textContent = `${weekPlan.statistics.averageScore}%`;
+            badgeEl.className = `score-badge ${weekPlan.statistics.averageScore >= 80 ? 'a' : 'b'}`;
+            
+            // Guardian warnings banner
+            let warningsHtml = '';
+            if (guardianWarnings && guardianWarnings.length > 0) {
+                warningsHtml = '<div class="guardian-warnings">';
+                guardianWarnings.forEach(w => {
+                    const icon = w.type === 'critical' ? 'fa-exclamation-circle' : 'fa-shield-alt';
+                    const colorClass = w.type === 'critical' ? 'critical' : 'warning';
+                    warningsHtml += `
+                        <div class="guardian-warning ${colorClass}">
+                            <i class="fas ${icon}"></i>
+                            <span>${w.message}</span>
+                        </div>
+                    `;
+                });
+                warningsHtml += '</div>';
+            }
+            
+            // Build day tabs
+            let tabsHtml = '<div class="week-tabs">';
+            workouts.forEach((w, i) => {
+                tabsHtml += `
+                    <button class="week-tab ${i === 0 ? 'active' : ''}" onclick="selectDay(${i})">
+                        <span class="tab-day">${w.dayName.substring(0, 3)}</span>
+                        <span class="tab-focus">${w.sessionFocus?.name || 'Workout'}</span>
+                    </button>
+                `;
+            });
+            tabsHtml += '</div>';
+            
+            // Build workout content
+            let contentHtml = '<div class="week-content">';
+            workouts.forEach((w, i) => {
+                contentHtml += `<div class="day-workout ${i === 0 ? 'active' : ''}" id="day-workout-${i}">`;
+                contentHtml += renderDayWorkout(w);
+                contentHtml += '</div>';
+            });
+            contentHtml += '</div>';
+            
+            document.getElementById('workoutBody').innerHTML = warningsHtml + tabsHtml + contentHtml;
+            document.getElementById('workoutActions').classList.add('show');
+            
+            // Update current workout reference
+            if (workouts.length > 0) {
+                currentWorkout = workouts[0];
+                currentValidation = workouts[0].validation;
+            }
+        }
+        
+        function selectDay(index) {
+            selectedDayIndex = index;
+            
+            // Update tabs
+            document.querySelectorAll('.week-tab').forEach((tab, i) => {
+                tab.classList.toggle('active', i === index);
+            });
+            
+            // Update content
+            document.querySelectorAll('.day-workout').forEach((content, i) => {
+                content.classList.toggle('active', i === index);
+            });
+            
+            // Update current workout reference
+            if (currentWeekPlan && currentWeekPlan.workouts[index]) {
+                currentWorkout = currentWeekPlan.workouts[index];
+                currentValidation = currentWorkout.validation;
+            }
+        }
+        
+        function renderDayWorkout(w) {
+            let exercises = w.exercises || [];
+            let html = '';
+            
+            // ═══════════════════════════════════════════════════════════════════
+            // INTELLIGENT WARMUP GENERATION (RAMP Protocol)
+            // ═══════════════════════════════════════════════════════════════════
+            let intelligentWarmup = null;
+            if (typeof WarmupIntelligence !== 'undefined') {
+                try {
+                    // Identifica esercizi di warmup esistenti (per rimuoverli)
+                    const warmupKeywords = ['warm', 'stretch', 'mobility', 'activation', 'jump rope', 'shadow boxing light', 'dynamic'];
+                    const isWarmupExercise = (e) => {
+                        if (e.phase === 'warmup' || e.type === 'warmup' || e.type === 'mobility') return true;
+                        const name = (e.name || '').toLowerCase();
+                        return warmupKeywords.some(kw => name.includes(kw));
+                    };
+                    
+                    // Separa esercizi main da warmup
+                    const mainExercises = exercises.filter(e => !isWarmupExercise(e));
+                    
+                    // Genera warmup intelligente basato sul contesto
+                    intelligentWarmup = WarmupIntelligence.generateWarmup({
+                        exercises: mainExercises,
+                        sport: athleteContext.sport || 'palestra',
+                        weekNumber: athleteContext.currentWeek || 1,
+                        totalWeeks: athleteContext.totalWeeks || 12,
+                        timeOfDay: getTimeOfDay(),
+                        injuryHistory: athleteContext.anamnesi?.injuries || [],
+                        mobilityIssues: athleteContext.anamnesi?.mobilityIssues || [],
+                        maxDuration: 12
+                    });
+                    
+                    // Converti warmup intelligente in formato esercizi
+                    const warmupExercises = WarmupIntelligence.toWorkoutExercises(intelligentWarmup);
+                    
+                    // Sostituisci: nuovo warmup + esercizi principali
+                    exercises = [...warmupExercises, ...mainExercises];
+                    
+                    console.log('🔥 RAMP Warmup Generated:', intelligentWarmup.phases.map(p => p.name).join(' → '));
+                    
+                } catch (err) {
+                    console.warn('Warmup Intelligence error:', err);
+                }
+            }
+            
+            // Session header
+            const methodLabels = {
+                'superset': '🔄 Superset',
+                'drop_set': '⬇️ Drop Set',
+                'rest_pause': '⏸️ Rest-Pause',
+                'myo_reps': '💪 Myo-Reps',
+                'tempo_training': '⏱️ Tempo',
+                'contrast_training': '⚡ PAP/Contrasto',
+                'giant_set': '🦾 Giant Set',
+                'cluster': '🔗 Cluster Set',
+                'circuit': '🔁 Circuit',
+                'emom': '⏰ EMOM',
+                'tabata': '🔥 Tabata',
+                'pap': '⚡ PAP'
+            };
+            
+            let methodsHtml = '';
+            if (w.methodsApplied && w.methodsApplied.length > 0) {
+                methodsHtml = '<div class="session-methods">' + 
+                    w.methodsApplied.map(m => `<span class="method-badge">${methodLabels[m] || m}</span>`).join('') +
+                    '</div>';
+                console.log('🎯 Metodologie nel workout:', w.methodsApplied);
+            }
+            
+            html += `
+                <div class="session-header">
+                    <div class="session-title">${w.sessionFocus?.name || w.name}</div>
+                    <div class="session-meta">
+                        <span><i class="fas fa-dumbbell"></i> ${exercises.length} esercizi</span>
+                        <span><i class="fas fa-clock"></i> ~${w.duration || 55} min</span>
+                        ${w.validation ? `<span class="session-score"><i class="fas fa-star"></i> ${w.validation.score}%</span>` : ''}
+                    </div>
+                    ${methodsHtml}
+                </div>
+            `;
+            
+            // Exercises - same logic as renderWorkout (v2026.01.02 - with circuit prefix fix)
+            if (Array.isArray(exercises)) {
+                // Helper: controlla se esercizio ha prefisso circuito (C1:, A1:, etc.)
+                const hasCircuitPrefix = (e) => {
+                    const name = (e.name || '').trim();
+                    return /^[A-Z]\d+:/.test(name);
+                };
+                
+                // Prima raggruppa per phase (più affidabile per sport-specific)
+                const warmup = exercises.filter(e => e.phase === 'warmup' || 
+                    (e.type === 'warmup' || e.type === 'mobility') && !e.phase);
+                const finisher = exercises.filter(e => e.phase === 'finisher');
+                const cooldown = exercises.filter(e => e.phase === 'cooldown' || 
+                    (e.type === 'cooldown' || e.type === 'flexibility') && !e.phase);
+                
+                // Main: tutto ciò che ha phase 'main' O tipi specifici
+                // INCLUDE anche esercizi con prefisso circuito (C1:, A1:, etc.)
+                const main = exercises.filter(e => {
+                    // Se ha prefisso circuito, va SEMPRE in main
+                    if (hasCircuitPrefix(e)) return true;
+                    
+                    if (e.phase === 'warmup' || e.phase === 'cooldown') return false;
+                    if (e.phase === 'main' || e.phase === 'finisher') return true;
+                    // Includi tipi boxing/strength che non hanno phase
+                    const validTypes = ['strength', 'power', 'technique', 'conditioning', 'coordination',
+                        'accuracy', 'agility', 'movement', 'defense', 'reaction', 'circuit'];
+                    return validTypes.includes(e.type);
+                });
+                
+                const accessory = exercises.filter(e => e.type === 'hypertrophy' || e.type === 'isolation');
+                
+                // Core: identifica per type 'core' O per nome esercizio
+                // MA ESCLUDI se ha prefisso circuito (C1:, A1:, etc.)
+                const coreNames = ['plank', 'pallof', 'woodchop', 'dead bug', 'russian twist', 
+                    'anti-rotation', 'hollow', 'bird dog'];
+                const core = exercises.filter(e => {
+                    // Se ha prefisso circuito, NON va in core
+                    if (hasCircuitPrefix(e)) return false;
+                    
+                    if (e.type === 'core') return true;
+                    const name = (e.name || '').toLowerCase();
+                    return coreNames.some(cn => name.includes(cn));
+                });
+                
+                const rehab = exercises.filter(e => e.type === 'eccentric' || e.type === 'prevention' || e.type === 'rehab');
+                
+                // Remove core exercises from main to avoid duplicates
+                // MA mantieni quelli con prefisso circuito
+                const mainFiltered = main.filter(e => {
+                    // Se ha prefisso circuito, MANTIENI sempre
+                    if (hasCircuitPrefix(e)) return true;
+                    
+                    const name = (e.name || '').toLowerCase();
+                    return !coreNames.some(cn => name.includes(cn)) && e.type !== 'core';
+                });
+                
+                // Remove exercises from core if they already appear in warmup
+                // E rimuovi quelli con prefisso circuito
+                const warmupNames = new Set(warmup.map(e => (e.name || '').toLowerCase().trim()));
+                const coreFiltered = core.filter(e => {
+                    // Se ha prefisso circuito, NON va in core
+                    if (hasCircuitPrefix(e)) return false;
+                    
+                    const name = (e.name || '').toLowerCase().trim();
+                    return !warmupNames.has(name);
+                });
+                
+                if (warmup.length) html += renderSection('🔥 Riscaldamento', warmup, 'warmup');
+                if (mainFiltered.length) html += renderSection('💪 Principale', mainFiltered, 'main');
+                if (accessory.length) html += renderSection('🎯 Accessori', accessory, 'accessory');
+                if (coreFiltered.length) html += renderSection('🧠 Core', coreFiltered, 'core');
+                if (rehab.length) html += renderSection('🏥 Prevenzione', rehab, 'rehab');
+                if (cooldown.length) html += renderSection('🧘 Defaticamento', cooldown, 'cooldown');
+                
+                // Se nessuna categoria matchata, mostra tutti come "Esercizi"
+                if (!warmup.length && !mainFiltered.length && !core.length && exercises.length) {
+                    html += renderSection('💪 Esercizi', exercises, 'main');
+                }
+            }
+            
+            return html;
+        }
+
+        function getWeeklyScheduleFromUI() {
+            const schedule = {};
+            document.querySelectorAll('.week-day').forEach(el => {
+                const day = el.dataset.day;
+                const select = el.querySelector('.week-day-select');
+                schedule[day] = select.value || null;
+            });
+            return schedule;
+        }
+
+        function showScheduleWarnings(analysis) {
+            const infoEl = document.getElementById('scheduleInfo');
+            if (!analysis.warnings || analysis.warnings.length === 0) {
+                infoEl.classList.remove('visible');
+                return;
+            }
+
+            const warningMessages = analysis.warnings.map(w => `⚠️ ${w.message}`).join('<br>');
+            infoEl.innerHTML = `
+                <strong>Adattamenti automatici:</strong><br>
+                ${warningMessages}<br>
+                <em>Workout adattato a: ${analysis.recommendedLabel}</em>
+            `;
+            infoEl.classList.add('visible', 'warning');
+        }
+
+        // Analyze schedule on change - now just counts GR days
+        function initScheduleListeners() {
+            document.querySelectorAll('.week-day-select').forEach(select => {
+                select.addEventListener('change', updateGRDaysCount);
+            });
+        }
+
+        function updateGRDaysCount() {
+            const weeklySchedule = getWeeklyScheduleFromUI();
+            let grDays = 0;
+            Object.values(weeklySchedule).forEach(v => {
+                if (v && ['gr_perform', 'gr_available', 'gym', 'palestra'].includes(v.toLowerCase())) {
+                    grDays++;
+                }
+            });
+            
+            const infoEl = document.getElementById('scheduleInfo');
+            if (grDays > 0) {
+                const splitName = grDays === 2 ? 'Upper/Lower' : 
+                                  grDays === 3 ? 'Push/Pull/Legs' : 
+                                  grDays === 4 ? 'Upper/Lower x2' : 
+                                  grDays === 5 ? 'PPL + Upper/Lower' : 
+                                  grDays === 6 ? 'PPL x2' : 'Full Body';
+                infoEl.innerHTML = `<strong>${grDays} giorni GR Perform</strong> → Split: ${splitName}`;
+                infoEl.classList.add('visible');
+                infoEl.classList.remove('warning');
+            } else {
+                infoEl.innerHTML = `⚠️ Seleziona almeno un giorno 🏋️ GR Perform`;
+                infoEl.classList.add('visible', 'warning');
+            }
+        }
+
+        function populateWeeklyScheduleUI(schedule) {
+            if (!schedule) return;
+            
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            days.forEach(day => {
+                const el = document.querySelector(`.week-day[data-day="${day}"] .week-day-select`);
+                if (el && schedule[day]) {
+                    // Map database values to UI values
+                    let value = schedule[day];
+                    // Handle legacy/different value formats
+                    if (value === 'gr_available' || value === 'both') value = 'gr_perform';
+                    if (value === 'training' || value === 'allenamento') value = 'team_training';
+                    if (value === 'tecnica' || value === 'skill') value = 'technical';
+                    if (value === 'partita' || value === 'gara') value = 'match';
+                    if (value === 'riposo' || value === 'off') value = 'rest';
+                    
+                    el.value = value;
+                }
+            });
+            
+            // Update GR days count after populating
+            updateGRDaysCount();
+        }
+
+        function mapSport(s) {
+            const m = { 'boxe':'boxe','boxing':'boxe','calcio':'calcio','football':'calcio','basket':'basket','crossfit':'crossfit','fitness':'crossfit','palestra':'crossfit' };
+            return m[(s||'').toLowerCase()] || 'crossfit';
+        }
+
+        function getReadiness() {
+            if (!athleteContext.wearableData) return { sleepQuality: 7, stressLevel: 4, musclesSoreness: 3 };
+            const w = athleteContext.wearableData;
+            return {
+                sleepQuality: w.sleep_score ? Math.round(w.sleep_score / 10) : 7,
+                stressLevel: w.stress_level || 4,
+                musclesSoreness: w.recovery_score ? 10 - Math.round(w.recovery_score / 10) : 3
+            };
+        }
+        
+        /**
+         * Determina il momento della giornata per adattare il riscaldamento
+         */
+        function getTimeOfDay() {
+            const hour = new Date().getHours();
+            if (hour < 10) return 'morning';
+            if (hour < 17) return 'afternoon';
+            return 'evening';
+        }
+
+        function renderWorkout(result) {
+            const w = result.workout;
+            const v = result.validation;
+
+            document.getElementById('workoutTitle').textContent = w.name || w.title || 'Workout Generato';
+            
+            // ⏱️ Mostra durata e conteggio esercizi
+            const metaInfoEl = document.getElementById('workoutMetaInfo');
+            const durationEl = document.getElementById('workoutDuration');
+            const countEl = document.getElementById('workoutExerciseCount');
+            const exerciseCount = Array.isArray(w.exercises) ? w.exercises.length : 0;
+            
+            if (metaInfoEl && durationEl && countEl) {
+                metaInfoEl.style.display = 'flex';
+                durationEl.innerHTML = `<i class="fas fa-clock"></i> ~${w.duration || '--'} min`;
+                countEl.innerHTML = `<i class="fas fa-dumbbell"></i> ${exerciseCount} esercizi`;
+            }
+            
+            const scoreEl = document.getElementById('workoutScore');
+            const badgeEl = document.getElementById('scoreBadge');
+            scoreEl.style.display = 'block';
+            
+            const score = v?.score || 80;
+            const grade = v?.grade?.letter || 'B';
+            badgeEl.textContent = `${grade} ${score}%`;
+            badgeEl.className = `score-badge ${grade.toLowerCase()}`;
+            
+            // 🎯 Visualizza metodologie applicate
+            const methodsContainer = document.getElementById('workoutMethods');
+            if (w.methodsApplied && w.methodsApplied.length > 0) {
+                const methodLabels = {
+                    'superset': '🔄 Superset',
+                    'drop_set': '⬇️ Drop Set',
+                    'rest_pause': '⏸️ Rest-Pause',
+                    'myo_reps': '💪 Myo-Reps',
+                    'tempo_training': '⏱️ Tempo',
+                    'contrast_training': '⚡ Contrasto',
+                    'giant_set': '🦾 Giant Set',
+                    'cluster': '🔗 Cluster Set',
+                    'circuit': '🔁 Circuit',
+                    'emom': '⏰ EMOM',
+                    'tabata': '🔥 Tabata'
+                };
+                const methodsHtml = w.methodsApplied.map(m => 
+                    `<span class="method-badge">${methodLabels[m] || m}</span>`
+                ).join('');
+                if (methodsContainer) {
+                    methodsContainer.innerHTML = methodsHtml;
+                    methodsContainer.style.display = 'flex';
+                }
+                console.log('🎯 Metodologie applicate:', w.methodsApplied);
+            } else if (methodsContainer) {
+                methodsContainer.style.display = 'none';
+            }
+
+            // Il workout può avere struttura { exercises: [...] } (array semplice)
+            // oppure { exercises: { warmup: [...], main: [...], ... } } (oggetto con sezioni)
+            const ex = w.exercises || w;
+            let html = '';
+
+            // Se exercises è un array semplice, raggruppa per phase prima, poi per type
+            // v2026.01.02.12 - Fixed circuit prefix detection
+            if (Array.isArray(ex)) {
+                // Helper: controlla se esercizio ha prefisso circuito (C1:, A1:, etc.)
+                const hasCircuitPrefix = (e) => {
+                    const name = (e.name || '').trim();
+                    const match = /^[A-Z]\d+:/.test(name);
+                    return match;
+                };
+                
+                // Log tutti gli esercizi per debug
+                console.log('📋 Esercizi da renderizzare:', ex.map(e => e.name));
+                
+                // Prima raggruppa per phase (più affidabile per boxing)
+                const warmup = ex.filter(e => e.phase === 'warmup' || 
+                    (e.type === 'warmup' || e.type === 'mobility') && !e.phase);
+                const finisher = ex.filter(e => e.phase === 'finisher');
+                const cooldown = ex.filter(e => e.phase === 'cooldown' || 
+                    (e.type === 'cooldown' || e.type === 'flexibility') && !e.phase);
+                
+                // Main: tutto ciò che ha phase 'main' O tipi specifici (senza phase o phase undefined)
+                // IMPORTANTE: Include anche esercizi con prefisso circuito (C1:, A1:, etc.)
+                const main = ex.filter(e => {
+                    // Se ha prefisso circuito, va sempre in main
+                    if (hasCircuitPrefix(e)) return true;
+                    
+                    if (e.phase === 'warmup' || e.phase === 'cooldown') return false;
+                    if (e.phase === 'main' || e.phase === 'finisher') return true;
+                    // Includi tipi boxing/strength che non hanno phase
+                    const validTypes = ['strength', 'power', 'technique', 'conditioning', 'coordination',
+                        'accuracy', 'agility', 'movement', 'defense', 'reaction', 'circuit'];
+                    return validTypes.includes(e.type);
+                });
+                
+                const accessory = ex.filter(e => e.type === 'hypertrophy' || e.type === 'isolation');
+                
+                // Core: identifica per type 'core' O per nome esercizio
+                // MA ESCLUDI se ha prefisso circuito (C1:, A1:, etc.)
+                const coreNames = ['plank', 'pallof', 'woodchop', 'dead bug', 'russian twist', 
+                    'anti-rotation', 'hollow', 'bird dog'];
+                const core = ex.filter(e => {
+                    // Se ha prefisso circuito, NON va in core
+                    if (hasCircuitPrefix(e)) return false;
+                    
+                    if (e.type === 'core') return true;
+                    const name = (e.name || '').toLowerCase();
+                    return coreNames.some(cn => name.includes(cn));
+                });
+                
+                const rehab = ex.filter(e => e.type === 'eccentric' || e.type === 'prevention' || e.type === 'rehab');
+                
+                // Remove core exercises from main to avoid duplicates
+                // MA mantieni quelli con prefisso circuito
+                const mainFiltered = main.filter(e => {
+                    // Se ha prefisso circuito, MANTIENI sempre
+                    if (hasCircuitPrefix(e)) return true;
+                    
+                    const name = (e.name || '').toLowerCase();
+                    return !coreNames.some(cn => name.includes(cn)) && e.type !== 'core';
+                });
+                
+                // Remove exercises from core if they already appear in warmup
+                // E rimuovi anche quelli con prefisso circuito (vanno in main)
+                const warmupNamesSet = new Set(warmup.map(e => (e.name || '').toLowerCase().trim()));
+                const coreFiltered = core.filter(e => {
+                    // Se ha prefisso circuito, NON va in core
+                    if (hasCircuitPrefix(e)) return false;
+                    
+                    const name = (e.name || '').toLowerCase().trim();
+                    return !warmupNamesSet.has(name);
+                });
+                
+                // Debug: log sezioni
+                console.log('📊 Sezioni workout:', {
+                    warmup: warmup.length,
+                    main: mainFiltered.length,
+                    core: coreFiltered.length,
+                    cooldown: cooldown.length,
+                    coreNames: coreFiltered.map(e => e.name)
+                });
+                
+                if (warmup.length) html += renderSection('🔥 Riscaldamento', warmup, 'warmup');
+                if (mainFiltered.length) html += renderSection('💪 Principale', mainFiltered, 'main');
+                if (accessory.length) html += renderSection('🎯 Accessori', accessory, 'accessory');
+                if (coreFiltered.length) html += renderSection('🧠 Core', coreFiltered, 'core');
+                if (rehab.length) html += renderSection('🏥 Prevenzione', rehab, 'rehab');
+                if (cooldown.length) html += renderSection('🧘 Defaticamento', cooldown, 'cooldown');
+                
+                // Se nessuna categoria matchata, mostra tutti come "Esercizi"
+                if (!html && ex.length) {
+                    html += renderSection('💪 Esercizi', ex, 'main');
+                }
+            } else {
+                // Struttura con sezioni
+                if (ex.warmup?.length) html += renderSection('🔥 Riscaldamento', ex.warmup, 'warmup');
+                if (ex.main?.length) html += renderSection('💪 Principale', ex.main, 'main');
+                if (ex.accessory?.length) html += renderSection('🎯 Accessori', ex.accessory, 'accessory');
+                if (ex.cooldown?.length) html += renderSection('🧘 Defaticamento', ex.cooldown, 'cooldown');
+                if (ex.rehab?.length) html += renderSection('🏥 Riabilitazione', ex.rehab, 'rehab');
+            }
+
+            document.getElementById('workoutBody').innerHTML = html || '<div class="workout-empty"><p>Nessun esercizio</p></div>';
+            document.getElementById('workoutActions').classList.add('show');
+        }
+
+        function renderSection(title, list, type) {
+            // Rendering standard per tutte le sezioni (warmup incluso)
+            return `
+                <div class="exercise-section">
+                    <div class="exercise-section-title">${title}${type === 'warmup' && list.some(e => e.rampPhase) ? ' <span class="ramp-badge">RAMP</span>' : ''}</div>
+                    ${list.map((e, i) => renderExerciseCard(e, i, type)).join('')}
+                </div>
+            `;
+        }
+        
+        function renderExerciseCard(e, index, type) {
+            // Check for various adjustment flags
+            const isModified = e.modified || e.schedulingAdjusted || e.recoveryReduced || e.feedbackReduced;
+            const badgeText = e.adjustmentReason 
+                ? e.adjustmentReason 
+                : (e.modified ? 'Modificato' : (e.schedulingAdjusted ? 'Adattato' : (e.recoveryReduced ? 'Ridotto' : '')));
+            
+            const exerciseName = e.name || e.exercise || '';
+            
+            // Check for special methodology notes (Circuit, EMOM, Tabata, Giant Set, Cluster, Contrast)
+            const methodNote = e.circuitNote || e.emomNote || e.tabataNote || 
+                               e.giantSetNote || e.clusterNote || e.contrastNote || '';
+            
+            // Check if guide or video available - show info button
+            const hasGuide = typeof ATLASExerciseGuides !== 'undefined' && ATLASExerciseGuides.hasGuide(exerciseName);
+            const hasVideo = typeof ATLASVideos !== 'undefined' && ATLASVideos.findVideo(exerciseName);
+            const showInfoBtn = hasGuide || hasVideo;
+            
+            // Build context with exercise parameters for intelligent focus selection
+            const exerciseContext = {
+                sport: selectedAthlete?.sport || 'general',
+                goal: selectedAthlete?.goal,
+                sets: e.sets || 3,
+                reps: e.reps,
+                duration: e.duration || e.time,
+                rest: e.rest,
+                sectionType: type
+            };
+            const contextStr = encodeURIComponent(JSON.stringify(exerciseContext));
+            
+            // Determine if this is a special methodology exercise
+            const isCircuit = exerciseName.startsWith('C') && exerciseName.includes(':') && /^C\d/.test(exerciseName);
+            const isEMOM = exerciseName.startsWith('EMOM');
+            const isTabata = exerciseName.startsWith('TABATA');
+            const isGiantSet = exerciseName.startsWith('G') && exerciseName.includes(':') && /^G\d/.test(exerciseName);
+            const isCluster = exerciseName.includes('(cluster)');
+            const isContrast = exerciseName.startsWith('PAP-');
+            
+            let specialClass = '';
+            if (isCircuit) specialClass = 'circuit-exercise';
+            else if (isEMOM) specialClass = 'emom-exercise';
+            else if (isTabata) specialClass = 'tabata-exercise';
+            else if (isGiantSet) specialClass = 'giant-set-exercise';
+            else if (isCluster) specialClass = 'cluster-exercise';
+            else if (isContrast) specialClass = 'contrast-exercise';
+            
+            const hideOrder = isCircuit || isEMOM || isTabata || isGiantSet || isContrast;
+            
+            return `
+                ${methodNote ? `<div class="method-note">${methodNote}</div>` : ''}
+                <div class="exercise-card ${type === 'rehab' ? 'rehab' : ''} ${isModified ? 'adjusted' : ''} ${specialClass}" 
+                     ${showInfoBtn ? `onclick="ATLASExerciseGuides.showExerciseModal('${exerciseName.replace(/'/g, "\\'")}', JSON.parse(decodeURIComponent('${contextStr}')))"` : ''}
+                     style="${showInfoBtn ? 'cursor: pointer;' : ''}">
+                    <div class="exercise-order">${hideOrder ? '' : index + 1}</div>
+                    <div class="exercise-info">
+                        <div class="exercise-name">${exerciseName || 'Esercizio'}</div>
+                        <div class="exercise-details">${e.sets || 3} × ${e.reps || '10'} ${e.rest ? '• Rest ' + e.rest : ''}</div>
+                    </div>
+                    <div class="exercise-actions">
+                        ${showInfoBtn ? '<i class="fas fa-chevron-right exercise-arrow"></i>' : ''}
+                        ${isModified ? `<span class="exercise-badge" title="${badgeText}">⚡</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * 📄 Export workout to PDF
+         */
+        function exportWorkoutPDF() {
+            if (!currentWeekPlan && !currentWorkout) {
+                alert('⚠️ Genera prima un workout per esportarlo');
+                return;
+            }
+            
+            if (typeof ATLASPDFExport === 'undefined') {
+                alert('⚠️ Modulo PDF non disponibile');
+                return;
+            }
+            
+            // Se abbiamo un piano settimanale, esporta il giorno selezionato
+            if (currentWeekPlan && currentWeekPlan.workouts?.length > 0) {
+                const selectedDay = document.querySelector('.day-tab.active')?.dataset?.day;
+                const workout = currentWeekPlan.workouts.find(w => w.day === selectedDay);
+                
+                if (workout) {
+                    ATLASPDFExport.print({
+                        title: `${workout.day} - ${workout.focus}`,
+                        type: workout.focus,
+                        exercises: workout.exercises,
+                        duration: workout.duration,
+                        notes: workout.coachNotes || ''
+                    }, selectedAthlete);
+                } else {
+                    alert('Seleziona un giorno del piano');
+                }
+            } else if (currentWorkout) {
+                // Singolo workout
+                ATLASPDFExport.print({
+                    title: currentWorkout.name || 'Workout ATLAS',
+                    type: athleteContext.phase,
+                    exercises: currentWorkout.exercises || currentWorkout,
+                    duration: currentWorkout.duration
+                }, selectedAthlete);
+            }
+        }
+
+        async function saveWorkout() {
+            // If we have a week plan, save all workouts
+            if (currentWeekPlan && currentWeekPlan.workouts?.length > 0) {
+                await saveWeekPlan();
+                return;
+            }
+            
+            // Otherwise save single workout
+            if (!currentWorkout || !selectedAthlete) return;
+
+            try {
+                const data = {
+                    athlete_id: selectedAthlete.id,
+                    name: currentWorkout.name || `ATLAS - ${athleteContext.phase}`,
+                    type: selectedAthlete.sport,
+                    goal: document.getElementById('cfgGoal').value,
+                    exercises: currentWorkout.exercises || currentWorkout,
+                    estimated_duration_minutes: currentWorkout.duration || 55,
+                    difficulty: selectedAthlete.experience_level || 'intermediate',
+                    status: 'assigned',
+                    ai_generated: true,
+                    week_number: athleteContext.currentWeek,
+                    ai_metadata: {
+                        engine: 'ATLAS',
+                        version: '2.0',
+                        score: currentValidation?.score || 80,
+                        grade: currentValidation?.grade?.letter || 'B',
+                        phase: athleteContext.phase
+                    }
+                };
+
+                await supabase.create('workouts', data);
+                alert('✅ Workout salvato!');
+                
+                // 🎓 Learning: aggiorna Structural Balance dai workout
+                if (typeof AtlasStructuralBalance !== 'undefined') {
+                    const profile = {
+                        weight: selectedAthlete.weight || selectedAthlete.peso || 75,
+                        gender: selectedAthlete.gender || selectedAthlete.sesso || 'M',
+                        age: selectedAthlete.age || selectedAthlete.eta || 30,
+                        level: selectedAthlete.level || selectedAthlete.experience || 'intermedio'
+                    };
+                    AtlasStructuralBalance.updateFromWorkout(selectedAthlete.id, {
+                        exercises: currentWorkout.exercises || currentWorkout
+                    }, profile);
+                    updateStructuralWidget();
+                    console.log('⚖️ Structural balance learned from workout');
+                }
+                
+                await loadAthleteContext();
+
+            } catch (err) {
+                console.error('Save error:', err);
+                alert('Errore: ' + err.message);
+            }
+        }
+        
+        async function saveWeekPlan() {
+            if (!currentWeekPlan || !selectedAthlete) return;
+            
+            const workouts = currentWeekPlan.workouts;
+            const goal = document.getElementById('cfgGoal').value;
+            
+            try {
+                let savedCount = 0;
+                
+                for (const workout of workouts) {
+                    const data = {
+                        athlete_id: selectedAthlete.id,
+                        name: workout.name || `${workout.dayName} - Workout`,
+                        type: selectedAthlete.sport,
+                        goal: goal,
+                        exercises: workout.exercises,
+                        estimated_duration_minutes: workout.duration || 55,
+                        difficulty: selectedAthlete.experience_level || 'intermediate',
+                        status: 'assigned',
+                        ai_generated: true,
+                        week_number: athleteContext.currentWeek,
+                        day_of_week: workout.dayOfWeek,
+                        session_number: workout.sessionNumber,
+                        ai_metadata: {
+                            engine: 'ATLAS',
+                            version: '2.0',
+                            score: workout.validation?.score || 80,
+                            grade: workout.validation?.grade?.letter || 'B',
+                            phase: athleteContext.phase,
+                            split: currentWeekPlan.split?.name,
+                            sessionFocus: workout.sessionFocus?.name
+                        }
+                    };
+                    
+                    await supabase.create('workouts', data);
+                    savedCount++;
+                }
+                
+                // 🎓 Learning: aggiorna Structural Balance da tutti i workout
+                if (typeof AtlasStructuralBalance !== 'undefined') {
+                    const profile = {
+                        weight: selectedAthlete.weight || selectedAthlete.peso || 75,
+                        gender: selectedAthlete.gender || selectedAthlete.sesso || 'M',
+                        age: selectedAthlete.age || selectedAthlete.eta || 30,
+                        level: selectedAthlete.level || selectedAthlete.experience || 'intermedio'
+                    };
+                    for (const workout of workouts) {
+                        AtlasStructuralBalance.updateFromWorkout(selectedAthlete.id, workout, profile);
+                    }
+                    updateStructuralWidget();
+                    console.log('⚖️ Structural balance learned from week plan');
+                }
+                
+                alert(`✅ Piano settimanale salvato! (${savedCount} workout)`);
+                await loadAthleteContext();
+                
+            } catch (err) {
+                console.error('Save error:', err);
+                alert('Errore: ' + err.message);
+            }
+        }
+
+        function coachLogout(e) {
+            e.preventDefault();
+            localStorage.removeItem('gr_coach_id');
+            window.location.href = 'coach-login.html';
+        }
+    </script>
+</body>
+</html>

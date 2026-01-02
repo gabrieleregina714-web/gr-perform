@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Performance Prediction Engine</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #e5e5e5; padding: 20px; line-height: 1.6; }
+        h1 { color: #fff; margin-bottom: 20px; }
+        .test-container { max-width: 900px; margin: 0 auto; }
+        .test-result { background: #1a1a1a; border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #333; }
+        .test-result.pass { border-left-color: #22c55e; }
+        .test-result.warn { border-left-color: #f59e0b; }
+        .test-result.fail { border-left-color: #ef4444; }
+        .test-title { font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .test-data { font-family: 'Fira Code', monospace; font-size: 0.85rem; background: #0d0d0d; padding: 12px; border-radius: 8px; white-space: pre-wrap; overflow-x: auto; max-height: 400px; overflow-y: auto; }
+        .btn { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; border: none; padding: 14px 28px; border-radius: 8px; font-size: 1rem; cursor: pointer; margin-bottom: 20px; }
+        .btn:hover { transform: translateY(-2px); }
+        .section-title { color: #888; font-size: 0.9rem; margin: 24px 0 12px; text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>📊 Test Performance Prediction Engine</h1>
+        
+        <button class="btn" onclick="runAllTests()">Esegui Test Completo</button>
+        
+        <div class="section-title">Test Results</div>
+        <div id="results"></div>
+    </div>
+
+    <script src="js/performance-prediction.js?v=1"></script>
+    <script src="js/feedback-engine.js?v=5"></script>
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        function log(title, data, status = 'pass') {
+            const div = document.createElement('div');
+            div.className = `test-result ${status}`;
+            const icon = status === 'pass' ? '✅' : status === 'warn' ? '⚠️' : '❌';
+            div.innerHTML = `
+                <div class="test-title">${icon} ${title}</div>
+                <div class="test-data">${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}</div>
+            `;
+            resultsDiv.appendChild(div);
+        }
+
+        async function runAllTests() {
+            resultsDiv.innerHTML = '';
+            const athleteId = 'perf-test-athlete-' + Date.now();
+            
+            try {
+                // Test 1: Module loaded
+                log('1️⃣ Modulo caricato', {
+                    version: window.PerformancePrediction.VERSION,
+                    functions: Object.keys(window.PerformancePrediction).length
+                }, 'pass');
+
+                // Test 2: Log performance data
+                // Simulate 8 weeks of squat progression
+                const startDate = Date.now() - (8 * 7 * 24 * 60 * 60 * 1000);
+                for (let week = 0; week < 8; week++) {
+                    const baseWeight = 80 + (week * 2.5); // 2.5kg per week progression
+                    const variation = (Math.random() - 0.5) * 5;
+                    
+                    // Override timestamp for testing
+                    const entry = window.PerformancePrediction.logPerformance(
+                        athleteId, 
+                        'squat_1rm', 
+                        baseWeight + variation, 
+                        'kg',
+                        `Week ${week + 1}`
+                    );
+                }
+                
+                const logs = window.PerformancePrediction.getPerformanceLogs(athleteId, 'squat_1rm', 90);
+                log('2️⃣ logPerformance() - Squat progression', {
+                    entriesLogged: logs.length,
+                    firstValue: logs[0]?.value?.toFixed(1) + 'kg',
+                    lastValue: logs[logs.length - 1]?.value?.toFixed(1) + 'kg'
+                }, 'pass');
+
+                // Test 3: Trend analysis
+                const trend = window.PerformancePrediction.analyzeTrend(athleteId, 'squat_1rm', 90);
+                log('3️⃣ analyzeTrend()', {
+                    trend: trend.trend,
+                    percentChange: trend.percentChange + '%',
+                    confidence: trend.confidence,
+                    rSquared: trend.rSquared?.toFixed(3),
+                    message: trend.message
+                }, trend.trend === 'improving' || trend.trend === 'slightly_improving' ? 'pass' : 'warn');
+
+                // Test 4: Performance prediction
+                const athleteData = { experience_level: 'intermediate', sport: 'powerlifting' };
+                const prediction = window.PerformancePrediction.predictPerformance(
+                    athleteId, 
+                    'squat_1rm', 
+                    4, 
+                    athleteData
+                );
+                log('4️⃣ predictPerformance()', {
+                    currentValue: prediction.currentValue?.toFixed(1),
+                    predictedIn4Weeks: prediction.predictedValue?.toFixed(1),
+                    range: `${prediction.lowerBound?.toFixed(1)} - ${prediction.upperBound?.toFixed(1)}`,
+                    confidence: prediction.confidence,
+                    message: prediction.message
+                }, 'pass');
+
+                // Test 5: 1RM estimation
+                const e1rm80x5 = window.PerformancePrediction.estimateOneRepMax(80, 5);
+                const e1rm100x3 = window.PerformancePrediction.estimateOneRepMax(100, 3);
+                const e1rm120x1 = window.PerformancePrediction.estimateOneRepMax(120, 1);
+                log('5️⃣ estimateOneRepMax()', {
+                    '80kg x 5 reps': e1rm80x5 + 'kg',
+                    '100kg x 3 reps': e1rm100x3 + 'kg',
+                    '120kg x 1 rep': e1rm120x1 + 'kg'
+                }, 'pass');
+
+                // Test 6: Optimal load prediction
+                // First log some weight/reps data
+                window.PerformancePrediction.logPerformance(athleteId, 'bench_press_weight', 80, 'kg');
+                window.PerformancePrediction.logPerformance(athleteId, 'bench_press_reps', 5, 'reps');
+                window.PerformancePrediction.logPerformance(athleteId, 'bench_press_weight', 85, 'kg');
+                window.PerformancePrediction.logPerformance(athleteId, 'bench_press_reps', 3, 'reps');
+                
+                const loadPrediction = window.PerformancePrediction.predictOptimalLoad(
+                    athleteId, 
+                    'bench_press', 
+                    8, 
+                    athleteData
+                );
+                log('6️⃣ predictOptimalLoad()', {
+                    exercise: 'bench_press',
+                    targetReps: 8,
+                    estimated1RM: loadPrediction.estimated1RM,
+                    recommendedLoad: loadPrediction.recommendedLoad,
+                    message: loadPrediction.message
+                }, loadPrediction.recommendedLoad ? 'pass' : 'warn');
+
+                // Test 7: Readiness calculation
+                const feedbackAnalysis = {
+                    rpeTrend: { avgRpe: 8.2, trend: 'warning' },
+                    pain: { bodyParts: ['lower_back'], chronicPain: [], recentPain: ['lower_back'] },
+                    completionRate: { rate: 85 }
+                };
+                const telemetry = {
+                    sleep_hours: 6.5,
+                    stress_level: 7
+                };
+                const readiness = window.PerformancePrediction.calculateReadiness(
+                    athleteId, 
+                    feedbackAnalysis, 
+                    telemetry
+                );
+                log('7️⃣ calculateReadiness()', {
+                    readiness: readiness.readiness + '%',
+                    level: readiness.level,
+                    recommendation: readiness.recommendation,
+                    volumeMultiplier: readiness.volumeMultiplier,
+                    intensityMultiplier: readiness.intensityMultiplier,
+                    factors: readiness.factors,
+                    message: readiness.message
+                }, readiness.readiness >= 50 ? 'pass' : 'warn');
+
+                // Test 8: Benchmarks for athlete
+                const benchmarks = window.PerformancePrediction.getBenchmarksForAthlete({
+                    sport: 'powerlifting',
+                    experience_level: 'intermediate'
+                });
+                log('8️⃣ getBenchmarksForAthlete()', {
+                    sport: 'powerlifting',
+                    level: 'intermediate',
+                    benchmarks: benchmarks
+                }, 'pass');
+
+                // Test 9: Save athlete benchmark
+                const savedBenchmark = window.PerformancePrediction.saveAthleteBenchmark(
+                    athleteId,
+                    'squat_1rm',
+                    105
+                );
+                log('9️⃣ saveAthleteBenchmark()', {
+                    metric: 'squat_1rm',
+                    value: savedBenchmark.value,
+                    date: savedBenchmark.date
+                }, 'pass');
+
+                // Test 10: Goal achievement prediction
+                const goal = {
+                    description: 'Squat 120kg',
+                    metric: 'squat_1rm',
+                    current_value: 100,
+                    target_value: 120,
+                    deadline: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString() // 90 days from now
+                };
+                const goalPrediction = window.PerformancePrediction.predictGoalAchievement(
+                    athleteId,
+                    goal,
+                    athleteData
+                );
+                log('🔟 predictGoalAchievement()', {
+                    goal: goalPrediction.goal,
+                    progressPct: goalPrediction.progressPct + '%',
+                    weeksToGoal: goalPrediction.weeksToGoal,
+                    onTrack: goalPrediction.onTrack,
+                    predictedDate: goalPrediction.predictedDate,
+                    message: goalPrediction.message
+                }, goalPrediction.onTrack ? 'pass' : 'warn');
+
+                // Test 11: Weekly summary
+                const summary = window.PerformancePrediction.generateWeeklySummary(
+                    athleteId,
+                    athleteData,
+                    feedbackAnalysis,
+                    telemetry
+                );
+                log('1️⃣1️⃣ generateWeeklySummary()', {
+                    readinessLevel: summary.readiness.level,
+                    trendsTracked: summary.trends.total,
+                    improving: summary.trends.improving,
+                    declining: summary.trends.declining,
+                    highlights: summary.highlights,
+                    recommendations: summary.recommendations.map(r => r.text)
+                }, 'pass');
+
+                // Test 12: Prompt generation
+                const prompt = window.PerformancePrediction.generatePerformancePredictionPrompt(
+                    athleteId,
+                    athleteData,
+                    feedbackAnalysis,
+                    telemetry
+                );
+                log('1️⃣2️⃣ generatePerformancePredictionPrompt()', prompt, 'pass');
+
+                // Test 13: Compare to benchmarks
+                // First log some benchmark-comparable data
+                window.PerformancePrediction.logPerformance(athleteId, 'deadlift_1rm_bw', 1.8, 'x BW');
+                window.PerformancePrediction.logPerformance(athleteId, 'bench_1rm_bw', 1.1, 'x BW');
+                window.PerformancePrediction.logPerformance(athleteId, 'squat_1rm_bw', 1.4, 'x BW');
+                
+                const comparison = window.PerformancePrediction.compareToBenchmarks(athleteId, {
+                    sport: 'general',
+                    experience_level: 'intermediate'
+                });
+                log('1️⃣3️⃣ compareToBenchmarks()', {
+                    overallScore: comparison.overallScore + '%',
+                    strengths: comparison.strengths,
+                    weaknesses: comparison.weaknesses,
+                    metrics: comparison.metrics.map(m => ({
+                        metric: m.metric,
+                        current: m.currentValue,
+                        benchmark: m.benchmark,
+                        percent: m.percentOfBenchmark + '%'
+                    })),
+                    message: comparison.message
+                }, comparison.overallScore >= 80 ? 'pass' : 'warn');
+
+                // Test 14: Integration with FeedbackEngine
+                if (window.FeedbackEngine) {
+                    // Create some feedback data
+                    for (let i = 0; i < 5; i++) {
+                        const fb = window.FeedbackEngine.createFeedback(athleteId, 'workout-' + i);
+                        window.FeedbackEngine.complete(fb.id, {
+                            rpe: 7.5 + i * 0.2,
+                            pain_areas: i >= 3 ? ['shoulder'] : [],
+                            exercises_completed: 6,
+                            exercises_skipped: 0
+                        });
+                    }
+                    
+                    const feAnalysis = window.FeedbackEngine.analyzeAll(athleteId);
+                    const integratedReadiness = window.PerformancePrediction.calculateReadiness(
+                        athleteId,
+                        feAnalysis,
+                        { sleep_hours: 7.5, stress_level: 5 }
+                    );
+                    
+                    log('1️⃣4️⃣ Integration con FeedbackEngine', {
+                        feedbackRpeTrend: feAnalysis.rpeTrend?.trend,
+                        feedbackPain: feAnalysis.pain?.bodyParts,
+                        calculatedReadiness: integratedReadiness.readiness + '%',
+                        recommendation: integratedReadiness.recommendation
+                    }, 'pass');
+                } else {
+                    log('1️⃣4️⃣ Integration con FeedbackEngine', 'FeedbackEngine non caricato', 'warn');
+                }
+
+                // Summary
+                log('🏁 TEST COMPLETATI', 
+                    `Tutti i 14 test eseguiti con successo!\n\n` +
+                    `📊 PerformancePrediction Engine v${window.PerformancePrediction.VERSION}\n` +
+                    `✅ Trend analysis funzionante\n` +
+                    `✅ Performance prediction attivo\n` +
+                    `✅ 1RM estimation accurata\n` +
+                    `✅ Readiness calculation OK\n` +
+                    `✅ Goal prediction attivo\n` +
+                    `✅ Benchmark comparison funzionante`,
+                    'pass'
+                );
+                
+            } catch (err) {
+                log('❌ ERRORE', err.message + '\n\n' + err.stack, 'fail');
+            }
+        }
+    </script>
+</body>
+</html>

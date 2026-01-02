@@ -2,7 +2,7 @@
   "name": "GR Perform - Elite Fitness Coaching",
   "short_name": "GR Perform",
   "description": "App di coaching fitness per atleti e coach professionisti",
-  "start_url": "/app-dashboard.html",
+  "start_url": "/coach-dashboard.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#E63946",
@@ -65,21 +65,21 @@
       "name": "Dashboard",
       "short_name": "Home",
       "description": "Vai alla dashboard",
-      "url": "/app-dashboard.html",
+      "url": "/coach-dashboard.html",
       "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
     },
     {
-      "name": "Workout",
-      "short_name": "Workout",
-      "description": "Il tuo workout di oggi",
-      "url": "/workout-session.html",
+      "name": "ATLAS AI",
+      "short_name": "ATLAS",
+      "description": "Genera workout con AI",
+      "url": "/coach-atlas.html",
       "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
     },
     {
-      "name": "Chat",
-      "short_name": "Chat",
-      "description": "Messaggia il coach",
-      "url": "/app-chat.html",
+      "name": "Atleti",
+      "short_name": "Atleti",
+      "description": "Gestisci i tuoi atleti",
+      "url": "/coach-clients.html",
       "icons": [{ "src": "assets/icons/icon-96.png", "sizes": "96x96" }]
     }
   ]

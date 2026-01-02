@@ -1,202 +1,168 @@
-// GR Perform - Wearables Integration Service
+// GR Perform - Wearables Integration Service v2.0
 // Gestisce connessione e sync con dispositivi fitness
+// Now with REAL OAuth flows via Vercel API routes
 
 const WearablesService = {
     
-    // Configurazioni OAuth (in produzione usare variabili d'ambiente)
-    config: {
-        garmin: {
-            clientId: 'YOUR_GARMIN_CLIENT_ID',
-            authUrl: 'https://connect.garmin.com/oauthConfirm',
-            tokenUrl: 'https://connectapi.garmin.com/oauth-service/oauth/access_token',
-            apiBase: 'https://apis.garmin.com'
-        },
-        fitbit: {
-            clientId: 'YOUR_FITBIT_CLIENT_ID',
-            authUrl: 'https://www.fitbit.com/oauth2/authorize',
-            tokenUrl: 'https://api.fitbit.com/oauth2/token',
-            apiBase: 'https://api.fitbit.com'
-        },
+    VERSION: '2.0',
+    
+    // API base URL (uses Vercel serverless functions)
+    apiBase: '/api/wearables',
+    
+    // Supported providers
+    providers: {
         whoop: {
-            clientId: 'YOUR_WHOOP_CLIENT_ID',
-            authUrl: 'https://api.prod.whoop.com/oauth/oauth2/auth',
-            tokenUrl: 'https://api.prod.whoop.com/oauth/oauth2/token',
-            apiBase: 'https://api.prod.whoop.com'
+            name: 'WHOOP',
+            icon: '🟢',
+            features: ['HRV', 'Recovery', 'Sleep', 'Strain'],
+            color: '#00D4AA'
         },
         oura: {
-            clientId: 'YOUR_OURA_CLIENT_ID',
-            authUrl: 'https://cloud.ouraring.com/oauth/authorize',
-            tokenUrl: 'https://api.ouraring.com/oauth/token',
-            apiBase: 'https://api.ouraring.com'
+            name: 'Oura Ring',
+            icon: '⚪',
+            features: ['HRV', 'Readiness', 'Sleep', 'Activity'],
+            color: '#B8B8B8'
+        },
+        garmin: {
+            name: 'Garmin',
+            icon: '🔵',
+            features: ['HR', 'HRV', 'Sleep', 'Stress', 'Body Battery'],
+            color: '#007CC3'
+        },
+        fitbit: {
+            name: 'Fitbit',
+            icon: '🔷',
+            features: ['HR', 'Sleep', 'Activity', 'Steps'],
+            color: '#00B0B9'
         },
         strava: {
-            clientId: 'YOUR_STRAVA_CLIENT_ID',
-            authUrl: 'https://www.strava.com/oauth/authorize',
-            tokenUrl: 'https://www.strava.com/oauth/token',
-            apiBase: 'https://www.strava.com/api/v3'
+            name: 'Strava',
+            icon: '🟠',
+            features: ['Activities', 'Training Load'],
+            color: '#FC4C02'
         }
     },
     
-    // Inizia OAuth flow
-    initiateOAuth(provider) {
-        const config = this.config[provider];
-        if (!config) {
+    // ═══════════════════════════════════════════════════════════════════════════
+    // OAUTH FLOW
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    /**
+     * Start OAuth flow for a provider
+     */
+    connect(provider) {
+        if (!this.providers[provider]) {
             console.error('Provider non supportato:', provider);
             return;
         }
         
-        const redirectUri = `${window.location.origin}/oauth-callback.html`;
-        const state = this.generateState();
-        localStorage.setItem('oauth_state', state);
-        localStorage.setItem('oauth_provider', provider);
-        
-        const scopes = this.getScopes(provider);
-        
-        let authUrl = `${config.authUrl}?` +
-            `client_id=${config.clientId}&` +
-            `response_type=code&` +
-            `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-            `scope=${encodeURIComponent(scopes)}&` +
-            `state=${state}`;
-        
-        window.location.href = authUrl;
-    },
-    
-    // Scopes per provider
-    getScopes(provider) {
-        const scopeMap = {
-            garmin: 'activity health sleep stress',
-            fitbit: 'activity heartrate sleep profile',
-            whoop: 'read:recovery read:sleep read:workout',
-            oura: 'daily sleep workout heartrate',
-            strava: 'read,activity:read'
-        };
-        return scopeMap[provider] || '';
-    },
-    
-    // Genera state per CSRF protection
-    generateState() {
-        return Math.random().toString(36).substring(2, 15);
-    },
-    
-    // Gestisci callback OAuth
-    async handleOAuthCallback(code, state) {
-        const savedState = localStorage.getItem('oauth_state');
-        const provider = localStorage.getItem('oauth_provider');
-        
-        if (state !== savedState) {
-            throw new Error('State mismatch - possibile attacco CSRF');
+        const athleteId = localStorage.getItem('gr_athlete_id');
+        if (!athleteId) {
+            alert('Devi essere loggato per connettere un dispositivo');
+            return;
         }
         
-        // In produzione, questo va fatto lato server per proteggere client_secret
-        const tokens = await this.exchangeCodeForTokens(provider, code);
-        
-        // Salva tokens
-        await this.saveTokens(provider, tokens);
-        
-        // Fetch dati iniziali
-        await this.syncData(provider);
-        
-        return { success: true, provider };
+        // Redirect to OAuth endpoint
+        window.location.href = `${this.apiBase}/${provider}-auth?action=authorize&athlete_id=${athleteId}`;
     },
     
-    // Scambia code per tokens (da fare lato server in produzione)
-    async exchangeCodeForTokens(provider, code) {
-        // Questo è un placeholder - in produzione usa un backend
-        console.log(`Exchanging code for ${provider} tokens...`);
-        
-        // Simula tokens
-        return {
-            access_token: 'simulated_access_token',
-            refresh_token: 'simulated_refresh_token',
-            expires_in: 3600
-        };
-    },
-    
-    // Salva tokens nel database
-    async saveTokens(provider, tokens) {
+    /**
+     * Disconnect a provider
+     */
+    async disconnect(provider) {
         const athleteId = localStorage.getItem('gr_athlete_id');
-        if (!athleteId) return;
+        if (!athleteId) return { success: false, error: 'Not logged in' };
         
-        const wearableData = {
-            provider: provider,
-            access_token: tokens.access_token, // In produzione: criptare
-            refresh_token: tokens.refresh_token,
-            expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
-            connected_at: new Date().toISOString()
-        };
-        
-        // Aggiorna atleta con wearable connesso
-        await supabase.update('athletes', athleteId, {
-            [`wearable_${provider}`]: wearableData
-        });
+        try {
+            // Update Supabase to mark as inactive
+            await supabase.update('athlete_wearables', {
+                athlete_id: athleteId,
+                provider: provider
+            }, {
+                is_active: false
+            });
+            
+            return { success: true };
+        } catch (error) {
+            console.error('Disconnect error:', error);
+            return { success: false, error: error.message };
+        }
     },
     
-    // Sync dati dal wearable
-    async syncData(provider) {
-        console.log(`Syncing data from ${provider}...`);
+    /**
+     * Get connected providers for current athlete
+     */
+    async getConnectedProviders() {
+        const athleteId = localStorage.getItem('gr_athlete_id');
+        if (!athleteId) return [];
         
-        // In produzione, chiama le API reali
-        // Per ora simuliamo i dati
-        const data = this.generateSimulatedData(provider);
-        
-        return this.processAndSaveData(data);
+        try {
+            const wearables = await supabase.fetch('athlete_wearables', 
+                `?athlete_id=eq.${athleteId}&is_active=eq.true`);
+            
+            return wearables.map(w => ({
+                provider: w.provider,
+                name: this.providers[w.provider]?.name || w.provider,
+                icon: this.providers[w.provider]?.icon || '📱',
+                connectedAt: w.connected_at,
+                lastSync: w.last_sync_at
+            }));
+        } catch (error) {
+            console.error('Error fetching connected providers:', error);
+            return [];
+        }
     },
     
-    // Genera dati simulati (per demo)
-    generateSimulatedData(provider) {
-        const baseHRV = 45 + Math.random() * 20;
-        const baseHR = 55 + Math.random() * 10;
-        const sleepHours = 6 + Math.random() * 2;
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DATA SYNC
+    // ═══════════════════════════════════════════════════════════════════════════
+    
+    /**
+     * Sync data from all connected providers
+     */
+    async syncAll() {
+        const athleteId = localStorage.getItem('gr_athlete_id');
+        if (!athleteId) return { success: false, error: 'Not logged in' };
         
-        return {
-            provider: provider,
-            timestamp: new Date().toISOString(),
-            metrics: {
-                // Heart Rate
-                resting_heart_rate: Math.round(baseHR),
-                max_heart_rate: Math.round(160 + Math.random() * 30),
-                avg_heart_rate: Math.round(baseHR + 15),
+        try {
+            const response = await fetch(`${this.apiBase}/sync?athlete_id=${athleteId}`);
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('✅ Wearables sync complete:', result);
                 
-                // HRV
-                hrv_rmssd: Math.round(baseHRV),
-                hrv_trend: baseHRV > 50 ? 'up' : (baseHRV > 40 ? 'stable' : 'down'),
-                
-                // Sleep
-                sleep_duration_minutes: Math.round(sleepHours * 60),
-                sleep_deep_minutes: Math.round(sleepHours * 60 * 0.2),
-                sleep_light_minutes: Math.round(sleepHours * 60 * 0.5),
-                sleep_rem_minutes: Math.round(sleepHours * 60 * 0.25),
-                sleep_awake_minutes: Math.round(sleepHours * 60 * 0.05),
-                sleep_score: Math.round(70 + Math.random() * 25),
-                
-                // Activity
-                steps: Math.round(5000 + Math.random() * 10000),
-                calories_total: Math.round(1800 + Math.random() * 1000),
-                calories_active: Math.round(300 + Math.random() * 500),
-                distance_meters: Math.round(3000 + Math.random() * 8000),
-                floors_climbed: Math.round(Math.random() * 20),
-                active_minutes: Math.round(30 + Math.random() * 90),
-                
-                // Stress/Recovery
-                stress_score: Math.round(20 + Math.random() * 50),
-                recovery_score: Math.round(50 + Math.random() * 50),
-                body_battery: Math.round(40 + Math.random() * 60), // Garmin specific
-                strain: Math.round(5 + Math.random() * 15), // WHOOP specific
-                
-                // Readiness (Oura/WHOOP)
-                readiness_score: Math.round(60 + Math.random() * 35)
+                // Emit event for UI update
+                window.dispatchEvent(new CustomEvent('wearables-synced', { 
+                    detail: result 
+                }));
             }
-        };
+            
+            return result;
+        } catch (error) {
+            console.error('Sync error:', error);
+            return { success: false, error: error.message };
+        }
     },
     
-    // Processa e salva dati
-    async processAndSaveData(data) {
+    /**
+     * Sync data from specific provider
+     */
+    async syncProvider(provider) {
         const athleteId = localStorage.getItem('gr_athlete_id');
-        if (!athleteId) return;
+        if (!athleteId) return { success: false, error: 'Not logged in' };
         
-        // Calcola readiness unificato
-        const readiness = this.calculateUnifiedReadiness(data.metrics);
+        try {
+            const response = await fetch(`${this.apiBase}/sync?athlete_id=${athleteId}&provider=${provider}`);
+            return await response.json();
+        } catch (error) {
+            console.error('Sync error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // READINESS CALCULATION (Local fallback + real data)
+    // ═══════════════════════════════════════════════════════════════════════════
         
         // Aggiorna database
         await supabase.update('athletes', athleteId, {

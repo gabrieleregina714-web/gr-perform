@@ -1,0 +1,408 @@
+/*
+ * COACH GENERATE - LAYOUT MASTER
+ * Layout unificato per tutti i dispositivi
+ * Priorità: Chat centrale GRANDE, Experts sinistra, Workout destra
+ */
+
+/* ============================================
+   LAYOUT GRID - DESKTOP FIRST
+   ============================================ */
+
+.main-grid {
+    display: grid !important;
+    grid-template-columns: 260px 1fr 360px !important;
+    grid-template-areas: "experts conversation workout" !important;
+    gap: 0 !important;
+    min-height: calc(100vh - 200px);
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.experts-panel {
+    grid-area: experts !important;
+    display: flex !important;
+    flex-direction: column;
+    background: var(--gray-900);
+    border-right: 1px solid var(--gray-700);
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+}
+
+.conversation-panel {
+    grid-area: conversation !important;
+    display: flex !important;
+    flex-direction: column;
+    background: var(--black);
+    min-width: 0;
+}
+
+.workout-panel {
+    grid-area: workout !important;
+    display: flex !important;
+    flex-direction: column;
+    background: var(--gray-900);
+    border-left: 1px solid var(--gray-700);
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+}
+
+/* Hero Header - same columns */
+.hero-header {
+    display: grid !important;
+    grid-template-columns: 260px 1fr 360px !important;
+}
+
+/* ============================================
+   DESKTOP LARGE (>1400px)
+   ============================================ */
+@media (min-width: 1401px) {
+    .main-grid {
+        grid-template-columns: 300px 1fr 400px !important;
+    }
+    .hero-header {
+        grid-template-columns: 300px 1fr 400px !important;
+    }
+}
+
+/* ============================================
+   DESKTOP MEDIUM (1200px - 1400px)
+   ============================================ */
+@media (min-width: 1200px) and (max-width: 1400px) {
+    .main-grid {
+        grid-template-columns: 260px 1fr 360px !important;
+    }
+    .hero-header {
+        grid-template-columns: 260px 1fr 360px !important;
+    }
+}
+
+/* ============================================
+   DESKTOP SMALL / LAPTOP (1000px - 1199px)
+   ============================================ */
+@media (min-width: 1000px) and (max-width: 1199px) {
+    .main-grid {
+        grid-template-columns: 220px 1fr 320px !important;
+    }
+    .hero-header {
+        grid-template-columns: 220px 1fr 320px !important;
+    }
+    
+    .experts-panel {
+        padding: 16px;
+    }
+    
+    .expert-info p {
+        display: none; /* Nascondi descrizione per risparmiare spazio */
+    }
+    
+    .workout-header {
+        padding: 16px;
+    }
+}
+
+/* ============================================
+   TABLET LANDSCAPE (900px - 999px)
+   ============================================ */
+@media (min-width: 900px) and (max-width: 999px) {
+    .main-grid {
+        grid-template-columns: 180px 1fr 280px !important;
+    }
+    .hero-header {
+        grid-template-columns: 180px 1fr 280px !important;
+    }
+    
+    .experts-panel {
+        padding: 12px;
+    }
+    
+    .expert-card {
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+    
+    .expert-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+    
+    .expert-info h4 {
+        font-size: 12px;
+    }
+    
+    .expert-info p,
+    .expert-status {
+        display: none;
+    }
+    
+    .athlete-context-box {
+        display: none !important;
+    }
+}
+
+/* ============================================
+   TABLET PORTRAIT (768px - 899px)
+   2 colonne: Chat + Workout
+   Experts in alto come strip
+   ============================================ */
+@media (min-width: 768px) and (max-width: 899px) {
+    .main-grid {
+        grid-template-columns: 1fr 320px !important;
+        grid-template-rows: auto 1fr !important;
+        grid-template-areas: 
+            "experts experts"
+            "conversation workout" !important;
+    }
+    
+    .hero-header {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .experts-panel {
+        flex-direction: row !important;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: 12px;
+        padding: 12px 16px;
+        border-right: none;
+        border-bottom: 1px solid var(--gray-700);
+        max-height: none;
+    }
+    
+    .experts-panel .panel-title {
+        display: none;
+    }
+    
+    .expert-card {
+        flex-shrink: 0;
+        width: 150px;
+        margin-bottom: 0;
+    }
+    
+    .expert-info p,
+    .expert-status,
+    .athlete-context-box {
+        display: none !important;
+    }
+}
+
+/* ============================================
+   MOBILE (< 768px)
+   1 colonna: Solo Chat
+   Workout come overlay con FAB
+   ============================================ */
+@media (max-width: 767px) {
+    .main-grid {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto 1fr !important;
+        grid-template-areas: 
+            "experts"
+            "conversation" !important;
+    }
+    
+    .hero-header {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .experts-panel {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+        padding: 12px;
+        border-right: none;
+        border-bottom: 1px solid var(--gray-700);
+        max-height: none;
+        overflow: visible;
+    }
+    
+    .experts-panel .panel-title {
+        grid-column: 1 / -1;
+        margin-bottom: 8px;
+    }
+    
+    .expert-card {
+        margin-bottom: 0;
+        padding: 10px;
+    }
+    
+    .expert-info p,
+    .expert-status,
+    .athlete-context-box,
+    .macrocycle-section,
+    .periodization-section,
+    .wearable-section {
+        display: none !important;
+    }
+    
+    /* Workout Panel - Nascosto di default */
+    .workout-panel {
+        display: none !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 70px; /* Spazio per bottom nav */
+        z-index: 100;
+        max-height: none;
+        border-left: none;
+    }
+    
+    .workout-panel.mobile-show {
+        display: flex !important;
+    }
+    
+    /* FAB visibile */
+    .mobile-fab {
+        display: flex !important;
+    }
+    
+    .workout-panel .close-mobile {
+        display: flex !important;
+    }
+    
+    /* Hero compatto */
+    .hero-header > .hero-top {
+        padding: 20px 16px 10px;
+    }
+    
+    .hero-title {
+        font-size: 28px !important;
+        letter-spacing: -1px;
+    }
+    
+    .hero-subtitle {
+        display: none;
+    }
+    
+    /* Sidebar diventa bottom nav */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        width: 100%;
+        height: 70px;
+        flex-direction: row;
+        padding: 0;
+        justify-content: space-around;
+        align-items: center;
+        border-right: none;
+        border-top: 1px solid var(--gray-700);
+    }
+    
+    .logo {
+        display: none;
+    }
+    
+    .nav-spacer {
+        display: none;
+    }
+    
+    .main {
+        margin-left: 0;
+        margin-bottom: 70px;
+    }
+}
+
+/* ============================================
+   MOBILE SMALL (< 480px)
+   ============================================ */
+@media (max-width: 479px) {
+    .hero-title {
+        font-size: 24px !important;
+    }
+    
+    .experts-panel {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .expert-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    .expert-info h4 {
+        font-size: 11px;
+    }
+    
+    .conversation-messages {
+        padding: 16px 12px;
+    }
+    
+    .coach-input-area {
+        padding: 12px;
+    }
+}
+
+/* ============================================
+   COMPONENTI MOBILE
+   ============================================ */
+
+/* FAB - Floating Action Button */
+.mobile-fab {
+    display: none;
+    position: fixed;
+    bottom: 86px;
+    right: 16px;
+    width: 56px;
+    height: 56px;
+    background: var(--red);
+    border-radius: 50%;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(230,57,70,0.4);
+    z-index: 90;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Close button per workout panel mobile */
+.workout-panel .close-mobile {
+    display: none;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    background: var(--gray-700);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 110;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============================================
+   UTILITY - FORCE OVERRIDES
+   Per risolvere conflitti CSS
+   ============================================ */
+
+/* Desktop: assicura che workout panel sia sempre visibile */
+@media (min-width: 768px) {
+    .workout-panel {
+        display: flex !important;
+    }
+    
+    .mobile-fab {
+        display: none !important;
+    }
+    
+    .workout-panel .close-mobile {
+        display: none !important;
+    }
+}
+
+/* Touch devices override - solo per mobile */
+@media (hover: none) and (pointer: coarse) and (max-width: 767px) {
+    .hero-header {
+        grid-template-columns: 1fr !important;
+    }
+}

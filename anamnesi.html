@@ -96,7 +96,7 @@
                     <label>Peso (kg) *</label>
                     <input type="number" id="weight" placeholder="70" min="30" max="200" step="0.1" required>
                 </div>
-                <div class="form-group full-width">
+                <div class="form-group">
                     <label>Anni di allenamento</label>
                     <select id="experience">
                         <option value="principiante">Meno di 1 anno</option>
@@ -104,6 +104,70 @@
                         <option value="avanzato">3-5 anni</option>
                         <option value="elite">5+ anni</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Livello di forza</label>
+                    <select id="strengthLevel">
+                        <option value="beginner">Principiante (mai sollevato pesi)</option>
+                        <option value="novice">Novizio (qualche mese)</option>
+                        <option value="intermediate">Intermedio (1-3 anni)</option>
+                        <option value="advanced">Avanzato (3+ anni)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ore di sonno medie</label>
+                    <select id="sleepHours">
+                        <option value="less5">Meno di 5 ore</option>
+                        <option value="5-6">5-6 ore</option>
+                        <option value="6-7">6-7 ore</option>
+                        <option value="7-8" selected>7-8 ore</option>
+                        <option value="8+">8+ ore</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Livello di stress (lavoro/studio)</label>
+                    <select id="stressLevel">
+                        <option value="low">Basso</option>
+                        <option value="moderate" selected>Moderato</option>
+                        <option value="high">Alto</option>
+                        <option value="very_high">Molto alto</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Optional: Lift Maxes for Structural Balance -->
+            <div class="lifts-section" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="font-size: 14px; margin-bottom: 8px; color: #16a34a;">
+                    ⚖️ Massimali (opzionale)
+                </h3>
+                <p style="font-size: 12px; color: #888; margin-bottom: 16px;">
+                    Se conosci i tuoi 1RM, inseriscili per un'analisi più precisa del bilancio muscolare
+                </p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Squat 1RM (kg)</label>
+                        <input type="number" id="liftSquat" placeholder="es. 100" min="0" max="500">
+                    </div>
+                    <div class="form-group">
+                        <label>Deadlift 1RM (kg)</label>
+                        <input type="number" id="liftDeadlift" placeholder="es. 120" min="0" max="500">
+                    </div>
+                    <div class="form-group">
+                        <label>Bench Press 1RM (kg)</label>
+                        <input type="number" id="liftBench" placeholder="es. 80" min="0" max="300">
+                    </div>
+                    <div class="form-group">
+                        <label>Row 1RM (kg)</label>
+                        <input type="number" id="liftRow" placeholder="es. 70" min="0" max="300">
+                    </div>
+                    <div class="form-group">
+                        <label>OHP 1RM (kg)</label>
+                        <input type="number" id="liftOHP" placeholder="es. 50" min="0" max="200">
+                    </div>
+                    <div class="form-group">
+                        <label>Pull-up Max BW+kg</label>
+                        <input type="number" id="liftPullup" placeholder="es. +10" min="0" max="100">
+                    </div>
                 </div>
             </div>
         </div>
@@ -249,16 +313,117 @@
                     <option value="90">90 minuti</option>
                 </select>
             </div>
+            
+            <div class="form-group">
+                <label>Momento preferito per allenarti</label>
+                <select id="preferredTime">
+                    <option value="morning">Mattina (6-10)</option>
+                    <option value="midday">Metà giornata (10-14)</option>
+                    <option value="afternoon" selected>Pomeriggio (14-18)</option>
+                    <option value="evening">Sera (18-22)</option>
+                    <option value="flexible">Flessibile</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Hai un partner o spotter disponibile?</label>
+                <select id="hasSpotter">
+                    <option value="no">No, mi alleno da solo</option>
+                    <option value="sometimes">A volte</option>
+                    <option value="yes">Sì, sempre</option>
+                </select>
+            </div>
         </div>
 
         <!-- Step 6: Injuries & Summary -->
         <div class="form-step" id="step6">
             <h2>Quasi fatto!</h2>
-            <p class="subtitle">Infortuni passati e note finali</p>
-            
-            <div class="form-group full-width">
-                <label>Hai infortuni o condizioni di cui dovremmo sapere?</label>
-                <textarea id="injuries" rows="3" placeholder="Es: Distorsione caviglia sinistra 6 mesi fa, dolore occasionale al ginocchio destro..."></textarea>
+            <p class="subtitle">Infortuni, massimali e note finali</p>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Conosci i tuoi massimali? (opzionale)</label>
+                    <p style="font-size: 0.85rem; color: #888; margin-bottom: 0.75rem;">Inserisci i valori in kg. Lascia vuoto se non li conosci.</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                        <div>
+                            <label style="font-size: 0.85rem; color: #888;">Squat</label>
+                            <input type="number" id="maxSquat" placeholder="kg" min="0" max="500">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.85rem; color: #888;">Panca</label>
+                            <input type="number" id="maxBench" placeholder="kg" min="0" max="400">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.85rem; color: #888;">Stacco</label>
+                            <input type="number" id="maxDeadlift" placeholder="kg" min="0" max="500">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.85rem; color: #888;">Military Press</label>
+                            <input type="number" id="maxPress" placeholder="kg" min="0" max="200">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label>Infortuni ATTUALI</label>
+                    <p style="font-size: 0.85rem; color: #888; margin-bottom: 0.5rem;">Problemi che hai ORA e che limitano l'allenamento</p>
+                    <textarea id="currentInjuries" rows="2" placeholder="Es: Dolore spalla destra, fastidio ginocchio sx..."></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label>Infortuni PASSATI rilevanti</label>
+                    <p style="font-size: 0.85rem; color: #888; margin-bottom: 0.5rem;">Infortuni guariti ma di cui tenere conto</p>
+                    <textarea id="pastInjuries" rows="2" placeholder="Es: LCA 2 anni fa, distorsione caviglia 6 mesi fa..."></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Focus allenamento (in percentuale)</label>
+                    <div style="margin-top:0.75rem;display:grid;gap:0.75rem;">
+                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                            <div style="min-width:170px;">Performance/Skill</div>
+                            <input id="focusPctPerformance" type="range" min="0" max="100" value="35" style="flex:1;" />
+                            <div style="min-width:48px;text-align:right;"><span id="focusPctPerformanceVal">35</span>%</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                            <div style="min-width:170px;">Forza</div>
+                            <input id="focusPctStrength" type="range" min="0" max="100" value="25" style="flex:1;" />
+                            <div style="min-width:48px;text-align:right;"><span id="focusPctStrengthVal">25</span>%</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                            <div style="min-width:170px;">Condizionamento</div>
+                            <input id="focusPctConditioning" type="range" min="0" max="100" value="30" style="flex:1;" />
+                            <div style="min-width:48px;text-align:right;"><span id="focusPctConditioningVal">30</span>%</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:0.75rem;">
+                            <div style="min-width:170px;">Mobilità/Prehab</div>
+                            <input id="focusPctMobility" type="range" min="0" max="100" value="10" style="flex:1;" />
+                            <div style="min-width:48px;text-align:right;"><span id="focusPctMobilityVal">10</span>%</div>
+                        </div>
+                        <div style="color:#888;font-size:0.85rem;">Somma = 100%. Se muovi uno slider, gli altri si adattano automaticamente.</div>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>Che attrezzatura hai a disposizione?</label>
+                    <select id="equipmentAccess">
+                        <option value="full_gym">Palestra completa</option>
+                        <option value="basic_gym">Palestra base</option>
+                        <option value="home">Home gym</option>
+                        <option value="outdoor">Solo outdoor/corpo libero</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>Esercizi/allenamenti che ti piacciono (opzionale)</label>
+                    <textarea id="trainingLikes" rows="2" placeholder="Es: bilanciere, sprint, lavoro tecnico, circuiti... (anche 2-3 parole)"></textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label>Esercizi/allenamenti che NON vuoi o che odi (opzionale)</label>
+                    <textarea id="trainingDislikes" rows="2" placeholder="Es: corsa lunga, squat back, burpees..."></textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label>Limitazioni / movimenti da evitare (opzionale)</label>
+                    <textarea id="constraints" rows="2" placeholder="Es: niente overhead pesante, fastidio spalla dx, no impatti...">
+                    </textarea>
+                </div>
             </div>
             
             <div class="form-group full-width">
@@ -286,6 +451,7 @@
     </div>
 
     <script src="js/supabase-client.js"></script>
+    <script src="js/atlas-structural-balance.js"></script>
     <script src="js/anamnesi.js"></script>
 </body>
 </html>

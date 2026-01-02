@@ -2,150 +2,1276 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Allenamento - GR Perform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --black: #0A0A0A; --dark: #1A1A1A; --medium: #2D2D2D; --white: #FFF; --red: #E63946; --green: #22C55E; --yellow: #F59E0B; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
         
-        .header { padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--medium); position: sticky; top: 0; background: var(--black); z-index: 100; }
-        .back-btn { background: none; border: none; color: white; font-size: 1.25rem; cursor: pointer; padding: 0.5rem; }
-        .header-title { font-weight: 600; }
-        .timer { font-family: monospace; font-size: 1.1rem; color: var(--red); }
-        
-        .main { padding: 1.5rem; max-width: 600px; margin: 0 auto; padding-bottom: 100px; }
-        
-        .workout-header { margin-bottom: 1.5rem; }
-        .workout-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .workout-meta { display: flex; gap: 1rem; color: #888; font-size: 0.9rem; }
-        
-        .progress-bar { height: 6px; background: var(--medium); border-radius: 3px; margin-bottom: 1.5rem; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--green); border-radius: 3px; transition: width 0.3s; }
-        
-        .section { margin-bottom: 2rem; }
-        .section-header { font-size: 0.85rem; color: #888; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
-        
-        .warmup-box, .cooldown-box { background: var(--dark); border-radius: 16px; padding: 1rem; }
-        .warmup-box p, .cooldown-box p { color: #aaa; font-size: 0.9rem; line-height: 1.6; }
-        
-        .exercise-card { background: var(--dark); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; border: 2px solid transparent; transition: all 0.2s; }
-        .exercise-card.active { border-color: var(--red); }
-        .exercise-card.completed { opacity: 0.5; }
-        
-        .exercise-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
-        .exercise-order { width: 28px; height: 28px; background: var(--medium); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; margin-right: 0.75rem; }
-        .exercise-card.completed .exercise-order { background: var(--green); }
-        .exercise-name { font-weight: 600; font-size: 1.1rem; flex: 1; }
-        .exercise-prescription { color: var(--red); font-weight: 700; }
-        
-        .exercise-details { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.75rem; font-size: 0.85rem; color: #888; }
-        .exercise-details span { display: flex; align-items: center; gap: 0.25rem; }
-        
-        .exercise-notes { background: var(--medium); padding: 0.75rem; border-radius: 10px; font-size: 0.85rem; margin-bottom: 0.75rem; }
-        .exercise-notes strong { color: var(--yellow); }
-        
-        .exercise-why { font-size: 0.8rem; color: var(--green); font-style: italic; }
-        
-        .sets-tracker { display: flex; gap: 0.5rem; margin-top: 1rem; }
-        .set-btn { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--medium); background: transparent; color: #888; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .set-btn.done { background: var(--green); border-color: var(--green); color: white; }
-        .set-btn:hover { border-color: var(--red); }
-        
-        .complete-btn { position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem 1.5rem; background: var(--black); border-top: 1px solid var(--medium); }
-        .complete-btn button { width: 100%; padding: 1rem; background: var(--green); border: none; border-radius: 12px; color: white; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .complete-btn button:disabled { background: var(--medium); color: #888; cursor: not-allowed; }
-        
-        .rest-timer { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--dark); padding: 3rem; border-radius: 24px; text-align: center; display: none; z-index: 200; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
-        .rest-timer.show { display: block; }
-        .rest-timer h3 { margin-bottom: 1rem; }
-        .rest-timer .time { font-size: 4rem; font-weight: 700; font-family: monospace; }
-        .rest-timer button { margin-top: 1rem; padding: 0.75rem 2rem; background: var(--red); border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; }
-        
-        .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; z-index: 150; }
-        .overlay.show { display: block; }
-        
-        /* Feedback Modal */
-        .feedback-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 300; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
-        .feedback-modal.show { display: flex; }
-        .feedback-content { background: var(--dark); border-radius: 24px; padding: 2rem; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
-        .feedback-content h2 { margin-bottom: 1.5rem; text-align: center; }
-        
-        .feedback-group { margin-bottom: 1.5rem; }
-        .feedback-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        
-        .emoji-scale { display: flex; justify-content: space-between; gap: 0.5rem; }
-        .emoji-btn { flex: 1; padding: 1rem 0.5rem; background: var(--medium); border: 2px solid transparent; border-radius: 12px; font-size: 1.5rem; cursor: pointer; transition: all 0.2s; }
-        .emoji-btn:hover { border-color: var(--red); }
-        .emoji-btn.selected { border-color: var(--green); background: rgba(34, 197, 94, 0.2); }
-        .emoji-btn span { display: block; font-size: 0.65rem; color: #888; margin-top: 0.25rem; }
-        
-        .feedback-textarea { width: 100%; background: var(--medium); border: none; border-radius: 12px; padding: 1rem; color: white; font-family: inherit; font-size: 0.9rem; min-height: 80px; resize: none; }
-        .feedback-textarea::placeholder { color: #666; }
-        
-        .feedback-submit { width: 100%; padding: 1rem; background: var(--green); border: none; border-radius: 12px; color: white; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1rem; }
-        
-        .stats-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
-        .stat-box { background: var(--medium); border-radius: 12px; padding: 1rem; text-align: center; }
-        .stat-box .value { font-size: 1.5rem; font-weight: 700; color: var(--green); }
-        .stat-box .label { font-size: 0.75rem; color: #888; margin-top: 0.25rem; }
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background: #000; 
+            color: #fff; 
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ========== HEADER STICKY ========== */
+        .header { 
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 12px 20px;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .back-btn { 
+            width: 40px;
+            height: 40px;
+            background: transparent; 
+            border: 1.5px solid #333;
+            border-radius: 50%;
+            color: #fff; 
+            font-size: 14px; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            border-color: #E63946;
+            color: #E63946;
+        }
+
+        .header-title { 
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .timer-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(230,57,70,0.15);
+            padding: 8px 14px;
+            border: 1px solid rgba(230,57,70,0.3);
+        }
+
+        .timer-box i {
+            color: #E63946;
+            font-size: 12px;
+        }
+
+        .timer { 
+            font-family: 'Inter', monospace; 
+            font-size: 14px; 
+            font-weight: 700;
+            color: #E63946;
+            letter-spacing: 1px;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main { 
+            padding: 80px 0 140px;
+            max-width: 600px; 
+            margin: 0 auto;
+        }
+
+        /* ========== WORKOUT HERO ========== */
+        .workout-hero {
+            padding: 32px 24px;
+            border-bottom: 1px solid #111;
+        }
+
+        .workout-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #E63946;
+            margin-bottom: 12px;
+        }
+
+        .workout-name { 
+            font-size: 28px; 
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .workout-meta { 
+            display: flex; 
+            gap: 20px; 
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .workout-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .workout-meta i {
+            color: #E63946;
+        }
+
+        /* ========== PROGRESS BAR ========== */
+        .progress-section {
+            padding: 20px 24px;
+            background: #0a0a0a;
+            border-bottom: 1px solid #111;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .progress-count {
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .progress-count span {
+            color: #E63946;
+        }
+
+        .progress-bar { 
+            height: 8px; 
+            background: #1a1a1a;
+            overflow: hidden;
+        }
+
+        .progress-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #E63946 0%, #22C55E 100%);
+            transition: width 0.4s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* ========== SECTIONS ========== */
+        .section { 
+            padding: 24px;
+        }
+
+        .section-header { 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 16px;
+        }
+
+        .section-header i {
+            color: #E63946;
+        }
+
+        /* ========== WARMUP/COOLDOWN ========== */
+        .phase-box { 
+            background: #111;
+            border: 1px solid #222;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phase-box::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #E63946;
+        }
+
+        .phase-box.cooldown::before {
+            background: #3B82F6;
+        }
+
+        .phase-box p { 
+            color: rgba(255,255,255,0.7);
+            font-size: 13px; 
+            line-height: 1.7;
+        }
+
+        .phase-box strong {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        /* ========== EXERCISE GROUPS (Superset, Circuit, etc) ========== */
+        .exercise-group {
+            margin-bottom: 16px;
+            border: 2px solid #333;
+            background: #0a0a0a;
+        }
+
+        .exercise-group.superset {
+            border-color: #8B5CF6;
+        }
+
+        .exercise-group.circuit {
+            border-color: #F59E0B;
+        }
+
+        .exercise-group.dropset {
+            border-color: #EC4899;
+        }
+
+        .group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #111;
+            border-bottom: 1px solid #222;
+        }
+
+        .group-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 6px 12px;
+        }
+
+        .group-badge.superset {
+            background: rgba(139,92,246,0.2);
+            color: #8B5CF6;
+        }
+
+        .group-badge.circuit {
+            background: rgba(245,158,11,0.2);
+            color: #F59E0B;
+        }
+
+        .group-badge.dropset {
+            background: rgba(236,72,153,0.2);
+            color: #EC4899;
+        }
+
+        .group-badge.emom {
+            background: rgba(34,197,94,0.2);
+            color: #22C55E;
+        }
+
+        .group-badge.amrap {
+            background: rgba(59,130,246,0.2);
+            color: #3B82F6;
+        }
+
+        .group-info {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .group-exercises {
+            padding: 0;
+        }
+
+        .group-exercises .exercise-card {
+            margin-bottom: 0;
+            border: none;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .group-exercises .exercise-card:last-child {
+            border-bottom: none;
+        }
+
+        .group-connector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            background: #0a0a0a;
+            color: rgba(255,255,255,0.3);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .group-connector i {
+            margin-right: 6px;
+        }
+
+        /* Method badge inline */
+        .method-badge {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .method-badge.superset { background: rgba(139,92,246,0.2); color: #8B5CF6; }
+        .method-badge.dropset { background: rgba(236,72,153,0.2); color: #EC4899; }
+        .method-badge.circuit { background: rgba(245,158,11,0.2); color: #F59E0B; }
+        .method-badge.emom { background: rgba(34,197,94,0.2); color: #22C55E; }
+        .method-badge.amrap { background: rgba(59,130,246,0.2); color: #3B82F6; }
+        .method-badge.rest-pause { background: rgba(239,68,68,0.2); color: #EF4444; }
+
+        /* ========== CIRCUIT STATIONS ========== */
+        .circuit-stations {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 8px;
+            padding: 12px 16px;
+        }
+
+        .circuit-station {
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.2);
+            padding: 12px;
+            text-align: center;
+            position: relative;
+        }
+
+        .station-number {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 20px;
+            height: 20px;
+            background: #F59E0B;
+            color: #000;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .station-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            line-height: 1.3;
+        }
+
+        .circuit-timing {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            padding: 12px 16px;
+            background: rgba(245,158,11,0.05);
+            border-top: 1px solid rgba(245,158,11,0.15);
+        }
+
+        .timing-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .timing-item strong {
+            color: #F59E0B;
+            font-weight: 700;
+        }
+
+        /* EMOM/AMRAP special layout */
+        .emom-blocks {
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .emom-block {
+            background: rgba(34,197,94,0.08);
+            border-left: 3px solid #22C55E;
+            padding: 10px 14px;
+        }
+
+        .emom-block.odd {
+            border-left-color: #3B82F6;
+            background: rgba(59,130,246,0.08);
+        }
+
+        .emom-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 4px;
+        }
+
+        .emom-content {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Drop set visual */
+        .dropset-chain {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            padding: 8px 16px;
+            background: rgba(236,72,153,0.05);
+        }
+
+        .dropset-step {
+            background: rgba(236,72,153,0.15);
+            color: #EC4899;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .dropset-arrow {
+            color: #EC4899;
+            font-size: 10px;
+        }
+
+        /* Giant Set styling */
+        .exercise-group.giantset {
+            border-color: #22D3EE;
+        }
+
+        .group-badge.giantset {
+            background: rgba(34,211,238,0.2);
+            color: #22D3EE;
+        }
+
+        /* Superset compact connector */
+        .group-connector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            background: linear-gradient(to bottom, rgba(139,92,246,0.1), transparent);
+            color: #8B5CF6;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            gap: 6px;
+        }
+
+        .group-connector.circuit-conn {
+            background: linear-gradient(to bottom, rgba(245,158,11,0.1), transparent);
+            color: #F59E0B;
+        }
+
+        /* ========== EXERCISE CARDS ========== */
+        .exercise-card { 
+            background: #111;
+            border: 1px solid #222;
+            padding: 0;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .exercise-card.active { 
+            border-color: #E63946;
+            box-shadow: 0 0 30px rgba(230,57,70,0.2);
+        }
+
+        .exercise-card.completed { 
+            opacity: 0.5;
+        }
+
+        .exercise-main {
+            padding: 20px;
+        }
+
+        .exercise-top { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .exercise-left {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .exercise-order { 
+            width: 36px; 
+            height: 36px; 
+            background: #222;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .exercise-card.active .exercise-order {
+            background: #E63946;
+        }
+
+        .exercise-card.completed .exercise-order { 
+            background: #22C55E;
+        }
+
+        .exercise-info {
+            flex: 1;
+        }
+
+        .exercise-name { 
+            font-weight: 800;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .exercise-details { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 12px;
+            font-size: 11px; 
+            color: rgba(255,255,255,0.4);
+        }
+
+        .exercise-details span { 
+            display: flex; 
+            align-items: center; 
+            gap: 4px;
+        }
+
+        .exercise-prescription { 
+            background: linear-gradient(135deg, #E63946 0%, #B71C1C 100%);
+            color: #fff;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 8px 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .exercise-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .video-tutorial-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(230, 57, 70, 0.15);
+            border-radius: 50%;
+            color: #E63946;
+            font-size: 18px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .video-tutorial-btn:hover {
+            background: #E63946;
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .exercise-notes { 
+            background: #1a1a1a;
+            border-left: 3px solid #F59E0B;
+            padding: 12px 16px;
+            font-size: 12px;
+            margin: 16px 0 0;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .exercise-notes strong { 
+            color: #F59E0B;
+            font-weight: 700;
+        }
+
+        .exercise-why { 
+            font-size: 11px; 
+            color: #22C55E;
+            margin-top: 12px;
+            padding-left: 16px;
+            border-left: 2px solid #22C55E;
+        }
+
+        /* ========== SETS TRACKER ========== */
+        .sets-section {
+            padding: 16px 20px;
+            background: #0a0a0a;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .sets-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 12px;
+        }
+
+        .sets-tracker { 
+            display: flex; 
+            gap: 10px;
+        }
+
+        .set-btn { 
+            width: 48px; 
+            height: 48px;
+            border: 2px solid #333;
+            background: transparent; 
+            color: rgba(255,255,255,0.5);
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+
+        .set-btn:hover {
+            border-color: #E63946;
+            color: #fff;
+        }
+
+        .set-btn.done { 
+            background: #22C55E; 
+            border-color: #22C55E; 
+            color: #fff;
+            animation: setComplete 0.3s ease;
+        }
+
+        @keyframes setComplete {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* ========== EXERCISE FEEDBACK ========== */
+        .exercise-feedback { 
+            display: none;
+            padding: 20px;
+            background: #0a0a0a;
+            border-top: 1px dashed #222;
+        }
+
+        .exercise-card.completed .exercise-feedback { 
+            display: block;
+        }
+
+        .feedback-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 14px;
+        }
+
+        .difficulty-btns { 
+            display: flex; 
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .difficulty-btn { 
+            flex: 1; 
+            padding: 12px 8px;
+            border: 1px solid #222;
+            background: transparent;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer; 
+            transition: all 0.2s;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .difficulty-btn:hover { 
+            border-color: #E63946;
+            color: #fff;
+        }
+
+        .difficulty-btn.selected {
+            color: #fff;
+        }
+
+        .difficulty-btn.too-easy.selected { 
+            background: rgba(34,197,94,0.2);
+            border-color: #22C55E;
+            color: #22C55E;
+        }
+
+        .difficulty-btn.just-right.selected { 
+            background: rgba(245,158,11,0.2);
+            border-color: #F59E0B;
+            color: #F59E0B;
+        }
+
+        .difficulty-btn.too-hard.selected { 
+            background: rgba(230,57,70,0.2);
+            border-color: #E63946;
+            color: #E63946;
+        }
+
+        .feedback-row { 
+            display: flex; 
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .feedback-row label { 
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            min-width: 45px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .feedback-input { 
+            flex: 1;
+            padding: 10px 14px;
+            background: #111;
+            border: 1px solid #222;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .feedback-input:focus { 
+            border-color: #E63946;
+            outline: none;
+        }
+
+        .pain-toggle { 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: transparent;
+            border: 1px solid #222;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            transition: all 0.2s;
+        }
+
+        .pain-toggle:hover { 
+            border-color: #E63946;
+        }
+
+        .pain-toggle.active { 
+            background: rgba(230,57,70,0.2);
+            border-color: #E63946;
+            color: #E63946;
+        }
+
+        .pain-area-select { 
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .pain-toggle.active + .pain-area-select { 
+            display: flex;
+        }
+
+        .pain-area-btn { 
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px solid #222;
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pain-area-btn:hover {
+            border-color: #E63946;
+        }
+
+        .pain-area-btn.selected { 
+            background: rgba(230,57,70,0.2);
+            border-color: #E63946;
+            color: #E63946;
+        }
+
+        /* ========== COMPLETE BUTTON ========== */
+        .complete-section { 
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 24px 28px;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid #1a1a1a;
+            z-index: 100;
+        }
+
+        .complete-btn { 
+            width: 100%;
+            padding: 18px;
+            background: #22C55E;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .complete-btn:hover {
+            background: #16a34a;
+        }
+
+        .complete-btn:disabled { 
+            background: #222;
+            color: rgba(255,255,255,0.3);
+            cursor: not-allowed;
+        }
+
+        /* ========== REST TIMER OVERLAY ========== */
+        .overlay { 
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            display: none;
+            z-index: 150;
+        }
+
+        .overlay.show { 
+            display: block;
+        }
+
+        .rest-timer { 
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #111;
+            border: 2px solid #E63946;
+            width: 90%;
+            max-width: 320px;
+            padding: 48px 32px;
+            text-align: center;
+            display: none;
+            z-index: 200;
+        }
+
+        .rest-timer.show { 
+            display: block;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .rest-timer h3 { 
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 16px;
+        }
+
+        .rest-timer .time { 
+            font-size: 80px;
+            font-weight: 900;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -4px;
+            line-height: 1;
+            color: #E63946;
+        }
+
+        .rest-timer .rest-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .rest-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .rest-btn { 
+            flex: 1;
+            padding: 14px;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .rest-btn.skip {
+            background: #E63946;
+            color: #fff;
+        }
+
+        .rest-btn.add {
+            background: transparent;
+            border: 1px solid #333;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .rest-btn.add:hover {
+            border-color: #E63946;
+        }
+
+        /* ========== FEEDBACK MODAL ========== */
+        .feedback-modal { 
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 300;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .feedback-modal.show { 
+            display: flex;
+        }
+
+        .feedback-content { 
+            background: #111;
+            border: 1px solid #222;
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .feedback-header {
+            padding: 32px 24px;
+            text-align: center;
+            border-bottom: 1px solid #222;
+        }
+
+        .feedback-header .trophy {
+            font-size: 56px;
+            margin-bottom: 16px;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .feedback-header h2 { 
+            font-size: 24px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .stats-preview { 
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .stat-box { 
+            padding: 24px 16px;
+            text-align: center;
+            border-right: 1px solid #222;
+        }
+
+        .stat-box:last-child {
+            border-right: none;
+        }
+
+        .stat-box .value { 
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: #22C55E;
+        }
+
+        .stat-box .label { 
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
+        }
+
+        .feedback-body {
+            padding: 24px;
+        }
+
+        .feedback-group { 
+            margin-bottom: 24px;
+        }
+
+        .feedback-group label { 
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 12px;
+        }
+
+        .emoji-scale { 
+            display: flex;
+            gap: 8px;
+        }
+
+        .emoji-btn { 
+            flex: 1;
+            padding: 16px 8px;
+            background: #1a1a1a;
+            border: 2px solid transparent;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .emoji-btn:hover { 
+            border-color: #333;
+        }
+
+        .emoji-btn.selected { 
+            border-color: #22C55E;
+            background: rgba(34,197,94,0.15);
+        }
+
+        .emoji-btn span { 
+            display: block;
+            font-size: 9px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .feedback-textarea { 
+            width: 100%;
+            background: #1a1a1a;
+            border: 1px solid #222;
+            padding: 16px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            min-height: 100px;
+            resize: none;
+        }
+
+        .feedback-textarea:focus {
+            outline: none;
+            border-color: #E63946;
+        }
+
+        .feedback-textarea::placeholder { 
+            color: rgba(255,255,255,0.3);
+        }
+
+        .feedback-submit { 
+            width: 100%;
+            padding: 18px;
+            background: #22C55E;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: background 0.2s;
+        }
+
+        .feedback-submit:hover {
+            background: #16a34a;
+        }
+
+        /* ========== SAFE AREA ========== */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .complete-section {
+                padding-bottom: calc(16px + env(safe-area-inset-bottom));
+            }
+        }
+
+        /* ========== MOBILE ========== */
+        @media (max-width: 480px) {
+            .workout-name { font-size: 24px; }
+            .rest-timer .time { font-size: 64px; }
+        }
     </style>
 </head>
 <body>
+    <!-- HEADER -->
     <header class="header">
-        <button class="back-btn" onclick="confirmExit()"><i class="fas fa-arrow-left"></i></button>
-        <span class="header-title">Allenamento</span>
-        <span class="timer" id="totalTimer">00:00</span>
+        <button class="back-btn" onclick="handleBack()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <span class="header-title">In Allenamento</span>
+        <div class="timer-box">
+            <i class="fas fa-clock"></i>
+            <span class="timer" id="totalTimer">00:00</span>
+        </div>
     </header>
     
     <main class="main">
-        <div class="workout-header">
-            <div class="workout-name" id="workoutName">Caricamento...</div>
+        <!-- WORKOUT HERO -->
+        <div class="workout-hero">
+            <div class="workout-badge">
+                <i class="fas fa-bolt"></i>
+                <span>Workout Attivo</span>
+            </div>
+            <h1 class="workout-name" id="workoutName">Caricamento...</h1>
             <div class="workout-meta">
                 <span><i class="fas fa-clock"></i> <span id="duration">-</span> min</span>
                 <span><i class="fas fa-dumbbell"></i> <span id="exerciseCount">-</span> esercizi</span>
             </div>
         </div>
-        
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+
+        <!-- PROGRESS -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <span class="progress-label">Progresso</span>
+                <span class="progress-count"><span id="completedSets">0</span>/<span id="totalSetsCount">0</span> set</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
         </div>
         
+        <!-- WARMUP -->
         <div id="warmupSection" class="section" style="display:none;">
             <div class="section-header"><i class="fas fa-fire"></i> Warm-up</div>
-            <div class="warmup-box"><p id="warmupContent"></p></div>
+            <div class="phase-box"><p id="warmupContent"></p></div>
         </div>
         
+        <!-- EXERCISES -->
         <div class="section">
             <div class="section-header"><i class="fas fa-dumbbell"></i> Esercizi</div>
             <div id="exercisesList"></div>
         </div>
         
+        <!-- COOLDOWN -->
         <div id="cooldownSection" class="section" style="display:none;">
             <div class="section-header"><i class="fas fa-snowflake"></i> Cool-down</div>
-            <div class="cooldown-box"><p id="cooldownContent"></p></div>
+            <div class="phase-box cooldown"><p id="cooldownContent"></p></div>
         </div>
     </main>
-    
-    <div class="complete-btn">
-        <button id="completeBtn" disabled onclick="showFeedback()">
+
+    <!-- COMPLETE BUTTON -->
+    <div class="complete-section">
+        <button class="complete-btn" id="completeBtn" disabled onclick="showFeedback()">
             <i class="fas fa-check-circle"></i> Completa Allenamento
         </button>
     </div>
-    
+
+    <!-- OVERLAYS -->
     <div class="overlay" id="overlay"></div>
+    
+    <!-- REST TIMER -->
     <div class="rest-timer" id="restTimer">
         <h3>⏱️ Recupero</h3>
         <div class="time" id="restTime">90</div>
-        <button onclick="skipRest()">Salta</button>
+        <div class="rest-label">secondi</div>
+        <div class="rest-buttons">
+            <button class="rest-btn add" onclick="addRestTime(30)">+30s</button>
+            <button class="rest-btn skip" onclick="skipRest()">Salta</button>
+        </div>
     </div>
     
     <!-- Feedback Modal -->
     <div class="feedback-modal" id="feedbackModal">
         <div class="feedback-content">
-            <h2>🏆 Ottimo lavoro!</h2>
+            <div class="feedback-header">
+                <div class="trophy">🏆</div>
+                <h2>Ottimo Lavoro!</h2>
+            </div>
             
             <div class="stats-preview">
                 <div class="stat-box">
@@ -154,48 +1280,57 @@
                 </div>
                 <div class="stat-box">
                     <div class="value" id="statSets">--</div>
-                    <div class="label">Set completati</div>
+                    <div class="label">Set</div>
                 </div>
                 <div class="stat-box">
                     <div class="value">+100</div>
                     <div class="label">XP</div>
                 </div>
             </div>
-            
-            <div class="feedback-group">
-                <label>Come ti sei sentito?</label>
-                <div class="emoji-scale" id="feelingScale">
-                    <button class="emoji-btn" data-value="1" onclick="selectFeeling(this)">😫<span>Distrutto</span></button>
-                    <button class="emoji-btn" data-value="2" onclick="selectFeeling(this)">😓<span>Difficile</span></button>
-                    <button class="emoji-btn" data-value="3" onclick="selectFeeling(this)">😊<span>Bene</span></button>
-                    <button class="emoji-btn" data-value="4" onclick="selectFeeling(this)">💪<span>Forte</span></button>
-                    <button class="emoji-btn" data-value="5" onclick="selectFeeling(this)">🔥<span>Top!</span></button>
+
+            <div class="feedback-body">
+                <div class="feedback-group">
+                    <label>Come ti sei sentito?</label>
+                    <div class="emoji-scale" id="feelingScale">
+                        <button class="emoji-btn" data-value="1" onclick="selectFeeling(this)">😫<span>Distrutto</span></button>
+                        <button class="emoji-btn" data-value="2" onclick="selectFeeling(this)">😓<span>Duro</span></button>
+                        <button class="emoji-btn" data-value="3" onclick="selectFeeling(this)">😊<span>Bene</span></button>
+                        <button class="emoji-btn" data-value="4" onclick="selectFeeling(this)">💪<span>Forte</span></button>
+                        <button class="emoji-btn" data-value="5" onclick="selectFeeling(this)">🔥<span>Top!</span></button>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="feedback-group">
-                <label>Livello di fatica (RPE)</label>
-                <div class="emoji-scale" id="rpeScale">
-                    <button class="emoji-btn" data-value="6" onclick="selectRPE(this)">6<span>Facile</span></button>
-                    <button class="emoji-btn" data-value="7" onclick="selectRPE(this)">7<span>Medio</span></button>
-                    <button class="emoji-btn" data-value="8" onclick="selectRPE(this)">8<span>Duro</span></button>
-                    <button class="emoji-btn" data-value="9" onclick="selectRPE(this)">9<span>Molto</span></button>
-                    <button class="emoji-btn" data-value="10" onclick="selectRPE(this)">10<span>Max</span></button>
+                
+                <div class="feedback-group">
+                    <label>Livello di fatica (RPE)</label>
+                    <div class="emoji-scale" id="rpeScale">
+                        <button class="emoji-btn" data-value="6" onclick="selectRPE(this)">6<span>Facile</span></button>
+                        <button class="emoji-btn" data-value="7" onclick="selectRPE(this)">7<span>Medio</span></button>
+                        <button class="emoji-btn" data-value="8" onclick="selectRPE(this)">8<span>Duro</span></button>
+                        <button class="emoji-btn" data-value="9" onclick="selectRPE(this)">9<span>Molto</span></button>
+                        <button class="emoji-btn" data-value="10" onclick="selectRPE(this)">10<span>Max</span></button>
+                    </div>
                 </div>
+                
+                <div class="feedback-group">
+                    <label>Note (dolori, sensazioni)</label>
+                    <textarea class="feedback-textarea" id="feedbackNotes" placeholder="Es: Leggero fastidio alla spalla, squat sembrava leggero..."></textarea>
+                </div>
+                
+                <button class="feedback-submit" onclick="submitFeedback()">
+                    <i class="fas fa-check"></i> Salva e Completa
+                </button>
             </div>
-            
-            <div class="feedback-group">
-                <label>Note (dolori, problemi, sensazioni)</label>
-                <textarea class="feedback-textarea" id="feedbackNotes" placeholder="Es: Leggero fastidio alla spalla destra, squat sembrava leggero oggi..."></textarea>
-            </div>
-            
-            <button class="feedback-submit" onclick="submitFeedback()">
-                <i class="fas fa-check"></i> Salva e Completa
-            </button>
         </div>
     </div>
     
     <script src="js/supabase-client.js"></script>
+    <script src="js/feedback-engine.js"></script>
+    <!-- ATLAS Progression for tracking -->
+    <script src="js/atlas-progression.js"></script>
+    <!-- ATLAS Feedback Loop for intelligent adjustments -->
+    <script src="js/atlas-feedback.js"></script>
+    <!-- ATLAS Video Library for exercise tutorials -->
+    <script src="js/atlas-videos.js"></script>
     <script>
         const workoutId = new URLSearchParams(window.location.search).get('id');
         const athleteId = localStorage.getItem('gr_athlete_id');
@@ -206,23 +1341,181 @@
         let totalSets = 0;
         let completedTotal = 0;
         let startTime = Date.now();
+        let totalTimerInterval = null;
         let restInterval = null;
         let selectedFeeling = 3; // Default: Bene
         let selectedRPE = 7; // Default: Medio
+        let exerciseFeedback = {}; // Feedback per esercizio
+
+        function setExerciseDifficulty(exerciseIndex, difficulty, btn) {
+            // Store feedback for this exercise
+            if (!exerciseFeedback[exerciseIndex]) {
+                exerciseFeedback[exerciseIndex] = {
+                    name: exercises[exerciseIndex]?.name || `Esercizio ${exerciseIndex + 1}`,
+                    exercise_type: exercises[exerciseIndex]?.type || 'strength'
+                };
+            }
+            exerciseFeedback[exerciseIndex].difficulty = difficulty;
+            
+            // Update button UI
+            const container = btn.parentElement;
+            container.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            
+            console.log('📝 Exercise feedback:', exerciseFeedback);
+        }
+
+        function setExerciseWeight(exerciseIndex, weight) {
+            if (!exerciseFeedback[exerciseIndex]) {
+                exerciseFeedback[exerciseIndex] = {
+                    name: exercises[exerciseIndex]?.name || `Esercizio ${exerciseIndex + 1}`
+                };
+            }
+            exerciseFeedback[exerciseIndex].actual_weight = weight;
+        }
+
+        function setExerciseRpe(exerciseIndex, rpe) {
+            if (!exerciseFeedback[exerciseIndex]) {
+                exerciseFeedback[exerciseIndex] = {
+                    name: exercises[exerciseIndex]?.name || `Esercizio ${exerciseIndex + 1}`
+                };
+            }
+            exerciseFeedback[exerciseIndex].exercise_rpe = parseInt(rpe) || null;
+        }
+
+        function togglePain(exerciseIndex, btn) {
+            btn.classList.toggle('active');
+            const isActive = btn.classList.contains('active');
+            
+            if (!exerciseFeedback[exerciseIndex]) {
+                exerciseFeedback[exerciseIndex] = {
+                    name: exercises[exerciseIndex]?.name || `Esercizio ${exerciseIndex + 1}`
+                };
+            }
+            exerciseFeedback[exerciseIndex].pain_during = isActive;
+            
+            // Show/hide pain area selector
+            const painAreaDiv = document.getElementById(`pain-area-${exerciseIndex}`);
+            if (painAreaDiv) {
+                painAreaDiv.style.display = isActive ? 'flex' : 'none';
+            }
+            
+            // Clear pain area if toggled off
+            if (!isActive) {
+                exerciseFeedback[exerciseIndex].pain_area = null;
+                exerciseFeedback[exerciseIndex].pain_intensity = 0;
+                if (painAreaDiv) {
+                    painAreaDiv.querySelectorAll('.pain-area-btn').forEach(b => b.classList.remove('selected'));
+                }
+            }
+        }
+
+        function setPainArea(exerciseIndex, area, btn) {
+            if (!exerciseFeedback[exerciseIndex]) {
+                exerciseFeedback[exerciseIndex] = {
+                    name: exercises[exerciseIndex]?.name || `Esercizio ${exerciseIndex + 1}`
+                };
+            }
+            exerciseFeedback[exerciseIndex].pain_area = area;
+            exerciseFeedback[exerciseIndex].pain_intensity = 5; // Default medio
+            
+            // Update button UI
+            const container = btn.parentElement;
+            container.querySelectorAll('.pain-area-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            
+            console.log('🩹 Pain recorded:', area, 'for exercise', exerciseIndex);
+        }
+
+        function getElapsedMinutes() {
+            const elapsedSeconds = (Date.now() - startTime) / 1000;
+            if (!Number.isFinite(elapsedSeconds) || elapsedSeconds <= 0) return 0;
+            return Math.max(1, Math.ceil(elapsedSeconds / 60));
+        }
+
+        function goBack() {
+            // Try to go back, or redirect to workouts page
+            if (window.history.length > 1) {
+                history.back();
+            } else {
+                window.location.href = 'app-workouts.html';
+            }
+        }
+
+        function handleBack() {
+            // Se workout non caricato, vai direttamente indietro
+            if (!workout) {
+                goBack();
+                return;
+            }
+            // Se allenamento iniziato, chiedi conferma
+            if (completedTotal > 0 && completedTotal < totalSets) {
+                if (confirm('Vuoi davvero uscire? L\'allenamento non è completo.')) {
+                    goBack();
+                }
+            } else {
+                goBack();
+            }
+        }
         
         async function loadWorkout() {
             if (!workoutId) {
-                alert('Workout ID mancante');
-                history.back();
+                document.getElementById('workoutName').textContent = 'Nessun workout selezionato';
+                document.getElementById('exercisesList').innerHTML = `
+                    <div style="text-align:center; padding:60px 24px;">
+                        <div style="font-size:48px; margin-bottom:16px;">🏋️</div>
+                        <h3 style="font-size:18px; margin-bottom:8px;">Nessun workout</h3>
+                        <p style="color:rgba(255,255,255,0.4); margin-bottom:24px;">Seleziona un workout dalla pagina allenamenti</p>
+                        <a href="app-workouts.html" style="display:inline-block; background:#E63946; color:#fff; padding:14px 28px; text-decoration:none; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Vai ai Workout</a>
+                    </div>
+                `;
                 return;
             }
+
+            // Check for test mode (localStorage workout)
+            const isTestMode = new URLSearchParams(window.location.search).get('test') === '1';
+            if (isTestMode) {
+                const testData = localStorage.getItem('testWorkout_' + workoutId);
+                if (testData) {
+                    try {
+                        workout = JSON.parse(testData);
+                        console.log('🧪 Modalità Test - Workout caricato da localStorage:', workout);
+                    } catch (e) {
+                        console.error('Errore parsing test workout:', e);
+                    }
+                }
+            }
             
-            const workouts = await supabase.fetch('workouts', `?id=eq.${workoutId}`);
-            workout = workouts[0];
+            // If not test mode or test workout not found, load from Supabase
+            if (!workout) {
+                try {
+                    const workouts = await supabase.fetch('workouts', `?id=eq.${workoutId}`);
+                    workout = workouts[0];
+                } catch (error) {
+                    console.error('Errore caricamento workout:', error);
+                    document.getElementById('workoutName').textContent = 'Errore di connessione';
+                    document.getElementById('exercisesList').innerHTML = `
+                        <div style="text-align:center; padding:60px 24px;">
+                            <div style="font-size:48px; margin-bottom:16px;">⚠️</div>
+                            <h3 style="font-size:18px; margin-bottom:8px;">Errore di connessione</h3>
+                            <p style="color:rgba(255,255,255,0.4); margin-bottom:24px;">Impossibile caricare il workout</p>
+                            <a href="app-workouts.html" style="display:inline-block; background:#E63946; color:#fff; padding:14px 28px; text-decoration:none; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Vai ai Workout</a>
+                        </div>
+                    `;
+                    return;
+                }
+            }
             
             if (!workout) {
-                alert('Workout non trovato');
-                history.back();
+                document.getElementById('workoutName').textContent = 'Workout non trovato';
+                document.getElementById('exercisesList').innerHTML = `
+                    <div style="text-align:center; padding:60px 24px;">
+                        <div style="font-size:48px; margin-bottom:16px;">❌</div>
+                        <h3 style="font-size:18px; margin-bottom:8px;">Workout non trovato</h3>
+                        <p style="color:rgba(255,255,255,0.4); margin-bottom:24px;">Il workout richiesto non esiste</p>
+                        <a href="app-workouts.html" style="display:inline-block; background:#E63946; color:#fff; padding:14px 28px; text-decoration:none; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Vai ai Workout</a>
+                    </div>
+                `;
                 return;
             }
             
@@ -273,58 +1566,436 @@
             renderExercises();
             startTimer();
         }
+
+        // Detect exercise methodology from name
+        function detectMethod(name) {
+            const n = name.toLowerCase();
+            if (n.includes('superset') || /^[a-c][12]:/.test(n)) return 'superset';
+            if (n.includes('drop set') || n.includes('dropset')) return 'dropset';
+            if (n.includes('circuit') || n.includes('circuito')) return 'circuit';
+            if (n.includes('emom')) return 'emom';
+            if (n.includes('amrap')) return 'amrap';
+            if (n.includes('rest-pause') || n.includes('rest pause')) return 'rest-pause';
+            return null;
+        }
+
+        // Get superset group letter (A, B, C, etc)
+        function getSupersetGroup(name) {
+            const match = name.match(/^([A-C])([1-9]):/i);
+            return match ? match[1].toUpperCase() : null;
+        }
+
+        // Clean exercise name (remove method indicators)
+        function cleanExerciseName(name) {
+            return name
+                .replace(/\s*\(superset\)\s*/gi, '')
+                .replace(/\s*\(drop\s*set\)\s*/gi, '')
+                .replace(/\s*\(circuit\)\s*/gi, '')
+                .replace(/\s*\(emom\)\s*/gi, '')
+                .replace(/\s*\(amrap\)\s*/gi, '')
+                .trim();
+        }
+
+        // Get method badge HTML
+        function getMethodBadge(method) {
+            const badges = {
+                'superset': '<span class="method-badge superset">Superset</span>',
+                'dropset': '<span class="method-badge dropset">Drop Set</span>',
+                'circuit': '<span class="method-badge circuit">Circuit</span>',
+                'emom': '<span class="method-badge emom">EMOM</span>',
+                'amrap': '<span class="method-badge amrap">AMRAP</span>',
+                'rest-pause': '<span class="method-badge rest-pause">Rest-Pause</span>'
+            };
+            return badges[method] || '';
+        }
+
+        // Parse circuit string into stations
+        // Example: "Circuit: 6 stazioni x 40" ON / 20" OFF x 3 giri | 1) Jump Rope 2) Med Ball Slams..."
+        function parseCircuit(name) {
+            const result = {
+                title: 'Circuito',
+                stations: [],
+                timing: { on: null, off: null, rounds: null, duration: null },
+                isEmom: false,
+                emomBlocks: []
+            };
+
+            // Check if EMOM
+            if (/emom/i.test(name)) {
+                result.isEmom = true;
+                // Parse EMOM duration
+                const durationMatch = name.match(/emom\s*(\d+)/i);
+                if (durationMatch) result.timing.duration = durationMatch[1] + "'";
+                
+                // Parse EMOM blocks (min pari / min dispari)
+                const blocks = name.split('|').slice(1);
+                blocks.forEach((block, idx) => {
+                    result.emomBlocks.push({
+                        label: idx % 2 === 0 ? 'Min Pari' : 'Min Dispari',
+                        content: block.trim()
+                    });
+                });
+                return result;
+            }
+
+            // Parse timing: "40" ON / 20" OFF" or "45"/15""
+            const timingMatch = name.match(/(\d+)[""']\s*(?:on)?\s*[\/\-]\s*(\d+)[""']\s*(?:off)?/i);
+            if (timingMatch) {
+                result.timing.on = timingMatch[1] + '"';
+                result.timing.off = timingMatch[2] + '"';
+            }
+
+            // Parse rounds: "x 3 giri" or "3 rounds"
+            const roundsMatch = name.match(/x?\s*(\d+)\s*(?:giri|round|volte)/i);
+            if (roundsMatch) {
+                result.timing.rounds = parseInt(roundsMatch[1]);
+            }
+
+            // Parse stations: "1) Jump Rope 2) Med Ball Slams" or "1. Jump Rope, 2. Med Ball"
+            const stationsMatch = name.match(/\|(.+)$/);
+            if (stationsMatch) {
+                const stationsText = stationsMatch[1];
+                // Match patterns like "1) Name" or "1. Name" or just split by numbers
+                const stationParts = stationsText.split(/\d+[\)\.\-]/).filter(s => s.trim());
+                stationParts.forEach(s => {
+                    const cleaned = s.replace(/^\s*[\)\.\-:]\s*/, '').trim();
+                    if (cleaned) result.stations.push(cleaned);
+                });
+            }
+
+            // If no stations found with |, try to extract from the name itself
+            if (result.stations.length === 0) {
+                const altMatch = name.match(/(\d+)\s*stazioni?/i);
+                if (altMatch) {
+                    result.title = `Circuito ${altMatch[1]} stazioni`;
+                }
+            }
+
+            return result;
+        }
+
+        // Parse drop set reps: "12 + drop 8 + drop 6"
+        function parseDropSets(reps) {
+            if (!reps) return null;
+            const str = reps.toString();
+            if (!/drop|↓|\+/i.test(str)) return null;
+            
+            // Parse "12 + drop 8 + drop 6" or "12 → 8 → 6" or "12, 8, 6"
+            const parts = str.split(/\+|→|↓/).map(p => p.replace(/drop/gi, '').trim()).filter(Boolean);
+            return parts.length > 1 ? parts : null;
+        }
+
+        // Render circuit exercise with visual stations
+        function renderCircuitExercise(ex, i) {
+            const circuit = parseCircuit(ex.name);
+            const sets = parseInt(ex.sets) || circuit.timing.rounds || 3;
+            
+            let html = `<div class="exercise-group circuit" id="exercise-${i}">`;
+            html += `<div class="group-header">
+                <span class="group-badge circuit"><i class="fas fa-sync-alt"></i> ${circuit.isEmom ? 'EMOM' : 'Circuito'}</span>
+                <span class="group-info">${circuit.timing.rounds ? circuit.timing.rounds + ' giri' : sets + ' round'}</span>
+            </div>`;
+
+            if (circuit.isEmom && circuit.emomBlocks.length > 0) {
+                // EMOM blocks layout
+                html += `<div class="emom-blocks">`;
+                circuit.emomBlocks.forEach((block, idx) => {
+                    html += `<div class="emom-block ${idx % 2 !== 0 ? 'odd' : ''}">
+                        <div class="emom-label">${block.label}</div>
+                        <div class="emom-content">${block.content}</div>
+                    </div>`;
+                });
+                html += `</div>`;
+            } else if (circuit.stations.length > 0) {
+                // Station grid layout
+                html += `<div class="circuit-stations">`;
+                circuit.stations.forEach((station, idx) => {
+                    html += `<div class="circuit-station">
+                        <span class="station-number">${idx + 1}</span>
+                        <div class="station-name">${station}</div>
+                    </div>`;
+                });
+                html += `</div>`;
+            } else {
+                // Fallback: show the full name
+                const cleanName = ex.name.replace(/^Circuit:\s*/i, '').replace(/^Circuito:\s*/i, '');
+                html += `<div style="padding: 16px; font-size: 13px; line-height: 1.5;">${cleanName}</div>`;
+            }
+
+            // Timing info
+            if (circuit.timing.on || circuit.timing.duration) {
+                html += `<div class="circuit-timing">`;
+                if (circuit.timing.duration) {
+                    html += `<div class="timing-item"><i class="fas fa-clock"></i> <strong>${circuit.timing.duration}</strong></div>`;
+                }
+                if (circuit.timing.on) {
+                    html += `<div class="timing-item"><i class="fas fa-play"></i> <strong>${circuit.timing.on}</strong> ON</div>`;
+                }
+                if (circuit.timing.off) {
+                    html += `<div class="timing-item"><i class="fas fa-pause"></i> <strong>${circuit.timing.off}</strong> OFF</div>`;
+                }
+                html += `</div>`;
+            }
+
+            // Sets tracker (for circuit rounds)
+            html += `<div class="sets-section" style="border-top: 1px solid #222; margin-top: 0;">
+                <div class="sets-label">Completa i giri</div>
+                <div class="sets-tracker" id="sets-${i}">
+                    ${Array(sets).fill(0).map((_, si) => `
+                        <button class="set-btn" onclick="completeSet(${i}, ${si}, ${ex.rest_seconds || 60})">${si + 1}</button>
+                    `).join('')}
+                </div>
+            </div>`;
+
+            html += `</div>`;
+            return html;
+        }
+
+        // Render drop set exercise with visual chain
+        function renderDropSetExercise(ex, i) {
+            const dropParts = parseDropSets(ex.reps);
+            const cleanName = cleanExerciseName(ex.name);
+            const sets = parseInt(ex.sets) || 3;
+
+            let html = `<div class="exercise-group dropset" id="exercise-${i}">`;
+            html += `<div class="group-header">
+                <span class="group-badge dropset"><i class="fas fa-level-down-alt"></i> Drop Set</span>
+                <span class="group-info">${sets} serie</span>
+            </div>`;
+
+            html += `<div style="padding: 16px;">
+                <div class="exercise-name" style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">${cleanName}</div>
+            </div>`;
+
+            // Drop chain visual
+            if (dropParts) {
+                html += `<div class="dropset-chain">`;
+                dropParts.forEach((part, idx) => {
+                    if (idx > 0) html += `<span class="dropset-arrow"><i class="fas fa-arrow-right"></i></span>`;
+                    html += `<span class="dropset-step">${part} reps</span>`;
+                });
+                html += `</div>`;
+            }
+
+            // Sets tracker
+            html += `<div class="sets-section" style="border-top: 1px solid #222; margin-top: 0;">
+                <div class="sets-label">Completa le serie</div>
+                <div class="sets-tracker" id="sets-${i}">
+                    ${Array(sets).fill(0).map((_, si) => `
+                        <button class="set-btn" onclick="completeSet(${i}, ${si}, ${ex.rest_seconds || 90})">${si + 1}</button>
+                    `).join('')}
+                </div>
+            </div>`;
+
+            // Feedback section
+            html += renderFeedbackSection(i, ex);
+            html += `</div>`;
+            return html;
+        }
+
+        // Render feedback section (reusable)
+        function renderFeedbackSection(i, ex) {
+            return `
+                <div class="exercise-feedback" id="feedback-${i}">
+                    <div class="feedback-title">Com'è stato questo esercizio?</div>
+                    <div class="difficulty-btns">
+                        <button class="difficulty-btn too-easy" onclick="setExerciseDifficulty(${i}, 'too_easy', this)">Facile</button>
+                        <button class="difficulty-btn just-right" onclick="setExerciseDifficulty(${i}, 'just_right', this)">Giusto</button>
+                        <button class="difficulty-btn too-hard" onclick="setExerciseDifficulty(${i}, 'too_hard', this)">Duro</button>
+                    </div>
+                    <div class="feedback-row">
+                        <label>Peso</label>
+                        <input type="text" class="feedback-input" id="weight-${i}" placeholder="${ex.load_suggestion || 'es: 60kg'}" onchange="setExerciseWeight(${i}, this.value)">
+                    </div>
+                </div>
+            `;
+        }
         
         function renderExercises() {
             let html = '';
+            let processedIndices = new Set();
             
+            // First pass: identify superset groups
+            const supersetGroups = {};
             exercises.forEach((ex, i) => {
+                const group = getSupersetGroup(ex.name);
+                if (group) {
+                    if (!supersetGroups[group]) supersetGroups[group] = [];
+                    supersetGroups[group].push(i);
+                }
+            });
+
+            exercises.forEach((ex, i) => {
+                if (processedIndices.has(i)) return;
+
                 const sets = parseInt(ex.sets) || 3;
                 totalSets += sets;
                 completedSets[i] = 0;
-                
-                // Handle technique cues (array or string)
-                const cues = ex.technique_cues || ex.notes;
-                let cuesText = '';
-                if (Array.isArray(cues)) {
-                    cuesText = cues.join(' • ');
-                } else if (cues) {
-                    cuesText = cues;
+
+                const method = detectMethod(ex.name);
+                const supersetGroupLetter = getSupersetGroup(ex.name);
+
+                // Check if this is part of a superset group
+                if (supersetGroupLetter && supersetGroups[supersetGroupLetter] && supersetGroups[supersetGroupLetter].length > 1) {
+                    const groupIndices = supersetGroups[supersetGroupLetter];
+                    
+                    // Only render the group once (when we hit the first exercise of the group)
+                    if (groupIndices[0] === i) {
+                        html += `<div class="exercise-group superset">`;
+                        html += `<div class="group-header">
+                            <span class="group-badge superset"><i class="fas fa-link"></i> Superset ${supersetGroupLetter}</span>
+                            <span class="group-info">Esegui senza pausa</span>
+                        </div>`;
+                        html += `<div class="group-exercises">`;
+                        
+                        groupIndices.forEach((idx, pos) => {
+                            const groupEx = exercises[idx];
+                            const groupSets = parseInt(groupEx.sets) || 3;
+                            if (idx !== i) {
+                                totalSets += groupSets;
+                                completedSets[idx] = 0;
+                            }
+                            processedIndices.add(idx);
+                            
+                            html += renderSingleExercise(groupEx, idx, true);
+                            
+                            // Add connector between exercises in superset
+                            if (pos < groupIndices.length - 1) {
+                                html += `<div class="group-connector"><i class="fas fa-arrow-down"></i> SUBITO</div>`;
+                            }
+                        });
+                        
+                        html += `</div></div>`;
+                    }
+                    return;
                 }
-                
-                // Build details
-                const details = [];
-                if (ex.tempo) details.push(`<span><i class="fas fa-stopwatch"></i> Tempo: ${ex.tempo}</span>`);
-                if (ex.rest_seconds) details.push(`<span><i class="fas fa-hourglass-half"></i> ${ex.rest_seconds}s rest</span>`);
-                if (ex.RPE_target) details.push(`<span><i class="fas fa-fire-alt"></i> RPE ${ex.RPE_target}</span>`);
-                if (ex.load_suggestion) details.push(`<span><i class="fas fa-weight-hanging"></i> ${ex.load_suggestion}</span>`);
-                
-                html += `
-                    <div class="exercise-card" id="exercise-${i}">
+
+                // Check if this is a circuit or EMOM
+                if (method === 'circuit' || method === 'emom') {
+                    html += renderCircuitExercise(ex, i);
+                    processedIndices.add(i);
+                    return;
+                }
+
+                // Check if this is a drop set
+                if (method === 'dropset' || parseDropSets(ex.reps)) {
+                    html += renderDropSetExercise(ex, i);
+                    processedIndices.add(i);
+                    return;
+                }
+
+                // Regular exercise (possibly with method badge)
+                html += renderSingleExercise(ex, i, false);
+                processedIndices.add(i);
+            });
+            
+            document.getElementById('exercisesList').innerHTML = html || '<p style="color:rgba(255,255,255,0.3);text-align:center;padding:40px;">Nessun esercizio trovato</p>';
+            
+            // Update total sets counter
+            document.getElementById('totalSetsCount').textContent = totalSets;
+            
+            // Highlight first exercise
+            if (exercises.length > 0) {
+                document.getElementById('exercise-0').classList.add('active');
+            }
+        }
+
+        function renderSingleExercise(ex, i, inGroup) {
+            const sets = parseInt(ex.sets) || 3;
+            const method = detectMethod(ex.name);
+            const cleanName = cleanExerciseName(ex.name);
+            const methodBadge = (method && !inGroup) ? getMethodBadge(method) : '';
+            
+            // Handle technique cues (array or string)
+            const cues = ex.technique_cues || ex.notes;
+            let cuesText = '';
+            if (Array.isArray(cues)) {
+                cuesText = cues.join(' • ');
+            } else if (cues) {
+                cuesText = cues;
+            }
+            
+            // Build details
+            const details = [];
+            if (ex.tempo) details.push(`<span><i class="fas fa-stopwatch"></i> ${ex.tempo}</span>`);
+            if (ex.rest_seconds) details.push(`<span><i class="fas fa-hourglass-half"></i> ${ex.rest_seconds}s</span>`);
+            if (ex.RPE_target) details.push(`<span><i class="fas fa-fire-alt"></i> RPE ${ex.RPE_target}</span>`);
+            if (ex.load_suggestion) details.push(`<span><i class="fas fa-weight-hanging"></i> ${ex.load_suggestion}</span>`);
+            
+            // Get video if available
+            const video = typeof ATLASVideos !== 'undefined' ? ATLASVideos.findVideo(cleanName) : null;
+            const videoBtn = video 
+                ? `<a href="${video.url}" target="_blank" class="video-tutorial-btn" title="Guarda il tutorial"><i class="fas fa-play-circle"></i></a>` 
+                : '';
+            
+            return `
+                <div class="exercise-card" id="exercise-${i}">
+                    <div class="exercise-main">
                         <div class="exercise-top">
-                            <div style="display:flex;align-items:center;">
+                            <div class="exercise-left">
                                 <span class="exercise-order">${ex.order || i + 1}</span>
-                                <span class="exercise-name">${ex.name}</span>
+                                <div class="exercise-info">
+                                    <div class="exercise-name">${cleanName}${methodBadge}</div>
+                                    ${details.length > 0 ? `<div class="exercise-details">${details.join('')}</div>` : ''}
+                                </div>
                             </div>
-                            <span class="exercise-prescription">${sets}x${ex.reps}</span>
+                            <div class="exercise-right">
+                                ${videoBtn}
+                                <span class="exercise-prescription">${sets}x${ex.reps}</span>
+                            </div>
                         </div>
-                        ${details.length > 0 ? `<div class="exercise-details">${details.join('')}</div>` : ''}
                         ${cuesText ? `<div class="exercise-notes"><strong>💡 Tecnica:</strong> ${cuesText}</div>` : ''}
                         ${ex.why ? `<div class="exercise-why">🎯 ${ex.why}</div>` : ''}
+                    </div>
+                    
+                    <div class="sets-section">
+                        <div class="sets-label">Completa i set</div>
                         <div class="sets-tracker" id="sets-${i}">
                             ${Array(sets).fill(0).map((_, si) => `
                                 <button class="set-btn" onclick="completeSet(${i}, ${si}, ${ex.rest_seconds || 90})">${si + 1}</button>
                             `).join('')}
                         </div>
                     </div>
-                `;
-            });
-            
-            document.getElementById('exercisesList').innerHTML = html || '<p style="color:#888;text-align:center;">Nessun esercizio trovato</p>';
-            
-            // Highlight first exercise
-            if (exercises.length > 0) {
-                document.getElementById('exercise-0').classList.add('active');
-            }
+                    
+                    <div class="exercise-feedback" id="feedback-${i}">
+                        <div class="feedback-title">Com'è stato questo esercizio?</div>
+                        <div class="difficulty-btns">
+                            <button class="difficulty-btn too-easy" onclick="setExerciseDifficulty(${i}, 'too_easy', this)">Facile</button>
+                            <button class="difficulty-btn just-right" onclick="setExerciseDifficulty(${i}, 'just_right', this)">Giusto</button>
+                            <button class="difficulty-btn too-hard" onclick="setExerciseDifficulty(${i}, 'too_hard', this)">Duro</button>
+                        </div>
+                        <div class="feedback-row">
+                            <label>Peso</label>
+                            <input type="text" class="feedback-input" id="weight-${i}" placeholder="${ex.load_suggestion || 'es: 60kg'}" onchange="setExerciseWeight(${i}, this.value)">
+                        </div>
+                        <div class="feedback-row">
+                            <label>RPE</label>
+                            <select class="feedback-input" id="rpe-${i}" onchange="setExerciseRpe(${i}, this.value)" style="max-width:80px;">
+                                <option value="">-</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
+                        <div class="feedback-row">
+                            <button class="pain-toggle" id="pain-toggle-${i}" onclick="togglePain(${i}, this)">
+                                <i class="fas fa-exclamation-triangle"></i> Dolore?
+                            </button>
+                        </div>
+                        <div class="pain-area-select" id="pain-area-${i}">
+                            <button class="pain-area-btn" onclick="setPainArea(${i}, 'shoulder', this)">Spalla</button>
+                            <button class="pain-area-btn" onclick="setPainArea(${i}, 'elbow', this)">Gomito</button>
+                            <button class="pain-area-btn" onclick="setPainArea(${i}, 'wrist', this)">Polso</button>
+                            <button class="pain-area-btn" onclick="setPainArea(${i}, 'lower_back', this)">Lombare</button>
+                            <button class="pain-area-btn" onclick="setPainArea(${i}, 'knee', this)">Ginocchio</button>
+                            <button class="pain-area-btn" onclick="setPainArea(${i}, 'hip', this)">Anca</button>
+                            <button class="pain-area-btn" onclick="setPainArea(${i}, 'ankle', this)">Caviglia</button>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
         
         function completeSet(exerciseIndex, setIndex, restSeconds) {
@@ -361,6 +2032,7 @@
         function updateProgress() {
             const percent = (completedTotal / totalSets) * 100;
             document.getElementById('progressFill').style.width = `${percent}%`;
+            document.getElementById('completedSets').textContent = completedTotal;
         }
         
         function checkAllCompleted() {
@@ -385,6 +2057,11 @@
             }, 1000);
         }
         
+        function addRestTime(seconds) {
+            const currentTime = parseInt(document.getElementById('restTime').textContent) || 0;
+            document.getElementById('restTime').textContent = currentTime + seconds;
+        }
+        
         function skipRest() {
             clearInterval(restInterval);
             document.getElementById('overlay').classList.remove('show');
@@ -392,7 +2069,9 @@
         }
         
         function startTimer() {
-            setInterval(() => {
+            startTime = Date.now();
+            if (totalTimerInterval) clearInterval(totalTimerInterval);
+            totalTimerInterval = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
                 const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
                 const secs = (elapsed % 60).toString().padStart(2, '0');
@@ -400,19 +2079,9 @@
             }, 1000);
         }
         
-        function confirmExit() {
-            if (completedTotal > 0 && completedTotal < totalSets) {
-                if (confirm('Vuoi davvero uscire? L\'allenamento non è completo.')) {
-                    history.back();
-                }
-            } else {
-                history.back();
-            }
-        }
-        
         function showFeedback() {
-            const elapsed = Math.floor((Date.now() - startTime) / 1000 / 60);
-            document.getElementById('statTime').textContent = elapsed;
+            const elapsedMinutes = getElapsedMinutes();
+            document.getElementById('statTime').textContent = elapsedMinutes;
             document.getElementById('statSets').textContent = `${completedTotal}/${totalSets}`;
             document.getElementById('feedbackModal').classList.add('show');
         }
@@ -431,23 +2100,78 @@
         
         async function submitFeedback() {
             const notes = document.getElementById('feedbackNotes').value;
-            const elapsed = Math.floor((Date.now() - startTime) / 1000 / 60);
+            const elapsedMinutes = getElapsedMinutes();
+            const submitBtn = document.querySelector('.feedback-submit');
+            if (submitBtn) submitBtn.disabled = true;
             
             try {
-                // Update workout status
-                await supabase.update('workouts', workoutId, {
+                if (!athleteId) {
+                    alert('Atleta non autenticato. Effettua il login e riprova.');
+                    if (submitBtn) submitBtn.disabled = false;
+                    return;
+                }
+
+                const completedAt = new Date().toISOString();
+
+                // 1) Update workout status (canonical columns)
+                const upd = await supabase.update('workouts', workoutId, {
                     status: 'completed',
-                    completed_at: new Date().toISOString(),
-                    actual_duration_minutes: elapsed,
-                    athlete_feedback: {
-                        feeling: selectedFeeling,
-                        rpe: selectedRPE,
-                        notes: notes,
-                        completed_sets: completedTotal,
-                        total_sets: totalSets,
-                        submitted_at: new Date().toISOString()
-                    }
+                    completed_at: completedAt
                 });
+                if (upd && upd.error) {
+                    throw new Error(upd.message || 'Update workout fallito');
+                }
+
+                // Idempotency: clear previous telemetry for this workout+athlete
+                await supabase.delete('workout_session_feedback', `?workout_id=eq.${workoutId}&athlete_id=eq.${athleteId}`);
+                await supabase.delete('workout_logs', `?workout_id=eq.${workoutId}&athlete_id=eq.${athleteId}`);
+
+                // 2) Insert session-level feedback (canonical table)
+                const sessionFeedback = {
+                    workout_id: workoutId,
+                    athlete_id: athleteId,
+                    duration_minutes: elapsedMinutes,
+                    feeling: selectedFeeling,
+                    rpe: selectedRPE,
+                    notes: notes,
+                    completed_sets: completedTotal,
+                    total_sets: totalSets,
+                    completed_at: completedAt
+                };
+
+                const insFb = await supabase.insert('workout_session_feedback', sessionFeedback);
+                if (insFb && insFb.error) {
+                    throw new Error(insFb.message || 'Insert workout_session_feedback fallito');
+                }
+
+                // 3) Insert per-exercise logs (workout_logs)
+                // UI doesn't capture weights/reps done: we log which sets were completed.
+                for (let i = 0; i < exercises.length; i++) {
+                    const ex = exercises[i] || {};
+                    const setsPlanned = parseInt(ex.sets) || 3;
+                    const setsDone = Math.min(setsPlanned, parseInt(completedSets[i] || 0));
+                    const setsCompleted = Array.from({ length: setsDone }, (_, idx) => ({
+                        set_number: idx + 1,
+                        reps_prescribed: String(ex.reps || ''),
+                        done: true
+                    }));
+
+                    const logRow = {
+                        workout_id: workoutId,
+                        athlete_id: athleteId,
+                        exercise_name: String(ex.name || ''),
+                        exercise_order: Number(ex.order || i + 1),
+                        sets_completed: setsCompleted,
+                        difficulty_rating: selectedRPE,
+                        notes: notes,
+                        completed_at: completedAt
+                    };
+
+                    const insLog = await supabase.insert('workout_logs', logRow);
+                    if (insLog && insLog.error) {
+                        throw new Error(insLog.message || `Insert workout_logs fallito (${logRow.exercise_name || 'exercise'})`);
+                    }
+                }
                 
                 // Update athlete XP
                 if (athleteId) {
@@ -465,12 +2189,170 @@
                     }
                 }
                 
+                // ═══════════════════════════════════════════════════════════════
+                // SAVE TO FEEDBACK ENGINE (for AI learning)
+                // ═══════════════════════════════════════════════════════════════
+                if (window.FeedbackEngine && athleteId) {
+                    try {
+                        // Determine completion status
+                        const completionPct = Math.round((completedTotal / totalSets) * 100);
+                        let completionStatus = 'full';
+                        if (completionPct < 50) completionStatus = 'skipped';
+                        else if (completionPct < 100) completionStatus = 'partial';
+                        
+                        // Map feeling to mood
+                        const moodMap = { 1: 'terrible', 2: 'bad', 3: 'ok', 4: 'good', 5: 'great' };
+                        
+                        // Build exercise feedback array
+                        const exFeedbackArray = exercises.map((ex, i) => {
+                            const setsPlanned = parseInt(ex.sets) || 3;
+                            const setsDone = parseInt(completedSets[i] || 0);
+                            return {
+                                exercise_name: ex.name || '',
+                                exercise_type: ex.type || 'strength',
+                                prescribed_sets: setsPlanned,
+                                prescribed_reps: ex.reps || '',
+                                completed_sets: setsDone,
+                                difficulty: exerciseFeedback[i]?.difficulty || 'just_right',
+                                completed: setsDone >= setsPlanned,
+                                skipped: setsDone === 0,
+                                pain_during: exerciseFeedback[i]?.pain || false,
+                                pain_area: exerciseFeedback[i]?.painArea || null,
+                                pain_intensity: exerciseFeedback[i]?.painIntensity || 0
+                            };
+                        });
+                        
+                        // Create and complete feedback
+                        const feedback = window.FeedbackEngine.createFeedback(athleteId, workoutId, {
+                            name: workout?.name || '',
+                            day_of_week: workout?.day_of_week || '',
+                            week_number: workout?.week_number || 1,
+                            expected_rpe: 7
+                        });
+                        
+                        window.FeedbackEngine.complete(feedback.id, athleteId, {
+                            overall_rpe: selectedRPE,
+                            completion: completionStatus,
+                            completion_pct: completionPct,
+                            energy_before: null,
+                            energy_after: selectedFeeling,
+                            mood: moodMap[selectedFeeling] || 'ok',
+                            exercise_feedback: exFeedbackArray,
+                            notes: notes,
+                            actual_duration_minutes: elapsedMinutes
+                        });
+                        
+                        console.log('🔄 Feedback saved to FeedbackEngine');
+                    } catch (fbErr) {
+                        console.warn('FeedbackEngine save failed:', fbErr);
+                    }
+                }
+                
+                // ═══════════════════════════════════════════════════════════════
+                // SAVE TO ATLAS PROGRESSION (for progressive overload)
+                // ═══════════════════════════════════════════════════════════════
+                if (window.ATLASProgression) {
+                    try {
+                        // Build session data for ATLAS
+                        const atlasExercises = exercises.map((ex, i) => {
+                            const setsPlanned = parseInt(ex.sets) || 3;
+                            const setsDone = parseInt(completedSets[i] || 0);
+                            const actualWeight = exerciseFeedback[i]?.actual_weight || ex.weight || 0;
+                            const reps = parseInt(String(ex.reps).split('-')[0]) || 10;
+                            
+                            return {
+                                name: ex.name || `Exercise ${i+1}`,
+                                weight: parseFloat(actualWeight) || 0,
+                                reps: reps,
+                                sets: setsDone,
+                                rpe: exerciseFeedback[i]?.rpe || selectedRPE,
+                                completed: setsDone >= setsPlanned
+                            };
+                        }).filter(ex => ex.weight > 0 && ex.sets > 0);
+
+                        if (atlasExercises.length > 0) {
+                            const atlasSession = {
+                                date: new Date().toISOString(),
+                                workoutName: workout?.name || 'Workout',
+                                exercises: atlasExercises,
+                                overallRPE: selectedRPE,
+                                notes: notes
+                            };
+
+                            ATLASProgression.logSession(atlasSession);
+                            ATLASProgression.updatePRs(atlasSession);
+                            console.log('🤖 ATLAS Progression saved:', atlasSession);
+                        }
+                    } catch (atlasErr) {
+                        console.warn('ATLAS Progression save failed:', atlasErr);
+                    }
+                }
+                
+                // ═══════════════════════════════════════════════════════════════
+                // SAVE TO ATLAS FEEDBACK LOOP (for intelligent adjustments)
+                // ═══════════════════════════════════════════════════════════════
+                if (window.ATLASFeedback && athleteId) {
+                    try {
+                        const completionPct = Math.round((completedTotal / totalSets) * 100);
+                        
+                        // Map feeling (1-5) to difficulty (1-10)
+                        // 5 = great = easy (3), 1 = terrible = hard (9)
+                        const difficultyMap = { 1: 9, 2: 7, 3: 5, 4: 4, 5: 3 };
+                        const difficulty = difficultyMap[selectedFeeling] || 5;
+                        
+                        // Map feeling to energy level (1-5)
+                        const energyMap = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5 };
+                        const energy = energyMap[selectedFeeling] || 3;
+                        
+                        // Build exercise feedback array
+                        const exFeedbackForATLAS = exercises.map((ex, i) => {
+                            const setsPlanned = parseInt(ex.sets) || 3;
+                            const setsDone = parseInt(completedSets[i] || 0);
+                            return {
+                                name: ex.name || '',
+                                tooHard: exerciseFeedback[i]?.difficulty === 'too_hard',
+                                pain: exerciseFeedback[i]?.pain || false,
+                                skipped: setsDone === 0
+                            };
+                        });
+                        
+                        // Build pain points from exercise feedback
+                        const painPoints = exercises
+                            .map((ex, i) => {
+                                if (exerciseFeedback[i]?.pain && exerciseFeedback[i]?.painArea) {
+                                    return {
+                                        area: exerciseFeedback[i].painArea,
+                                        intensity: exerciseFeedback[i].painIntensity || 2
+                                    };
+                                }
+                                return null;
+                            })
+                            .filter(Boolean);
+                        
+                        ATLASFeedback.recordFeedback(workoutId, athleteId, {
+                            difficulty: difficulty,
+                            rpe: selectedRPE,
+                            energy: energy,
+                            completionRate: completionPct,
+                            painPoints: painPoints,
+                            exercises: exFeedbackForATLAS,
+                            notes: notes
+                        });
+                        
+                        console.log('🔄 ATLAS Feedback Loop saved');
+                    } catch (fbErr) {
+                        console.warn('ATLAS Feedback save failed:', fbErr);
+                    }
+                }
+                
                 // Success redirect
                 window.location.href = 'app-dashboard.html?completed=true';
                 
             } catch (error) {
                 console.error('Errore salvataggio:', error);
-                alert('Errore durante il salvataggio. Riprova.');
+                const msg = String(error?.message || error || 'Errore sconosciuto');
+                alert(`Errore durante il salvataggio.\n\nDettagli: ${msg}\n\nSe vedi errori tipo "relation workout_session_feedback does not exist", esegui prima supabase-telemetry-v1.sql.`);
+                if (submitBtn) submitBtn.disabled = false;
             }
         }
         

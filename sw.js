@@ -1,7 +1,7 @@
-// GR Perform - Service Worker v1.4
-const CACHE_NAME = 'gr-perform-v10';
-const STATIC_CACHE = 'gr-perform-static-v10';
-const DYNAMIC_CACHE = 'gr-perform-dynamic-v10';
+// GR Perform - Service Worker v1.5
+const CACHE_NAME = 'gr-perform-v11';
+const STATIC_CACHE = 'gr-perform-static-v11';
+const DYNAMIC_CACHE = 'gr-perform-dynamic-v11';
 
 // Files to cache for offline use
 const STATIC_FILES = [
@@ -12,6 +12,7 @@ const STATIC_FILES = [
   '/app-progress.html',
   '/app-wearables.html',
   '/workout-session.html',
+  '/telemetry-test.html',
   '/login.html',
   '/css/style.css',
   '/js/supabase-client.js',

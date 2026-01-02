@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GR Perform - Benchmark Qualità Coach (test)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #e5e5e5; padding: 20px; line-height: 1.5; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    h1 { color: #fff; margin-bottom: 10px; }
+    .hint { color: #a3a3a3; margin-bottom: 16px; }
+
+    .panel { background: #151515; border: 1px solid #2a2a2a; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    @media (max-width: 900px) { .row { grid-template-columns: 1fr; } }
+
+    label { display: block; font-size: 0.9rem; color: #bdbdbd; margin-bottom: 6px; }
+    input, select { width: 100%; padding: 10px; background: #0d0d0d; border: 1px solid #333; border-radius: 8px; color: #fff; }
+
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    button { border: none; border-radius: 10px; padding: 12px 16px; cursor: pointer; color: #fff; font-weight: 600; }
+    .btn-run { background: linear-gradient(135deg, #22c55e, #16a34a); }
+    .btn-stop { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+    .btn-export { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+
+    .status { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 0.9rem; white-space: pre-wrap; background: #0d0d0d; border: 1px solid #2b2b2b; padding: 12px; border-radius: 10px; min-height: 120px; }
+    .warn { color: #f59e0b; }
+    .ok { color: #22c55e; }
+
+    .report { margin-top: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 0.85rem; white-space: pre-wrap; background: #0d0d0d; border: 1px solid #2b2b2b; padding: 12px; border-radius: 10px; max-height: 520px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Benchmark Qualità Coach (pagina test)</h1>
+    <div class="hint">Genera settimane su profili fissi e calcola score/criticità con CoachQuality. Usa server locale (non file://). Se usi Groq serve <b>GROQ_API_KEY</b>; se usi Ollama serve Ollama attivo su <b>http://localhost:11434</b>.</div>
+
+    <div class="panel">
+      <div class="row">
+        <div>
+          <label>Sport (casi)</label>
+          <select id="sports">
+            <option value="all">Tutti (12 casi)</option>
+            <option value="boxe">Solo Boxe (3 casi)</option>
+            <option value="calcio">Solo Calcio (3 casi)</option>
+            <option value="basket">Solo Basket (3 casi)</option>
+            <option value="palestra">Solo Palestra (3 casi)</option>
+            <option value="quick">Quick Test (4 casi: 1 per sport)</option>
+          </select>
+        </div>
+        <div>
+          <label>Settimane per caso</label>
+          <input id="weeks" type="number" min="1" max="6" value="1" />
+        </div>
+        <div>
+          <label>AI Provider</label>
+          <select id="aiProvider">
+            <option value="ollama" selected>Ollama (locale)</option>
+            <option value="ollama_gemini">Ollama + Gemini (validazione)</option>
+            <option value="groq">Groq (cloud, veloce)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div>
+          <label>Temperatura</label>
+          <input id="temp" type="number" min="0" max="1" step="0.05" value="0.35" />
+        </div>
+        <div>
+          <label>Max tokens</label>
+          <input id="maxTokens" type="number" min="500" max="4096" step="100" value="2200" />
+        </div>
+        <div>
+          <label>Modello Ollama (se usato)</label>
+          <input id="ollamaModel" type="text" value="qwen2.5:14b" placeholder="qwen2.5:14b, llama3.2, gemma2:2b, mistral..." />
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="btn-run" onclick="runBenchmark()">Avvia benchmark</button>
+        <button class="btn-stop" onclick="stopBenchmark()">Stop (soft)</button>
+        <button class="btn-export" onclick="exportReport()">Esporta JSON</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div id="status" class="status">Pronto.</div>
+      <div id="report" class="report" style="display:none"></div>
+    </div>
+  </div>
+
+  <script>
+    // Guard: fetch su /api/ai/chat non funziona in file://
+    if (location.protocol === 'file:') {
+      const el = document.getElementById('status');
+      el.innerHTML = 'ATTENZIONE: apri questa pagina via server (es. dev-server.js).\n\nEsempio: avvia il server e poi apri http://localhost:PORT/test-benchmark.html';
+      el.classList.add('warn');
+    }
+  </script>
+
+  <!-- Dipendenze minime -->
+  <script src="js/dual-ai.js?v=1"></script>
+  <script src="js/ai-json.js?v=1"></script>
+  <script src="js/workout-quality-audit.js?v=1"></script>
+  <script src="js/coach-playbook.js?v=1"></script>
+  <script src="js/coach-quality-engine.js?v=1"></script>
+  <script src="js/benchmark-runner.js?v=1"></script>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const reportEl = document.getElementById('report');
+
+    let lastReport = null;
+    let stopRequested = false;
+
+    function setStatus(text, cls) {
+      statusEl.classList.remove('warn');
+      statusEl.classList.remove('ok');
+      if (cls) statusEl.classList.add(cls);
+      statusEl.textContent = text;
+    }
+
+    function stopBenchmark() {
+      stopRequested = true;
+      setStatus('Stop richiesto: termino a fine step corrente...', 'warn');
+    }
+
+    async function runBenchmark() {
+      stopRequested = false;
+      reportEl.style.display = 'none';
+      reportEl.textContent = '';
+      lastReport = null;
+
+      const weeks = Math.max(1, parseInt(document.getElementById('weeks').value, 10) || 1);
+      const temperature = Math.max(0, Math.min(1, parseFloat(document.getElementById('temp').value) || 0.35));
+      const maxTokens = Math.max(500, parseInt(document.getElementById('maxTokens').value, 10) || 2200);
+      const sportsFilter = document.getElementById('sports').value;
+      const aiProvider = document.getElementById('aiProvider').value;
+      const ollamaModel = document.getElementById('ollamaModel').value.trim() || 'llama3.2';
+
+      // Configura provider AI
+      if (window.DualAI) {
+        window.DualAI._benchmarkProvider = aiProvider;
+        window.DualAI._benchmarkOllamaModel = ollamaModel;
+      }
+
+      // Filtra casi
+      let cases = window.BenchmarkRunner.defaultCases ? window.BenchmarkRunner.defaultCases() : [];
+      if (sportsFilter === 'quick') {
+        // 1 caso per sport (solo intermediate)
+        cases = cases.filter(c => c.athleteLevel === 'intermediate');
+      } else if (sportsFilter !== 'all') {
+        cases = cases.filter(c => c.sportKey === sportsFilter);
+      }
+
+      if (cases.length === 0) {
+        setStatus('Nessun caso selezionato.', 'warn');
+        return;
+      }
+
+      setStatus(`Benchmark in corso (${cases.length} casi, provider: ${aiProvider})...`, 'warn');
+
+      const lines = [];
+      function log(line) {
+        lines.push(line);
+        const tail = lines.slice(-18).join('\n');
+        statusEl.textContent = tail;
+      }
+
+      try {
+        const report = await window.BenchmarkRunner.run({
+          cases,
+          weeksPerCase: weeks,
+          temperature,
+          maxTokens,
+          onProgress: (p) => {
+            if (stopRequested) throw new Error('STOP_REQUESTED');
+
+            if (p.type === 'day_start') {
+              log(`→ ${p.caseId} | W${p.week}/${p.weeksPerCase} | ${p.day} (${p.dayNumber})`);
+            }
+            if (p.type === 'day_done') {
+              const s = (p.score === null || p.score === undefined) ? 'n/a' : `${p.score}/100`;
+              const c = p.criticalCount ?? 0;
+              log(`  ✓ ${p.caseId} | ${p.day} | score ${s} | crit ${c}${p.error ? ' | ERR' : ''}`);
+            }
+            if (p.type === 'week_done') {
+              log(`✓ WEEK DONE: ${p.caseId} | avg ${p.averageScore}/100 | crit ${p.criticalCount}`);
+            }
+          }
+        });
+
+        lastReport = report;
+        setStatus(`Completato in ${Math.round((report.durationMs || 0) / 1000)}s. Casi: ${report.totals.cases} | Settimane: ${report.totals.weeks} | Giorni: ${report.totals.days} | Fail: ${report.totals.failures}`, 'ok');
+
+        reportEl.style.display = 'block';
+        reportEl.textContent = JSON.stringify(report, null, 2);
+
+      } catch (e) {
+        const msg = String(e?.message || e);
+        if (msg === 'STOP_REQUESTED') {
+          setStatus('Benchmark interrotto (stop richiesto).', 'warn');
+          return;
+        }
+        setStatus('Errore benchmark: ' + msg, 'warn');
+      }
+    }
+
+    function exportReport() {
+      if (!lastReport) {
+        setStatus('Nessun report da esportare: prima avvia il benchmark.', 'warn');
+        return;
+      }
+      const blob = new Blob([JSON.stringify(lastReport, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `benchmark-report-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

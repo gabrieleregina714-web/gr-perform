@@ -4,7 +4,8 @@ const formData = {
     role: null,
     package: 'completo',
     goals: [],
-    schedule: {}
+    schedule: {},
+    pillars: {}
 };
 
 let currentStep = 1;
@@ -50,8 +51,97 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSportCards();
     setupPackageCards();
     setupNavigation();
+    setupFocusPercentSliders();
     updateProgress();
 });
+
+function setupFocusPercentSliders() {
+    const ids = [
+        { key: 'performance', input: 'focusPctPerformance', val: 'focusPctPerformanceVal' },
+        { key: 'strength', input: 'focusPctStrength', val: 'focusPctStrengthVal' },
+        { key: 'conditioning', input: 'focusPctConditioning', val: 'focusPctConditioningVal' },
+        { key: 'mobility', input: 'focusPctMobility', val: 'focusPctMobilityVal' }
+    ];
+
+    const getEl = (id) => document.getElementById(id);
+    const inputs = ids.map(x => ({
+        key: x.key,
+        input: getEl(x.input),
+        val: getEl(x.val)
+    }));
+
+    // If step 6 not yet in DOM (should be), gracefully skip.
+    if (!inputs.every(x => x.input && x.val)) return;
+
+    const read = () => {
+        const out = {};
+        inputs.forEach(x => { out[x.key] = parseInt(x.input.value, 10) || 0; });
+        return out;
+    };
+
+    const write = (pct) => {
+        inputs.forEach(x => {
+            const v = Math.max(0, Math.min(100, parseInt(pct[x.key], 10) || 0));
+            x.input.value = String(v);
+            x.val.textContent = String(v);
+        });
+    };
+
+    const normalize = (changedKey) => {
+        const pct = read();
+        const total = Object.values(pct).reduce((a, b) => a + b, 0);
+        if (total === 100) {
+            write(pct);
+            return;
+        }
+
+        // Keep changedKey fixed, scale others proportionally to reach 100.
+        const fixed = Math.max(0, Math.min(100, pct[changedKey] || 0));
+        const others = inputs.filter(x => x.key !== changedKey).map(x => x.key);
+        const otherTotal = others.reduce((a, k) => a + (pct[k] || 0), 0);
+        const remaining = Math.max(0, 100 - fixed);
+
+        if (otherTotal <= 0) {
+            // If others are all 0, distribute evenly.
+            const base = Math.floor(remaining / others.length);
+            let r = remaining - base * others.length;
+            others.forEach(k => {
+                pct[k] = base + (r > 0 ? 1 : 0);
+                r = Math.max(0, r - 1);
+            });
+        } else {
+            let assigned = 0;
+            others.forEach((k, idx) => {
+                if (idx === others.length - 1) return;
+                const v = Math.round(((pct[k] || 0) / otherTotal) * remaining);
+                pct[k] = v;
+                assigned += v;
+            });
+            pct[others[others.length - 1]] = Math.max(0, remaining - assigned);
+        }
+
+        pct[changedKey] = fixed;
+        write(pct);
+    };
+
+    inputs.forEach(x => {
+        x.val.textContent = String(parseInt(x.input.value, 10) || 0);
+        x.input.addEventListener('input', () => {
+            x.val.textContent = String(parseInt(x.input.value, 10) || 0);
+        });
+        x.input.addEventListener('change', () => normalize(x.key));
+    });
+
+    // Helpers exposed for submit/summary
+    window.__gr_readFocusPct = () => {
+        const pct = read();
+        // Ensure 100 at read-time
+        const keys = Object.keys(pct);
+        const total2 = keys.reduce((a, k) => a + (pct[k] || 0), 0);
+        if (total2 !== 100) normalize('performance');
+        return read();
+    };
+}
 
 function setupSportCards() {
     document.querySelectorAll('.sport-card').forEach(card => {
@@ -59,6 +149,29 @@ function setupSportCards() {
             document.querySelectorAll('.sport-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             formData.sport = card.dataset.sport;
+
+            // Set sensible defaults by sport (still sums to 100)
+            const sport = String(formData.sport || '').toLowerCase();
+            const presets = {
+                calcio: { performance: 35, strength: 25, conditioning: 30, mobility: 10 },
+                basket: { performance: 35, strength: 25, conditioning: 30, mobility: 10 },
+                boxe: { performance: 30, strength: 20, conditioning: 40, mobility: 10 },
+                palestra: { performance: 15, strength: 35, conditioning: 30, mobility: 20 }
+            };
+            const p = presets[sport];
+            if (p && window.__gr_readFocusPct) {
+                // Write directly through DOM controls if present
+                const set = (id, v) => {
+                    const el = document.getElementById(id);
+                    const val = document.getElementById(id + 'Val');
+                    if (el) el.value = String(v);
+                    if (val) val.textContent = String(v);
+                };
+                set('focusPctPerformance', p.performance);
+                set('focusPctStrength', p.strength);
+                set('focusPctConditioning', p.conditioning);
+                set('focusPctMobility', p.mobility);
+            }
         });
     });
 }
@@ -300,6 +413,13 @@ async function loadGoals() {
 
 function loadSummary() {
     const getValue = id => document.getElementById(id)?.value || '';
+
+    const pct = (window.__gr_readFocusPct && typeof window.__gr_readFocusPct === 'function')
+        ? window.__gr_readFocusPct()
+        : null;
+    const pctText = pct
+        ? `P:${pct.performance}% | F:${pct.strength}% | C:${pct.conditioning}% | M:${pct.mobility}%`
+        : '-';
     
     const sportNames = { calcio: 'Calcio', basket: 'Basket', boxe: 'Boxe', palestra: 'Palestra' };
     const packageNames = { tecnica: 'Tecnica', performance: 'Performance', completo: 'Completo' };
@@ -324,6 +444,10 @@ function loadSummary() {
         <div class="summary-row">
             <span class="summary-label">Obiettivi</span>
             <span class="summary-value">${formData.goals.length} selezionati</span>
+        </div>
+        <div class="summary-row">
+            <span class="summary-label">Focus</span>
+            <span class="summary-value">${pctText}</span>
         </div>
     `;
 }
@@ -360,6 +484,21 @@ async function submitForm() {
     document.querySelectorAll('.day-activity').forEach(select => {
         formData.schedule[select.dataset.day] = select.value;
     });
+
+    // Collect pillars (anamnesi essentials)
+    const focusPct = (window.__gr_readFocusPct && typeof window.__gr_readFocusPct === 'function')
+        ? window.__gr_readFocusPct()
+        : { performance: 35, strength: 25, conditioning: 30, mobility: 10 };
+
+    formData.pillars = {
+        focus_percentages: focusPct,
+        equipment_access: getValue('equipmentAccess'),
+        training_likes: getValue('trainingLikes'),
+        training_dislikes: getValue('trainingDislikes'),
+        constraints: getValue('constraints'),
+        session_duration_minutes: getValue('sessionDuration'),
+        program_duration_weeks: getValue('programDuration')
+    };
     
     try {
         // 1. Create athlete
@@ -431,6 +570,27 @@ async function submitForm() {
             });
         }
         
+        // 4b. Save lifts for Structural Balance (if provided)
+        const liftsData = {
+            squat: toIntOrNull(getValue('liftSquat')) || toIntOrNull(getValue('maxSquat')),
+            deadlift: toIntOrNull(getValue('liftDeadlift')) || toIntOrNull(getValue('maxDeadlift')),
+            bench: toIntOrNull(getValue('liftBench')) || toIntOrNull(getValue('maxBench')),
+            row: toIntOrNull(getValue('liftRow')),
+            ohp: toIntOrNull(getValue('liftOHP')) || toIntOrNull(getValue('maxPress')),
+            pullup: toIntOrNull(getValue('liftPullup'))
+        };
+        
+        // If any lift is provided, save to Structural Balance
+        const hasLifts = Object.values(liftsData).some(v => v && v > 0);
+        if (hasLifts && typeof AtlasStructuralBalance !== 'undefined') {
+            try {
+                AtlasStructuralBalance.setLiftsFromAnamnesi(athleteId, liftsData);
+                console.log('⚖️ Lifts saved to Structural Balance:', liftsData);
+            } catch (e) {
+                console.warn('Structural balance save failed (non-blocking):', e);
+            }
+        }
+        
         // 5. Save injuries if any
         const injuries = getValue('injuries');
         if (injuries) {
@@ -441,10 +601,42 @@ async function submitForm() {
                 status: 'noted'
             });
         }
+
+        // 6. Save anamnesi pillars to AI memory (best-effort)
+        try {
+            const state = {
+                version: 1,
+                created_at: new Date().toISOString(),
+                anamnesis: {
+                    sport: formData.sport,
+                    role: formData.role,
+                    package: formData.package,
+                    goals_selected: formData.goals,
+                    schedule: {
+                        ...formData.schedule,
+                        max_gr_sessions_per_week: scheduleData.max_gr_sessions_per_week
+                    },
+                    pillars: {
+                        ...formData.pillars,
+                        session_duration_minutes: formData.pillars.session_duration_minutes != null ? parseInt(formData.pillars.session_duration_minutes, 10) : null,
+                        program_duration_weeks: formData.pillars.program_duration_weeks != null ? parseInt(formData.pillars.program_duration_weeks, 10) : null
+                    },
+                    injuries: injuries || null,
+                    notes: getValue('notes')
+                }
+            };
+
+            await supabase.insert('ai_program_state', {
+                athlete_id: athleteId,
+                state
+            });
+        } catch (e) {
+            console.warn('ai_program_state insert failed (non-blocking):', e);
+        }
         
         // Success!
         alert('Anamnesi completata! Benvenuto in GR Perform 🎉');
-        window.location.href = `athlete-dashboard.html?id=${athleteId}`;
+        window.location.href = `app-dashboard.html?id=${athleteId}`;
         
     } catch (error) {
         console.error('Error submitting form:', error);

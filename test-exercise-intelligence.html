@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ATLAS Exercise Intelligence</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+        
+        :root {
+            --bg-dark: #0D0D0F;
+            --surface: #141417;
+            --surface-2: #191A1E;
+            --red: #D71921;
+            --text: #F6F7FB;
+            --text-dim: #A6A8B3;
+            --border: rgba(255,255,255,0.08);
+            --green: #4CAF50;
+            --yellow: #FFB300;
+            --blue: #2196F3;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        h1 { color: var(--red); margin-bottom: 1rem; }
+        h2 { margin: 2rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        h3 { color: var(--yellow); margin: 1.5rem 0 0.5rem; }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .controls {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .control-group label {
+            display: block;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 0.5rem;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        
+        button {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        
+        button:hover { transform: scale(1.02); }
+        
+        .result-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .exercise-card {
+            background: var(--surface-2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-left: 4px solid var(--blue);
+        }
+        
+        .exercise-card.optimized {
+            border-left-color: var(--green);
+        }
+        
+        .exercise-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .exercise-details {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        
+        .volume-badge {
+            display: inline-block;
+            background: var(--green);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+        
+        .order-badge {
+            display: inline-block;
+            background: var(--blue);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+        }
+        
+        .notes {
+            color: var(--yellow);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+        
+        pre {
+            background: var(--surface-2);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison { grid-template-columns: 1fr; }
+        }
+        
+        .arrow {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--green);
+            margin: 1rem 0;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .stat-card {
+            background: var(--surface-2);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--red);
+        }
+        
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 ATLAS Exercise Intelligence - Test</h1>
+        <p style="color: var(--text-dim); margin-bottom: 2rem;">
+            Questo test mostra come il sistema calcola volumi e ordina esercizi intelligentemente.
+        </p>
+        
+        <!-- Controls -->
+        <div class="controls">
+            <div class="control-group">
+                <label>Obiettivo</label>
+                <select id="goal">
+                    <option value="forza">Forza</option>
+                    <option value="potenza">Potenza</option>
+                    <option value="ipertrofia" selected>Ipertrofia</option>
+                    <option value="resistenza">Resistenza</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Livello</label>
+                <select id="level">
+                    <option value="principiante">Principiante</option>
+                    <option value="intermedio" selected>Intermedio</option>
+                    <option value="avanzato">Avanzato</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Età</label>
+                <input type="number" id="age" value="30" min="16" max="80">
+            </div>
+            <div class="control-group">
+                <label>Settimana Mesociclo (1-4)</label>
+                <input type="number" id="week" value="2" min="1" max="4">
+            </div>
+            <div class="control-group">
+                <label>Stato CNS</label>
+                <select id="cnsState">
+                    <option value="fresh">Fresco</option>
+                    <option value="normal" selected>Normale</option>
+                    <option value="fatigued">Affaticato</option>
+                    <option value="depleted">Depleto</option>
+                </select>
+            </div>
+            <div class="control-group" style="display: flex; align-items: flex-end;">
+                <button onclick="runTest()">🚀 Genera Test</button>
+            </div>
+        </div>
+        
+        <!-- Results -->
+        <div id="results"></div>
+    </div>
+    
+    <!-- Load ATLAS modules -->
+    <script src="js/atlas-templates.js?v=1"></script>
+    <script src="js/atlas-exercise-intelligence.js?v=1"></script>
+    <script src="js/scientific-workout-validator.js?v=1"></script>
+    
+    <script>
+        function runTest() {
+            const context = {
+                goal: document.getElementById('goal').value,
+                level: document.getElementById('level').value,
+                age: parseInt(document.getElementById('age').value),
+                weekNumber: parseInt(document.getElementById('week').value),
+                cnsState: document.getElementById('cnsState').value,
+                fatigue: document.getElementById('cnsState').value === 'depleted' ? 9 :
+                         document.getElementById('cnsState').value === 'fatigued' ? 7 : 4
+            };
+            
+            // Sample exercises in RANDOM order (simulates unoptimized workout)
+            const randomExercises = [
+                { name: 'Bicep Curl', type: 'isolation', muscles: ['biceps'] },
+                { name: 'Box Jump', type: 'plyometric', muscles: ['quadriceps', 'glutes'] },
+                { name: 'Cooldown Stretch', type: 'cooldown', muscles: [] },
+                { name: 'Back Squat', type: 'compound', muscles: ['quadriceps', 'glutes', 'hamstrings'] },
+                { name: 'Dynamic Warmup', type: 'warmup', muscles: [] },
+                { name: 'Romanian Deadlift', type: 'compound', muscles: ['hamstrings', 'glutes'] },
+                { name: 'Plank Hold', type: 'core', muscles: ['core'] },
+                { name: 'Single-Leg Split Squat', type: 'unilateral', muscles: ['quadriceps', 'glutes'] },
+                { name: 'Lateral Raise', type: 'isolation', muscles: ['shoulders'] },
+                { name: 'Bench Press', type: 'compound', muscles: ['chest', 'triceps', 'shoulders'] }
+            ];
+            
+            const unoptimizedWorkout = { exercises: randomExercises };
+            
+            // Run optimization
+            const optimizedWorkout = ATLASExerciseIntelligence.optimizeWorkout(unoptimizedWorkout, context);
+            
+            // Analyze volume
+            const volumeAnalysis = ATLASExerciseIntelligence.analyzeSessionVolume(
+                optimizedWorkout.exercises, 
+                context
+            );
+            
+            // Render results
+            renderResults(context, randomExercises, optimizedWorkout.exercises, volumeAnalysis);
+        }
+        
+        function renderResults(context, before, after, volumeAnalysis) {
+            const resultsDiv = document.getElementById('results');
+            
+            // Context summary
+            let contextHtml = `
+                <div class="result-section">
+                    <h2>📋 Contesto Atleta</h2>
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${context.goal.toUpperCase()}</div>
+                            <div class="stat-label">Obiettivo</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${context.level}</div>
+                            <div class="stat-label">Livello</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${context.age}</div>
+                            <div class="stat-label">Età</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">W${context.weekNumber}/4</div>
+                            <div class="stat-label">Settimana</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${context.cnsState}</div>
+                            <div class="stat-label">Stato CNS</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Comparison
+            let comparisonHtml = `
+                <div class="result-section">
+                    <h2>🔄 Prima vs Dopo Ottimizzazione</h2>
+                    <div class="comparison">
+                        <div>
+                            <h3>❌ PRIMA (ordine casuale)</h3>
+                            ${before.map((ex, i) => `
+                                <div class="exercise-card">
+                                    <span class="order-badge">#${i + 1}</span>
+                                    <span class="exercise-name">${ex.name}</span>
+                                    <div class="exercise-details">
+                                        Tipo: ${ex.type} | Sets/Reps: non calcolati
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div>
+                            <h3>✅ DOPO (ottimizzato)</h3>
+                            ${after.map((ex, i) => `
+                                <div class="exercise-card optimized">
+                                    <span class="order-badge">#${i + 1}</span>
+                                    <span class="exercise-name">${ex.name}</span>
+                                    <span class="volume-badge">${ex.sets || '-'}×${ex.reps || '-'}</span>
+                                    <div class="exercise-details">
+                                        ${ex.rest ? `Recupero: ${ex.rest}` : ''} 
+                                        ${ex.rpe ? `| RPE: ${ex.rpe}` : ''} 
+                                        ${ex.intensity ? `| Int: ${ex.intensity}` : ''}
+                                    </div>
+                                    ${ex.volumeNotes && ex.volumeNotes.length ? `
+                                        <div class="notes">📝 ${ex.volumeNotes.join(' | ')}</div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Volume Analysis
+            let volumeHtml = `
+                <div class="result-section">
+                    <h2>📊 Analisi Volume</h2>
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${volumeAnalysis.totalSets}</div>
+                            <div class="stat-label">Sets Totali</div>
+                        </div>
+                        ${Object.entries(volumeAnalysis.muscleVolume).map(([muscle, sets]) => `
+                            <div class="stat-card">
+                                <div class="stat-value">${sets}</div>
+                                <div class="stat-label">${muscle}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <h3>Raccomandazioni</h3>
+                    ${volumeAnalysis.recommendations.map(r => `
+                        <p style="color: ${r.type === 'success' ? 'var(--green)' : r.type === 'warning' ? 'var(--yellow)' : 'var(--blue)'}">
+                            ${r.type === 'success' ? '✅' : r.type === 'warning' ? '⚠️' : 'ℹ️'} ${r.message}
+                        </p>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Order Priority Legend
+            let legendHtml = `
+                <div class="result-section">
+                    <h2>📖 Logica Ordinamento Esercizi</h2>
+                    <p style="color: var(--text-dim); margin-bottom: 1rem;">
+                        Il sistema ordina gli esercizi secondo priorità fisiologica ottimale:
+                    </p>
+                    <ol style="color: var(--text-dim); padding-left: 1.5rem;">
+                        <li><strong>Warmup (1)</strong> - Preparazione sistema</li>
+                        <li><strong>Activation/Mobility (2)</strong> - Attiva pattern motori</li>
+                        <li><strong>Power/Plyometrics (3)</strong> - CNS fresco per max velocità</li>
+                        <li><strong>Compound Lower (4)</strong> - Esercizi più tassanti prima</li>
+                        <li><strong>Compound Upper (5)</strong> - Dopo lower per recupero</li>
+                        <li><strong>Unilateral (6)</strong> - Dopo bilaterali</li>
+                        <li><strong>Accessory (7)</strong> - Supporto ai compound</li>
+                        <li><strong>Isolation (8)</strong> - Non interferisce</li>
+                        <li><strong>Core/Conditioning (9)</strong> - Finisher</li>
+                        <li><strong>Cooldown (10)</strong> - Recupero finale</li>
+                    </ol>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = contextHtml + comparisonHtml + volumeHtml + legendHtml;
+        }
+        
+        // Auto-run on load
+        document.addEventListener('DOMContentLoaded', runTest);
+    </script>
+</body>
+</html>

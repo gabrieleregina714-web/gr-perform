@@ -17,244 +17,664 @@
             background: #000;
             color: #fff;
             min-height: 100vh;
-            padding-bottom: 90px;
+            padding-bottom: 100px;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* HEADER */
+        /* ========== NIKE-STYLE HEADER ========== */
         .header {
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 100;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 20px;
-            background: #000;
-            border-bottom: 1px solid #1a1a1a;
+            padding: 12px 20px;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
         .header-logo {
-            height: 60px;
+            height: 48px;
         }
 
         .header-btn {
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: rgba(230,57,70,0.2);
-            border: none;
-            color: #E63946;
-            font-size: 16px;
+            background: transparent;
+            border: 1.5px solid #333;
+            color: #fff;
+            font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
         }
 
-        /* PAGE HEADER */
-        .page-header {
-            padding: 24px 20px 16px;
+        .header-btn:hover {
+            border-color: #E63946;
+            color: #E63946;
         }
 
-        .page-title {
-            font-size: 28px;
+        /* ========== HERO SECTION - NIKE STYLE ========== */
+        .hero {
+            position: relative;
+            height: 45vh;
+            min-height: 320px;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-bg.boxing, .hero-bg.boxe, .hero-bg.pugilato {
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/pexels-cottonbro-4761598.jpg?v=1766853929');
+        }
+        .hero-bg.calcio, .hero-bg.football, .hero-bg.soccer {
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/pexels-ec-lipse-263453583-33212390_1.jpg?v=1766854005');
+        }
+        .hero-bg.basket, .hero-bg.basketball {
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/pexels-cottonbro-5274824_90dbeba6-d4f2-4f1a-ac1b-c491f1c1e594.jpg?v=1759134326');
+        }
+        .hero-bg.palestra, .hero-bg.fitness, .hero-bg.gym {
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/pexels-marcuschanmedia-18112396_c52f0a72-41dc-4b4e-954a-d9a26946e337.jpg?v=1757328614');
+        }
+        .hero-bg.default {
+            background-image: url('https://cdn.shopify.com/s/files/1/0969/1801/2243/files/pexels-marcuschanmedia-18112396_c52f0a72-41dc-4b4e-954a-d9a26946e337.jpg?v=1757328614');
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.4) 0%,
+                rgba(0,0,0,0.7) 60%,
+                #000 100%
+            );
+        }
+
+        .hero-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 32px 24px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #E63946;
+            margin-bottom: 12px;
+        }
+
+        .hero-badge i {
+            font-size: 14px;
+        }
+
+        .hero-title {
+            font-size: 36px;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 8px;
         }
 
-        .page-subtitle {
-            font-size: 13px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 4px;
+        .hero-subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
         }
 
-        /* PERIOD TABS */
+        /* ========== PERIOD TABS - NIKE PILL ========== */
+        .tabs-container {
+            padding: 24px 24px 20px;
+            margin-top: -24px;
+            position: relative;
+            z-index: 10;
+        }
+
         .tabs {
             display: flex;
-            padding: 0 20px;
-            gap: 8px;
-            margin-bottom: 24px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tabs::-webkit-scrollbar {
-            display: none;
+            background: rgba(17,17,17,0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #222;
+            border-radius: 0;
+            padding: 0;
+            gap: 0;
         }
 
         .tab {
-            padding: 10px 16px;
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 20px;
+            flex: 1;
+            padding: 14px 8px;
+            background: transparent;
+            border: none;
+            border-right: 1px solid #222;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: rgba(255,255,255,0.5);
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.4);
             cursor: pointer;
             transition: all 0.2s;
-            white-space: nowrap;
-            flex-shrink: 0;
+        }
+
+        .tab:last-child {
+            border-right: none;
         }
 
         .tab.active {
             background: #E63946;
-            border-color: #E63946;
             color: #fff;
         }
 
-        /* STATS GRID */
-        .stats-section {
-            padding: 0 16px 24px;
+        .tab:hover:not(.active) {
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.7);
         }
 
-        .section-label {
+        /* ========== MAIN STATS - BIG NUMBERS ========== */
+        .stats-hero {
+            padding: 0 24px 32px;
+        }
+
+        .stats-hero-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            background: #111;
+            border: 2px solid #E63946;
+        }
+
+        .stats-hero-item {
+            padding: 24px 16px;
+            text-align: center;
+            border-right: 1px solid #222;
+            position: relative;
+        }
+
+        .stats-hero-item:last-child {
+            border-right: none;
+        }
+
+        .stats-hero-item.featured {
+            background: linear-gradient(135deg, #E63946 0%, #B71C1C 100%);
+        }
+
+        .stats-hero-value {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .stats-hero-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            margin-top: 8px;
+        }
+
+        .stats-hero-item.featured .stats-hero-label {
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* ========== SECTION HEADERS ========== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .section-title .icon {
+            font-size: 16px;
+        }
+
+        .section-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            background: rgba(230,57,70,0.2);
+            color: #E63946;
+            border-radius: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ========== PR CARDS - TROPHY STYLE ========== */
+        .pr-section {
+            padding: 0 24px 32px;
+        }
+
+        .pr-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .pr-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 1px solid #333;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .pr-card:hover {
+            border-color: #E63946;
+            transform: translateY(-2px);
+        }
+
+        .pr-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #FFD700 0%, #E63946 100%);
+        }
+
+        .pr-exercise {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+        }
+
+        .pr-value {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .pr-value span {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .pr-details {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 6px;
+        }
+
+        .pr-1rm {
+            display: inline-block;
+            background: #E63946;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 4px 8px;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .empty-pr {
+            grid-column: 1 / -1;
+            background: #111;
+            border: 1px solid #222;
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .empty-pr i {
+            font-size: 48px;
+            color: rgba(255,255,255,0.1);
+            margin-bottom: 16px;
+        }
+
+        .empty-pr p {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .empty-pr span {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* ========== GOALS CARDS ========== */
+        .goals-section {
+            padding: 0 24px 32px;
+        }
+
+        .goal-card {
+            background: #111;
+            border: 1px solid #222;
+            padding: 20px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .goal-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #E63946;
+        }
+
+        .goal-card.completed::before {
+            background: #22C55E;
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .goal-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-right: 60px;
+        }
+
+        .goal-type {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 4px 10px;
+            background: rgba(230,57,70,0.2);
+            color: #E63946;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .goal-progress-bar {
+            height: 6px;
+            background: #222;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .goal-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E63946 0%, #22C55E 100%);
+            transition: width 0.5s ease;
+        }
+
+        .goal-card.completed .goal-progress-fill {
+            background: #22C55E;
+        }
+
+        .goal-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .goal-current {
+            font-weight: 800;
+        }
+
+        .goal-target {
+            color: rgba(255,255,255,0.4);
+        }
+
+        .goal-deadline {
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .empty-goals {
+            background: #111;
+            border: 1px solid #222;
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .empty-goals i {
+            font-size: 48px;
+            color: rgba(255,255,255,0.1);
+            margin-bottom: 16px;
+        }
+
+        .empty-goals p {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .empty-goals span {
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* ========== WEIGHT TRACKING - FEATURED ========== */
+        .weight-section {
+            padding: 0 24px 32px;
+        }
+
+        .weight-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 2px solid #222;
+            padding: 24px;
+            position: relative;
+        }
+
+        .weight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .weight-label {
             font-size: 10px;
             font-weight: 700;
             letter-spacing: 2px;
             text-transform: uppercase;
             color: rgba(255,255,255,0.4);
-            margin-bottom: 12px;
-            padding-left: 4px;
+            margin-bottom: 8px;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+        .weight-current {
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: -3px;
+            line-height: 1;
         }
 
-        .stat-card {
-            background: #111;
-            border: 1px solid #222;
-            padding: 20px 16px;
+        .weight-unit {
+            font-size: 20px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
+            margin-left: 4px;
+        }
+
+        .weight-trend {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .weight-trend.up {
+            background: rgba(230,57,70,0.2);
+            color: #E63946;
+        }
+
+        .weight-trend.down {
+            background: rgba(34,197,94,0.2);
+            color: #22C55E;
+        }
+
+        .weight-trend.stable {
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+        }
+
+        .weight-chart {
+            height: 100px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 24px;
+        }
+
+        .weight-input-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .weight-input {
+            flex: 1;
+            background: #000;
+            border: 2px solid #333;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
             text-align: center;
+            transition: border-color 0.2s;
         }
 
-        .stat-card.highlight {
-            background: linear-gradient(135deg, #E63946 0%, #B71C1C 100%);
+        .weight-input:focus {
+            outline: none;
             border-color: #E63946;
         }
 
-        .stat-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-            color: #E63946;
-        }
-        
-        .stat-card.highlight .stat-icon {
-            color: #fff;
+        .weight-input::placeholder {
+            color: rgba(255,255,255,0.3);
         }
 
-        .stat-value {
-            font-size: 32px;
-            font-weight: 900;
-            letter-spacing: -1px;
-        }
-
-        .stat-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.5);
-            margin-top: 4px;
-        }
-
-        .stat-card.highlight .stat-label {
-            color: rgba(255,255,255,0.8);
-        }
-
-        /* LEVEL CARD */
-        .level-section {
-            padding: 0 16px 24px;
-        }
-
-        .level-card {
-            background: #111;
-            border: 1px solid #222;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .level-badge {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
+        .weight-btn {
             background: #E63946;
+            border: none;
+            padding: 16px 28px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            font-weight: 900;
         }
 
-        .level-info {
-            flex: 1;
+        .weight-btn:hover {
+            background: #ff4757;
         }
 
-        .level-title {
-            font-size: 14px;
+        .weight-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .weight-history {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #222;
+        }
+
+        .weight-history-title {
+            font-size: 10px;
             font-weight: 700;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 16px;
         }
 
-        .level-progress-bar {
-            height: 8px;
-            background: #333;
-            border-radius: 4px;
-            overflow: hidden;
+        .weight-history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .level-progress-fill {
-            height: 100%;
-            background: #E63946;
-            border-radius: 4px;
-            transition: width 0.5s ease;
+        .weight-history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #1a1a1a;
         }
 
-        .level-xp {
+        .weight-history-date {
             font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 8px;
+            color: rgba(255,255,255,0.4);
         }
 
-        /* CHART SECTION */
+        .weight-history-value {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        /* ========== WEEKLY CHART ========== */
         .chart-section {
-            padding: 0 16px 24px;
+            padding: 0 24px 32px;
         }
 
         .chart-card {
             background: #111;
             border: 1px solid #222;
-            padding: 20px;
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+            padding: 24px;
         }
 
         .chart-title {
-            font-size: 14px;
+            font-size: 10px;
             font-weight: 700;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 24px;
         }
 
         .chart-container {
-            height: 150px;
+            height: 120px;
             display: flex;
             align-items: flex-end;
+            justify-content: space-between;
             gap: 8px;
         }
 
@@ -267,51 +687,63 @@
 
         .chart-bar {
             width: 100%;
-            max-width: 24px;
-            border-radius: 4px 4px 0 0;
+            max-width: 40px;
             transition: height 0.5s ease;
         }
 
         .chart-bar.workout {
-            background: #E63946;
+            background: linear-gradient(180deg, #E63946 0%, #B71C1C 100%);
         }
 
         .chart-bar.empty {
             background: #222;
-            height: 20px;
+            height: 8px;
         }
 
         .chart-day {
-            font-size: 9px;
-            color: rgba(255,255,255,0.4);
-            margin-top: 8px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 12px;
             text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
 
-        /* HISTORY SECTION */
+        .chart-day.today {
+            color: #E63946;
+        }
+
+        /* ========== HISTORY ========== */
         .history-section {
-            padding: 0 16px 24px;
+            padding: 0 24px 32px;
         }
 
         .history-item {
             background: #111;
             border: 1px solid #222;
-            padding: 16px;
+            padding: 16px 20px;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            border-color: #333;
+            background: #1a1a1a;
         }
 
         .history-date {
             text-align: center;
-            min-width: 44px;
+            min-width: 50px;
         }
 
         .history-date .day {
-            font-size: 22px;
-            font-weight: 800;
+            font-size: 28px;
+            font-weight: 900;
             line-height: 1;
+            letter-spacing: -1px;
         }
 
         .history-date .month {
@@ -319,6 +751,7 @@
             color: rgba(255,255,255,0.4);
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-top: 4px;
         }
 
         .history-info {
@@ -327,8 +760,8 @@
         }
 
         .history-name {
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 13px;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             white-space: nowrap;
@@ -338,80 +771,48 @@
 
         .history-stats {
             font-size: 11px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 2px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
         }
 
-        .history-badge {
-            padding: 6px 12px;
-            background: rgba(34,197,94,0.2);
-            color: #22C55E;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-
-        /* EMPTY STATE */
-        .empty-state {
-            text-align: center;
-            padding: 48px 20px;
-        }
-
-        .empty-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: #111;
+        .history-icon {
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 32px;
-            color: #333;
+            background: rgba(34,197,94,0.15);
+            color: #22C55E;
+            font-size: 18px;
         }
 
-        .empty-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .empty-text {
-            font-size: 13px;
-            color: rgba(255,255,255,0.5);
-        }
-
-        /* TEST CHARTS */
+        /* ========== FITNESS TESTS ========== */
         .tests-section {
-            padding: 0 16px 24px;
+            padding: 0 24px 32px;
         }
 
         .empty-tests {
             background: #111;
             border: 1px solid #222;
-            border-radius: 16px;
-            padding: 40px 24px;
+            padding: 48px 24px;
             text-align: center;
         }
 
         .empty-tests i {
             font-size: 48px;
-            color: #333;
+            color: rgba(255,255,255,0.1);
             margin-bottom: 16px;
         }
 
         .empty-tests p {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .empty-tests span {
-            font-size: 13px;
-            color: #666;
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
         }
 
         .test-chart-card {
@@ -424,22 +825,28 @@
         .test-chart-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 16px;
         }
 
-        .test-chart-title {
-            font-size: 14px;
-            font-weight: 700;
+        .test-latest-value {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .test-latest-date {
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            margin-top: 4px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .test-chart-change {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 6px 12px;
         }
 
         .test-chart-change.positive {
@@ -454,13 +861,15 @@
 
         .test-chart-svg {
             width: 100%;
-            height: 100px;
+            height: 80px;
         }
 
         .test-chart-line {
             fill: none;
             stroke: #E63946;
-            stroke-width: 2;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .test-chart-area {
@@ -474,30 +883,49 @@
         .test-chart-values {
             display: flex;
             justify-content: space-between;
-            margin-top: 12px;
+            margin-top: 16px;
             font-size: 11px;
-            color: rgba(255,255,255,0.5);
-        }
-
-        .test-latest-value {
-            font-size: 24px;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-
-        .test-latest-date {
-            font-size: 10px;
             color: rgba(255,255,255,0.4);
         }
 
-        /* BOTTOM NAV */
+        /* ========== EMPTY STATE ========== */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .empty-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 13px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* ========== BOTTOM NAV ========== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: #000;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid #1a1a1a;
             display: flex;
             justify-content: space-around;
@@ -513,14 +941,15 @@
             color: rgba(255,255,255,0.3);
             text-decoration: none;
             font-size: 9px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            padding: 4px 8px;
+            padding: 4px 12px;
+            transition: color 0.2s;
         }
 
         .nav-item i {
-            font-size: 18px;
+            font-size: 20px;
         }
 
         .nav-item.active,
@@ -534,31 +963,32 @@
                 padding-bottom: calc(12px + env(safe-area-inset-bottom));
             }
             body {
-                padding-bottom: calc(90px + env(safe-area-inset-bottom));
+                padding-bottom: calc(100px + env(safe-area-inset-bottom));
             }
         }
 
         /* Mobile */
         @media (max-width: 480px) {
-            .page-title {
-                font-size: 24px;
+            .hero-title { font-size: 32px; }
+            .stats-hero-value { font-size: 36px; }
+            .weight-current { font-size: 48px; }
+            .pr-value { font-size: 28px; }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-            
-            .stat-value {
-                font-size: 28px;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-            
-            .stat-card {
-                padding: 16px 12px;
-            }
-            
-            .header-logo {
-                height: 48px;
-            }
-            
-            .chart-container {
-                height: 120px;
-            }
+        }
+
+        .pr-card, .goal-card, .history-item {
+            animation: fadeInUp 0.4s ease-out;
         }
     </style>
 </head>
@@ -571,69 +1001,122 @@
         </button>
     </header>
 
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-        <h1 class="page-title">I Tuoi Progressi</h1>
-        <p class="page-subtitle">Monitora la tua crescita atletica</p>
-    </div>
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg default" id="heroBg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-chart-line"></i>
+                <span>Tracking</span>
+            </div>
+            <h1 class="hero-title">I Tuoi Progressi</h1>
+            <p class="hero-subtitle">Monitora la tua crescita atletica</p>
+        </div>
+    </section>
 
     <!-- PERIOD TABS -->
-    <div class="tabs">
-        <button class="tab active" data-period="week">Settimana</button>
-        <button class="tab" data-period="month">Mese</button>
-        <button class="tab" data-period="3months">3 Mesi</button>
-        <button class="tab" data-period="all">Tutto</button>
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab active" data-period="week">Settimana</button>
+            <button class="tab" data-period="month">Mese</button>
+            <button class="tab" data-period="3months">3 Mesi</button>
+            <button class="tab" data-period="all">Tutto</button>
+        </div>
     </div>
 
-    <!-- STATS -->
-    <section class="stats-section">
-        <div class="section-label">Statistiche</div>
-        <div class="stats-grid">
-            <div class="stat-card highlight">
-                <div class="stat-icon"><i class="fas fa-dumbbell"></i></div>
-                <div class="stat-value" id="totalWorkouts">0</div>
-                <div class="stat-label">Workout</div>
+    <!-- MAIN STATS -->
+    <section class="stats-hero">
+        <div class="stats-hero-grid">
+            <div class="stats-hero-item featured">
+                <div class="stats-hero-value" id="totalWorkouts">0</div>
+                <div class="stats-hero-label">Workout</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                <div class="stat-value" id="totalMinutes">0</div>
-                <div class="stat-label">Minuti</div>
+            <div class="stats-hero-item">
+                <div class="stats-hero-value" id="totalMinutes">0</div>
+                <div class="stats-hero-label">Minuti</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-fire"></i></div>
-                <div class="stat-value" id="currentStreak">0</div>
-                <div class="stat-label">Streak</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-star"></i></div>
-                <div class="stat-value" id="totalXP">0</div>
-                <div class="stat-label">XP</div>
+            <div class="stats-hero-item">
+                <div class="stats-hero-value" id="currentStreak">0</div>
+                <div class="stats-hero-label">Streak</div>
             </div>
         </div>
     </section>
 
-    <!-- LEVEL -->
-    <section class="level-section">
-        <div class="section-label">Livello Attuale</div>
-        <div class="level-card">
-            <div class="level-badge" id="levelBadge">1</div>
-            <div class="level-info">
-                <div class="level-title">Livello <span id="levelNum">1</span></div>
-                <div class="level-progress-bar">
-                    <div class="level-progress-fill" id="levelProgress" style="width: 0%"></div>
+    <!-- PERSONAL RECORDS -->
+    <section class="pr-section">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-trophy" style="color: #E63946;"></i>
+                <span>Personal Records</span>
+            </div>
+            <span class="section-badge" id="prCount">0 PR</span>
+        </div>
+        <div class="pr-grid" id="prGrid">
+            <!-- Generated by JS -->
+        </div>
+    </section>
+
+    <!-- COACH GOALS -->
+    <section class="goals-section">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-bullseye" style="color: #E63946;"></i>
+                <span>Obiettivi</span>
+            </div>
+        </div>
+        <div id="goalsContainer">
+            <!-- Generated by JS -->
+        </div>
+    </section>
+
+    <!-- WEIGHT TRACKING -->
+    <section class="weight-section">
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-weight" style="color: #E63946;"></i>
+                <span>Peso Corporeo</span>
+            </div>
+        </div>
+        <div class="weight-card">
+            <div class="weight-header">
+                <div>
+                    <div class="weight-label">Peso Attuale</div>
+                    <div class="weight-current" id="currentWeight">--<span class="weight-unit">kg</span></div>
                 </div>
-                <div class="level-xp"><span id="currentXP">0</span> / <span id="nextLevelXP">500</span> XP per il prossimo livello</div>
+                <div class="weight-trend stable" id="weightTrend">
+                    <i class="fas fa-minus"></i>
+                    <span>Stabile</span>
+                </div>
+            </div>
+            <div class="weight-chart" id="weightChart">
+                <!-- SVG chart generated by JS -->
+            </div>
+            <div class="weight-input-row">
+                <input type="number" class="weight-input" id="weightInput" placeholder="Inserisci peso" step="0.1" min="30" max="300">
+                <button class="weight-btn" id="saveWeightBtn" onclick="saveWeight()">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="weight-history" id="weightHistorySection" style="display: none;">
+                <div class="weight-history-title">Storico Recente</div>
+                <div class="weight-history-list" id="weightHistoryList">
+                    <!-- Generated by JS -->
+                </div>
             </div>
         </div>
     </section>
 
     <!-- WEEKLY CHART -->
     <section class="chart-section">
-        <div class="section-label">Attività Settimanale</div>
-        <div class="chart-card">
-            <div class="chart-header">
-                <span class="chart-title">Workout Completati</span>
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-chart-bar" style="color: #E63946;"></i>
+                <span>Attività Settimanale</span>
             </div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-title">Workout Completati</div>
             <div class="chart-container" id="weeklyChart">
                 <!-- Generated by JS -->
             </div>
@@ -642,15 +1125,25 @@
 
     <!-- HISTORY -->
     <section class="history-section">
-        <div class="section-label">Cronologia Recente</div>
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-history" style="color: #E63946;"></i>
+                <span>Cronologia</span>
+            </div>
+        </div>
         <div id="historyList">
             <!-- Generated by JS -->
         </div>
     </section>
 
-    <!-- FITNESS TESTS SECTION -->
+    <!-- FITNESS TESTS -->
     <section class="tests-section" id="testsSection">
-        <div class="section-label">I Miei Test Fisici</div>
+        <div class="section-header">
+            <div class="section-title">
+                <i class="fas fa-stopwatch" style="color: #E63946;"></i>
+                <span>Test Fisici</span>
+            </div>
+        </div>
         <div id="testsCharts">
             <div class="empty-tests">
                 <i class="fas fa-stopwatch"></i>
@@ -690,6 +1183,9 @@
         let allWorkouts = [];
         let athlete = null;
         let currentPeriod = 'week';
+        let personalRecords = [];
+        let coachGoals = [];
+        let weightHistory = [];
 
         document.addEventListener('DOMContentLoaded', async () => {
             if (!athleteId) {
@@ -713,7 +1209,6 @@
 
         async function loadData() {
             try {
-                // Load athlete data
                 const athletes = await supabase.fetch('athletes', `?id=eq.${athleteId}&select=*`);
                 athlete = athletes[0];
                 
@@ -722,20 +1217,322 @@
                     return;
                 }
 
-                // Load all workouts
+                // Imposta sfondo hero in base allo sport
+                updateHeroBackground();
+
                 const workouts = await supabase.fetch('workouts', 
                     `?athlete_id=eq.${athleteId}&select=*&order=created_at.desc`
                 );
                 allWorkouts = workouts;
 
                 updateStats();
-                updateLevel();
                 renderWeeklyChart();
                 renderHistory();
                 loadFitnessTests();
+                
+                // Carica nuovi dati progressi
+                await loadPersonalRecords();
+                await loadCoachGoals();
+                await loadWeightHistory();
 
             } catch (error) {
                 console.error('Error:', error);
+            }
+        }
+
+        function updateHeroBackground() {
+            if (!athlete || !athlete.sport) return;
+            
+            const sport = athlete.sport.toLowerCase();
+            const heroBg = document.getElementById('heroBg');
+            
+            // Rimuovi tutte le classi sport
+            heroBg.className = 'hero-bg';
+            
+            // Aggiungi classe sport appropriata
+            if (sport.includes('box') || sport.includes('pugil')) {
+                heroBg.classList.add('boxing');
+            } else if (sport.includes('calc') || sport.includes('foot') || sport.includes('soccer')) {
+                heroBg.classList.add('calcio');
+            } else if (sport.includes('basket')) {
+                heroBg.classList.add('basket');
+            } else {
+                heroBg.classList.add('palestra');
+            }
+        }
+
+        // ========== PERSONAL RECORDS ==========
+        async function loadPersonalRecords() {
+            const emptyHtml = `
+                <div class="empty-pr">
+                    <i class="fas fa-trophy"></i>
+                    <p>Nessun PR registrato</p>
+                    <span>Completa workout per sbloccare i tuoi record!</span>
+                </div>
+            `;
+            
+            try {
+                const prs = await supabase.fetch('personal_records', 
+                    `?athlete_id=eq.${athleteId}&select=*&order=estimated_1rm.desc`
+                );
+                personalRecords = prs || [];
+                
+                // Aggiorna badge PR count
+                document.getElementById('prCount').textContent = `${personalRecords.length} PR`;
+                
+                if (personalRecords.length === 0) {
+                    document.getElementById('prGrid').innerHTML = emptyHtml;
+                    return;
+                }
+
+                document.getElementById('prGrid').innerHTML = personalRecords.slice(0, 6).map((pr, index) => {
+                    const date = new Date(pr.achieved_at);
+                    const dateStr = date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+                    const delay = index * 0.1;
+                    
+                    return `
+                        <div class="pr-card" style="animation-delay: ${delay}s">
+                            <div class="pr-exercise">${pr.exercise_name}</div>
+                            <div class="pr-value">${pr.weight_kg}<span>kg</span></div>
+                            <div class="pr-details">${pr.reps} rep • ${dateStr}</div>
+                            <span class="pr-1rm">1RM: ${Math.round(pr.estimated_1rm)} kg</span>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.log('Tabella personal_records non ancora creata:', error);
+                document.getElementById('prGrid').innerHTML = emptyHtml;
+            }
+        }
+
+        // ========== COACH GOALS ==========
+        async function loadCoachGoals() {
+            const emptyHtml = `
+                <div class="empty-goals">
+                    <i class="fas fa-bullseye"></i>
+                    <p>Nessun obiettivo impostato</p>
+                    <span>Il tuo coach imposterà i tuoi obiettivi</span>
+                </div>
+            `;
+            
+            try {
+                const goals = await supabase.fetch('coach_goals', 
+                    `?athlete_id=eq.${athleteId}&select=*&order=end_date.asc`
+                );
+                coachGoals = goals || [];
+                
+                if (coachGoals.length === 0) {
+                    document.getElementById('goalsContainer').innerHTML = emptyHtml;
+                    return;
+                }
+
+                document.getElementById('goalsContainer').innerHTML = coachGoals.map(goal => {
+                    const progress = Math.min(100, Math.round((goal.current_value / goal.target_value) * 100));
+                    const endDate = new Date(goal.end_date);
+                    const deadlineStr = endDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'long' });
+                    const isCompleted = goal.status === 'completed' || progress >= 100;
+                    
+                    const goalTypeLabels = {
+                        'strength': 'Forza',
+                        'endurance': 'Resistenza',
+                        'weight': 'Peso',
+                        'skill': 'Skill',
+                        'performance': 'Performance',
+                        'other': 'Altro'
+                    };
+                    
+                    return `
+                        <div class="goal-card ${isCompleted ? 'goal-completed' : ''}">
+                            <div class="goal-header">
+                                <div class="goal-title">${goal.goal_title}</div>
+                                <span class="goal-type">${goalTypeLabels[goal.goal_type] || goal.goal_type}</span>
+                            </div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                            <div class="goal-stats">
+                                <span class="goal-current">${goal.current_value} ${goal.unit || ''}</span>
+                                <span class="goal-target">Obiettivo: ${goal.target_value} ${goal.unit || ''}</span>
+                            </div>
+                            <div class="goal-deadline">
+                                ${isCompleted ? '<i class="fas fa-check"></i> Completato!' : `Scadenza: ${deadlineStr}`}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.log('Tabella coach_goals non ancora creata:', error);
+                document.getElementById('goalsContainer').innerHTML = emptyHtml;
+            }
+        }
+
+        // ========== WEIGHT TRACKING ==========
+        async function loadWeightHistory() {
+            try {
+                const weights = await supabase.fetch('weight_history', 
+                    `?athlete_id=eq.${athleteId}&select=*&order=recorded_at.desc&limit=30`
+                );
+                weightHistory = weights || [];
+                
+                if (weightHistory.length > 0) {
+                    renderWeightSection();
+                } else if (athlete.weight_kg) {
+                    document.getElementById('currentWeight').textContent = athlete.weight_kg;
+                }
+
+            } catch (error) {
+                console.log('Tabella weight_history non ancora creata:', error);
+                if (athlete.weight_kg) {
+                    document.getElementById('currentWeight').textContent = athlete.weight_kg;
+                }
+            }
+        }
+
+        function renderWeightSection() {
+            if (weightHistory.length === 0) return;
+
+            const latest = weightHistory[0];
+            document.getElementById('currentWeight').textContent = latest.weight_kg;
+
+            // Calcola trend (ultimi 7 giorni vs precedenti 7)
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            
+            const recentWeights = weightHistory.filter(w => new Date(w.recorded_at) >= weekAgo);
+            const olderWeights = weightHistory.filter(w => new Date(w.recorded_at) < weekAgo).slice(0, 7);
+
+            if (recentWeights.length > 0 && olderWeights.length > 0) {
+                const recentAvg = recentWeights.reduce((s, w) => s + w.weight_kg, 0) / recentWeights.length;
+                const olderAvg = olderWeights.reduce((s, w) => s + w.weight_kg, 0) / olderWeights.length;
+                const diff = recentAvg - olderAvg;
+
+                const trendEl = document.getElementById('weightTrend');
+                if (diff > 0.3) {
+                    trendEl.className = 'weight-trend up';
+                    trendEl.innerHTML = `<i class="fas fa-arrow-up"></i><span>+${diff.toFixed(1)} kg</span>`;
+                } else if (diff < -0.3) {
+                    trendEl.className = 'weight-trend down';
+                    trendEl.innerHTML = `<i class="fas fa-arrow-down"></i><span>${diff.toFixed(1)} kg</span>`;
+                } else {
+                    trendEl.className = 'weight-trend stable';
+                    trendEl.innerHTML = `<i class="fas fa-minus"></i><span>Stabile</span>`;
+                }
+            }
+
+            // Render chart se abbiamo almeno 2 punti
+            if (weightHistory.length >= 2) {
+                renderWeightChart();
+            }
+
+            // Render history ultimi 7
+            if (weightHistory.length > 0) {
+                document.getElementById('weightHistorySection').style.display = 'block';
+                document.getElementById('weightHistoryList').innerHTML = weightHistory.slice(0, 7).map(w => {
+                    const date = new Date(w.recorded_at);
+                    const dateStr = date.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' });
+                    return `
+                        <div class="weight-history-item">
+                            <span class="weight-history-date">${dateStr}</span>
+                            <span class="weight-history-value">${w.weight_kg} kg</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderWeightChart() {
+            const chartData = weightHistory.slice(0, 14).reverse();
+            if (chartData.length < 2) return;
+
+            const width = 280;
+            const height = 60;
+            const padding = 10;
+
+            const values = chartData.map(w => w.weight_kg);
+            const minVal = Math.min(...values) - 0.5;
+            const maxVal = Math.max(...values) + 0.5;
+            const range = maxVal - minVal || 1;
+
+            const points = values.map((v, i) => {
+                const x = padding + (i / (values.length - 1)) * (width - padding * 2);
+                const y = height - padding - ((v - minVal) / range) * (height - padding * 2);
+                return { x, y };
+            });
+
+            const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+            const areaD = `${pathD} L ${points[points.length-1].x} ${height} L ${points[0].x} ${height} Z`;
+
+            document.getElementById('weightChart').innerHTML = `
+                <svg width="100%" height="100%" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="weightGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#E63946;stop-opacity:0.3"/>
+                            <stop offset="100%" style="stop-color:#E63946;stop-opacity:0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="${areaD}" fill="url(#weightGradient)"/>
+                    <path d="${pathD}" fill="none" stroke="#E63946" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    ${points.map((p, i) => i === points.length - 1 ? 
+                        `<circle cx="${p.x}" cy="${p.y}" r="4" fill="#E63946"/>` : ''
+                    ).join('')}
+                </svg>
+            `;
+        }
+
+        async function saveWeight() {
+            const input = document.getElementById('weightInput');
+            const weight = parseFloat(input.value);
+            
+            if (!weight || weight < 30 || weight > 300) {
+                alert('Inserisci un peso valido (30-300 kg)');
+                return;
+            }
+
+            const btn = document.getElementById('saveWeightBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            try {
+                // Verifica se esiste già un peso per oggi
+                const today = new Date().toISOString().split('T')[0];
+                const existing = await supabase.fetch('weight_history', 
+                    `?athlete_id=eq.${athleteId}&recorded_at=gte.${today}T00:00:00&recorded_at=lt.${today}T23:59:59`
+                );
+
+                if (existing && existing.length > 0) {
+                    // Aggiorna il peso esistente
+                    await supabase.update('weight_history', existing[0].id, {
+                        weight_kg: weight,
+                        recorded_at: new Date().toISOString()
+                    });
+                } else {
+                    // Inserisce nuovo peso
+                    await supabase.insert('weight_history', {
+                        athlete_id: athleteId,
+                        weight_kg: weight,
+                        recorded_at: new Date().toISOString()
+                    });
+                }
+
+                // Aggiorna anche il peso in athletes
+                await supabase.update('athletes', athleteId, { weight_kg: weight });
+
+                input.value = '';
+                await loadWeightHistory();
+                
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-plus"></i>';
+                    btn.disabled = false;
+                }, 1500);
+
+            } catch (error) {
+                console.error('Errore salvataggio peso:', error);
+                alert('Errore nel salvataggio. Riprova.');
+                btn.innerHTML = '<i class="fas fa-plus"></i>';
+                btn.disabled = false;
             }
         }
 
@@ -770,29 +1567,12 @@
 
             document.getElementById('totalWorkouts').textContent = completed.length;
             
-            // Calculate total minutes
             const totalMins = completed.reduce((sum, w) => {
                 return sum + (w.actual_duration_minutes || w.estimated_duration_minutes || 45);
             }, 0);
             document.getElementById('totalMinutes').textContent = totalMins;
 
-            // Streak and XP from athlete data
             document.getElementById('currentStreak').textContent = athlete.streak || 0;
-            document.getElementById('totalXP').textContent = athlete.xp || athlete.total_xp || 0;
-        }
-
-        function updateLevel() {
-            const level = athlete.level || athlete.current_level || 1;
-            const xp = athlete.xp || athlete.total_xp || 0;
-            const xpForLevel = 500;
-            const xpInLevel = xp % xpForLevel;
-            const progress = (xpInLevel / xpForLevel) * 100;
-
-            document.getElementById('levelBadge').textContent = level;
-            document.getElementById('levelNum').textContent = level;
-            document.getElementById('levelProgress').style.width = progress + '%';
-            document.getElementById('currentXP').textContent = xpInLevel;
-            document.getElementById('nextLevelXP').textContent = xpForLevel;
         }
 
         function renderWeeklyChart() {
@@ -800,13 +1580,11 @@
             const today = new Date();
             const chartData = [];
 
-            // Get last 7 days
             for (let i = 6; i >= 0; i--) {
                 const date = new Date(today);
                 date.setDate(today.getDate() - i);
                 const dayName = days[date.getDay()];
                 
-                // Count workouts on this day
                 const dayWorkouts = allWorkouts.filter(w => {
                     const wDate = new Date(w.completed_at || w.created_at);
                     return wDate.toDateString() === date.toDateString() && w.status === 'completed';
@@ -825,8 +1603,8 @@
                 const height = d.count > 0 ? Math.max((d.count / maxCount) * 100, 20) : 0;
                 return `
                     <div class="chart-bar-group">
-                        <div class="chart-bar ${d.count > 0 ? 'workout' : 'empty'}" style="height: ${d.count > 0 ? height : 20}px;"></div>
-                        <span class="chart-day" style="${d.isToday ? 'color: #E63946; font-weight: 700;' : ''}">${d.day}</span>
+                        <div class="chart-bar ${d.count > 0 ? 'workout' : 'empty'}" style="height: ${d.count > 0 ? height : 8}px;"></div>
+                        <span class="chart-day ${d.isToday ? 'today' : ''}">${d.day}</span>
                     </div>
                 `;
             }).join('');
@@ -852,9 +1630,7 @@
                 const date = new Date(w.completed_at || w.created_at);
                 const day = date.getDate();
                 const month = date.toLocaleDateString('it-IT', { month: 'short' });
-                
                 const duration = w.actual_duration_minutes || w.estimated_duration_minutes || 45;
-                const xp = '+100 XP';
 
                 return `
                     <div class="history-item">
@@ -866,7 +1642,9 @@
                             <div class="history-name">${w.name || 'Workout'}</div>
                             <div class="history-stats">${duration} min</div>
                         </div>
-                        <div class="history-badge">${xp}</div>
+                        <div class="history-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -883,7 +1661,6 @@
             });
         }
 
-        // Load and render fitness tests
         async function loadFitnessTests() {
             const emptyHtml = `
                 <div class="empty-tests">
@@ -894,8 +1671,8 @@
             `;
             
             try {
-                const tests = await supabase.fetch('fitness_tests', 
-                    `?athlete_id=eq.${athleteId}&select=*&order=test_date.asc`
+                const tests = await supabase.fetch('physical_tests', 
+                    `?athlete_id=eq.${athleteId}&select=*&order=created_at.asc`
                 );
 
                 if (!tests || tests.length === 0) {
@@ -903,23 +1680,21 @@
                     return;
                 }
 
-                // Group tests by test_name
                 const testGroups = {};
                 tests.forEach(t => {
-                    if (!testGroups[t.test_name]) {
-                        testGroups[t.test_name] = {
-                            label: t.test_label,
-                            unit: t.unit,
+                    if (!testGroups[t.test_id]) {
+                        testGroups[t.test_id] = {
+                            label: t.test_id,
+                            unit: '',
                             values: []
                         };
                     }
-                    testGroups[t.test_name].values.push({
+                    testGroups[t.test_id].values.push({
                         value: parseFloat(t.value),
-                        date: t.test_date
+                        date: t.created_at
                     });
                 });
 
-                // Render charts for each test type
                 let chartsHtml = '';
                 Object.keys(testGroups).forEach(testName => {
                     const group = testGroups[testName];
@@ -933,7 +1708,7 @@
                 document.getElementById('testsCharts').innerHTML = chartsHtml || emptyHtml;
 
             } catch (error) {
-                console.log('Tabella fitness_tests non ancora creata:', error);
+                console.log('Tabella physical_tests non ancora creata:', error);
                 document.getElementById('testsCharts').innerHTML = emptyHtml;
             }
         }
@@ -945,7 +1720,6 @@
             const change = ((last - first) / first * 100).toFixed(1);
             const isPositive = change >= 0;
 
-            // Create SVG path for line chart
             const width = 280;
             const height = 80;
             const padding = 10;
@@ -986,7 +1760,7 @@
                         </defs>
                         <path class="test-chart-area" d="${areaD}" fill="url(#chartGradient-${testName})"/>
                         <path class="test-chart-line" d="${pathD}"/>
-                        ${points.map(p => `<circle class="test-chart-dot" cx="${p.x}" cy="${p.y}" r="3"/>`).join('')}
+                        ${points.map(p => `<circle class="test-chart-dot" cx="${p.x}" cy="${p.y}" r="4"/>`).join('')}
                     </svg>
                     <div class="test-chart-values">
                         <span>Inizio: ${first} ${group.unit}</span>
@@ -1008,11 +1782,11 @@
                             <div class="test-latest-value">${val.value} ${group.unit}</div>
                             <div class="test-latest-date">${group.label} - ${dateStr}</div>
                         </div>
-                        <span class="test-chart-change" style="background: #222; color: #888;">
+                        <span class="test-chart-change" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5);">
                             Primo test
                         </span>
                     </div>
-                    <div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.4); font-size: 12px;">
+                    <div style="text-align: center; padding: 24px; color: rgba(255,255,255,0.3); font-size: 12px;">
                         <i class="fas fa-info-circle"></i> Completa altri test per vedere il grafico
                     </div>
                 </div>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Workout Methods</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 24px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        .test-btn {
+            background: #111;
+            border: 2px solid #333;
+            color: #fff;
+            padding: 16px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .test-btn:hover {
+            border-color: #E63946;
+            background: #1a1a1a;
+        }
+        .test-btn.superset { border-color: #8B5CF6; }
+        .test-btn.superset:hover { background: rgba(139,92,246,0.1); }
+        .test-btn.circuit { border-color: #F59E0B; }
+        .test-btn.circuit:hover { background: rgba(245,158,11,0.1); }
+        .test-btn.dropset { border-color: #EC4899; }
+        .test-btn.dropset:hover { background: rgba(236,72,153,0.1); }
+        .test-btn.emom { border-color: #22C55E; }
+        .test-btn.emom:hover { background: rgba(34,197,94,0.1); }
+        .test-btn.full { border-color: #E63946; }
+        .test-btn.full:hover { background: rgba(230,57,70,0.1); }
+        
+        .info {
+            background: #111;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.6;
+        }
+        .info code {
+            background: #222;
+            padding: 2px 6px;
+            color: #F59E0B;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Metodologie Workout</h1>
+    <p style="color: rgba(255,255,255,0.5); margin-bottom: 20px;">Clicca per testare il layout dei diversi tipi di esercizio</p>
+
+    <div class="test-grid">
+        <button class="test-btn superset" onclick="testSuperset()">
+            💜 SUPERSET<br>
+            <small style="opacity:0.6">A1 + A2</small>
+        </button>
+        
+        <button class="test-btn circuit" onclick="testCircuit()">
+            🔄 CIRCUITO<br>
+            <small style="opacity:0.6">6 stazioni</small>
+        </button>
+        
+        <button class="test-btn dropset" onclick="testDropSet()">
+            ⬇️ DROP SET<br>
+            <small style="opacity:0.6">12→8→6</small>
+        </button>
+        
+        <button class="test-btn emom" onclick="testEmom()">
+            ⏱️ EMOM<br>
+            <small style="opacity:0.6">12 minuti</small>
+        </button>
+        
+        <button class="test-btn full" onclick="testFullWorkout()">
+            🏋️ WORKOUT COMPLETO<br>
+            <small style="opacity:0.6">Mix di tutto</small>
+        </button>
+    </div>
+
+    <div class="info">
+        <strong>Come funziona:</strong><br>
+        1. Clicca un bottone per creare un workout di test<br>
+        2. Il workout viene salvato in localStorage<br>
+        3. Vieni reindirizzato a workout-session.html<br><br>
+        <strong>Pattern riconosciuti:</strong><br>
+        • Superset: <code>A1: Exercise</code>, <code>A2: Exercise</code><br>
+        • Circuit: <code>Circuit: 6 stazioni x 40" ON...</code><br>
+        • Drop Set: <code>12 + drop 8 + drop 6</code> nelle reps<br>
+        • EMOM: <code>EMOM 12' | Min pari: ... | Min dispari: ...</code>
+    </div>
+
+    <script>
+        const TEST_WORKOUT_ID = 'test-workout-methods';
+
+        function saveAndOpen(workout) {
+            workout.id = TEST_WORKOUT_ID;
+            localStorage.setItem('testWorkout_' + TEST_WORKOUT_ID, JSON.stringify(workout));
+            window.location.href = 'workout-session.html?id=' + TEST_WORKOUT_ID + '&test=1';
+        }
+
+        function testSuperset() {
+            saveAndOpen({
+                name: 'Test Superset',
+                date: new Date().toISOString().split('T')[0],
+                exercises: {
+                    main: [
+                        { order: 1, name: 'A1: Panca Piana (superset con A2)', sets: 4, reps: '8-10', rest_seconds: 0, tempo: '3010', type: 'hypertrophy', technique_cues: ['Petto in fuori', 'Scapole retratte'] },
+                        { order: 2, name: 'A2: Rematore con Bilanciere (superset)', sets: 4, reps: '8-10', rest_seconds: 90, tempo: '3010', type: 'hypertrophy', technique_cues: ['Tira al petto', 'Gomiti vicini'] },
+                        { order: 3, name: 'B1: OHP Manubri (superset)', sets: 3, reps: '10-12', rest_seconds: 0, type: 'hypertrophy' },
+                        { order: 4, name: 'B2: Lat Pulldown (superset)', sets: 3, reps: '10-12', rest_seconds: 90, type: 'hypertrophy' },
+                        { order: 5, name: 'Curl Bicipiti', sets: 3, reps: '12-15', rest_seconds: 60, type: 'hypertrophy' }
+                    ]
+                }
+            });
+        }
+
+        function testCircuit() {
+            saveAndOpen({
+                name: 'Test Circuito Boxing',
+                date: new Date().toISOString().split('T')[0],
+                exercises: {
+                    main: [
+                        { order: 1, name: 'Squat Goblet', sets: 3, reps: '12', rest_seconds: 60, type: 'strength' },
+                        { order: 2, name: 'Circuit: 6 stazioni x 40" ON / 20" OFF x 3 giri (RPE 7) | 1) Jump Rope 2) Med Ball Slams 3) Push-Up 4) Row (band) 5) Split Squat 6) Shadowboxing', sets: 3, reps: '6 stazioni', rest_seconds: 120, type: 'conditioning' },
+                        { order: 3, name: 'Plank', sets: 3, reps: '45s', rest_seconds: 45, type: 'core' }
+                    ]
+                }
+            });
+        }
+
+        function testDropSet() {
+            saveAndOpen({
+                name: 'Test Drop Set',
+                date: new Date().toISOString().split('T')[0],
+                exercises: {
+                    main: [
+                        { order: 1, name: 'Panca Piana', sets: 3, reps: '8', rest_seconds: 90, type: 'strength' },
+                        { order: 2, name: 'Leg Curl (drop set finale)', sets: 3, reps: '12 + drop 8 + drop 6', rest_seconds: 120, type: 'hypertrophy', load_suggestion: '40kg → 30kg → 20kg' },
+                        { order: 3, name: 'Chest Fly Machine (drop set)', sets: 3, reps: '10 + drop 8 + drop 6', rest_seconds: 120, type: 'hypertrophy' },
+                        { order: 4, name: 'Lateral Raise', sets: 3, reps: '15', rest_seconds: 60, type: 'hypertrophy' }
+                    ]
+                }
+            });
+        }
+
+        function testEmom() {
+            saveAndOpen({
+                name: 'Test EMOM Conditioning',
+                date: new Date().toISOString().split('T')[0],
+                exercises: {
+                    main: [
+                        { order: 1, name: 'Deadlift', sets: 5, reps: '3', rest_seconds: 180, type: 'strength', RPE_target: 8 },
+                        { order: 2, name: 'Circuit: EMOM 12\' (tecnico-condizionante) | Min pari: 45" shadowboxing (focus footwork) | Min dispari: 10 burpee step-back + 20" plank', sets: 1, reps: '12 min', rest_seconds: 0, type: 'conditioning' },
+                        { order: 3, name: 'Cool-down stretching', sets: 1, reps: '5 min', rest_seconds: 0, type: 'mobility' }
+                    ]
+                }
+            });
+        }
+
+        function testFullWorkout() {
+            saveAndOpen({
+                name: 'Upper Body Power + Conditioning',
+                date: new Date().toISOString().split('T')[0],
+                coach_notes: 'Workout completo con superset, drop set e circuito finale. Focus su potenza upper body per boxe.',
+                exercises: {
+                    warmup: {
+                        duration: '8 min',
+                        exercises: ['Jumping Jacks', 'Arm Circles', 'Band Pull-Aparts', 'Shadowboxing leggero']
+                    },
+                    main: [
+                        // Superset A
+                        { order: 1, name: 'A1: Bench Press (superset)', sets: 4, reps: '6', rest_seconds: 0, tempo: '20X1', type: 'strength', RPE_target: 8, technique_cues: ['Esplosivo in salita', 'Controlla la discesa'] },
+                        { order: 2, name: 'A2: Explosive Med Ball Throw (superset)', sets: 4, reps: '8', rest_seconds: 120, type: 'power', technique_cues: ['Massima velocità', 'Rotazione core'] },
+                        
+                        // Superset B
+                        { order: 3, name: 'B1: Weighted Pull-Ups (superset)', sets: 3, reps: '6-8', rest_seconds: 0, type: 'strength', load_suggestion: '+10kg' },
+                        { order: 4, name: 'B2: Dips (superset)', sets: 3, reps: '8-10', rest_seconds: 90, type: 'strength' },
+                        
+                        // Drop set
+                        { order: 5, name: 'Lateral Raise (drop set finale)', sets: 3, reps: '12 + drop 10 + drop 8', rest_seconds: 90, type: 'hypertrophy', load_suggestion: '12kg → 8kg → 5kg' },
+                        
+                        // Esercizio singolo
+                        { order: 6, name: 'Face Pull', sets: 3, reps: '15-20', rest_seconds: 60, type: 'hypertrophy', technique_cues: ['Tira alle orecchie', 'Rotazione esterna'] },
+                        
+                        // Circuito finale
+                        { order: 7, name: 'Circuit: 5 stazioni x 30" ON / 15" OFF x 3 giri | 1) Battle Rope 2) Push-Up 3) Shadowboxing 4) TRX Row 5) Plank', sets: 3, reps: '5 stazioni', rest_seconds: 120, type: 'conditioning' }
+                    ],
+                    cooldown: {
+                        duration: '5 min',
+                        exercises: ['Stretching spalle', 'Child pose', 'Cat-Cow', 'Respirazione diaframmatica']
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

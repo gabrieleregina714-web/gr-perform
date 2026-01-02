@@ -1,9 +1,9 @@
-/* Anamnesi Form Styles */
+/* Anamnesi Form Styles - Nike Style */
 :root {
-    --black: #0A0A0A;
-    --dark-gray: #1A1A1A;
-    --medium-gray: #2D2D2D;
-    --light-gray: #4A4A4A;
+    --black: #000;
+    --dark-gray: #111;
+    --medium-gray: #222;
+    --light-gray: #333;
     --white: #FFFFFF;
     --primary-red: #E63946;
     --success-green: #22C55E;
@@ -16,6 +16,7 @@ body {
     background: var(--black);
     color: var(--white);
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* Progress Bar */
@@ -25,15 +26,15 @@ body {
     left: 0;
     right: 0;
     background: var(--dark-gray);
+    border-bottom: 1px solid var(--medium-gray);
     padding: 1rem 2rem;
     z-index: 100;
 }
 
 .progress-bar {
-    height: 4px;
+    height: 3px;
     background: var(--primary-red);
     width: 16.66%;
-    border-radius: 2px;
     transition: width 0.4s ease;
 }
 
@@ -59,8 +60,8 @@ body {
 .step span {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
     background: var(--medium-gray);
+    border: 1px solid var(--light-gray);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -68,8 +69,8 @@ body {
     font-size: 0.875rem;
 }
 
-.step.active span { background: var(--primary-red); }
-.step.completed span { background: var(--success-green); }
+.step.active span { background: var(--primary-red); border-color: var(--primary-red); }
+.step.completed span { background: var(--success-green); border-color: var(--success-green); }
 .step p { font-size: 0.75rem; margin-top: 0.5rem; }
 
 /* Form Container */
@@ -114,22 +115,20 @@ h2 {
 .sport-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 12px;
 }
 
 .sport-card {
     background: var(--dark-gray);
-    border: 2px solid var(--medium-gray);
-    border-radius: 16px;
+    border: 1px solid var(--medium-gray);
     padding: 2rem;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .sport-card:hover {
     border-color: var(--primary-red);
-    transform: translateY(-4px);
 }
 
 .sport-card.selected {
@@ -173,11 +172,10 @@ h2 {
     padding: 0.875rem 1rem;
     background: var(--dark-gray);
     border: 1px solid var(--medium-gray);
-    border-radius: 8px;
     color: var(--white);
     font-size: 1rem;
     font-family: inherit;
-    transition: border-color 0.3s;
+    transition: border-color 0.2s;
 }
 
 .form-group input:focus,
@@ -200,12 +198,11 @@ h2 {
 
 .role-card {
     background: var(--dark-gray);
-    border: 2px solid var(--medium-gray);
-    border-radius: 12px;
+    border: 1px solid var(--medium-gray);
     padding: 1rem;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
     font-size: 0.9rem;
 }
 
@@ -219,17 +216,16 @@ h2 {
 .goals-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    gap: 12px;
     margin-bottom: 2rem;
 }
 
 .goal-card {
     background: var(--dark-gray);
-    border: 2px solid var(--medium-gray);
-    border-radius: 12px;
+    border: 1px solid var(--medium-gray);
     padding: 1rem;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .goal-card:hover { border-color: var(--primary-red); }
@@ -262,12 +258,11 @@ h2 {
 
 .package-card {
     background: var(--dark-gray);
-    border: 2px solid var(--medium-gray);
-    border-radius: 12px;
+    border: 1px solid var(--medium-gray);
     padding: 1.25rem;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .package-card:hover { border-color: var(--primary-red); }
@@ -293,12 +288,12 @@ h2 {
     align-items: center;
     justify-content: space-between;
     background: var(--dark-gray);
+    border: 1px solid var(--medium-gray);
     padding: 1rem 1.25rem;
-    border-radius: 10px;
 }
 
 .day-name {
-    font-weight: 500;
+    font-weight: 600;
     min-width: 100px;
 }
 
@@ -308,14 +303,13 @@ h2 {
     padding: 0.5rem;
     background: var(--medium-gray);
     border: 1px solid var(--light-gray);
-    border-radius: 6px;
     color: var(--white);
 }
 
 /* Summary */
 .summary-card {
     background: var(--dark-gray);
-    border-radius: 16px;
+    border: 1px solid var(--medium-gray);
     padding: 1.5rem;
     margin-top: 1.5rem;
 }
@@ -350,11 +344,12 @@ h2 {
 
 .btn-primary, .btn-secondary {
     padding: 1rem 2rem;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 1rem;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -367,15 +362,15 @@ h2 {
     margin-left: auto;
 }
 
-.btn-primary:hover { background: #d32f3f; transform: translateY(-2px); }
+.btn-primary:hover { background: #d32f3f; }
 
 .btn-secondary {
     background: transparent;
     color: var(--white);
-    border: 1px solid var(--medium-gray);
+    border: 1px solid var(--light-gray);
 }
 
-.btn-secondary:hover { border-color: var(--white); }
+.btn-secondary:hover { border-color: var(--primary-red); color: var(--primary-red); }
 
 /* Mobile */
 @media (max-width: 600px) {
