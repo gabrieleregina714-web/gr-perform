@@ -16,21 +16,23 @@ const CONFIG = {
 
 // Mapping prodotti Shopify → piani
 const PRODUCT_TO_PLAN = {
-    'Abbonamento Mensile': 'monthly',
-    'Abbonamento Trimestrale': 'quarterly',
-    'Abbonamento Annuale': 'yearly',
-    'Piano Mensile': 'monthly',
-    'Piano Trimestrale': 'quarterly',
-    'Piano Annuale': 'yearly',
-    'Monthly': 'monthly',
-    'Quarterly': 'quarterly',
-    'Yearly': 'yearly'
+    // I tuoi prodotti GR Perform
+    'Season': 'season',
+    'Full Year': 'fullyear',
+    'Elite': 'elite',
+    // Varianti possibili
+    'GR Season': 'season',
+    'GR Full Year': 'fullyear',
+    'GR Elite': 'elite',
+    'Percorso Season': 'season',
+    'Percorso Full Year': 'fullyear',
+    'Percorso Elite': 'elite'
 };
 
 const PLAN_DURATIONS = {
-    'monthly': 30,
-    'quarterly': 90,
-    'yearly': 365
+    'season': 112,      // 16 settimane
+    'fullyear': 365,    // 12 mesi
+    'elite': 365        // 12 mesi
 };
 
 // Hash password
@@ -111,20 +113,37 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Determina tipo piano
-        let planType = 'monthly';
+        // Determina tipo piano - SOLO per prodotti GR Perform (Season, Full Year, Elite)
+        let planType = null;
+        let foundProduct = false;
+        
         for (const item of order.line_items || []) {
             const title = item.title || '';
             const productId = String(item.product_id);
             
             if (PRODUCT_TO_PLAN[title]) {
                 planType = PRODUCT_TO_PLAN[title];
+                foundProduct = true;
+                console.log('✅ Prodotto GR Perform trovato:', title);
                 break;
             }
             if (PRODUCT_TO_PLAN[productId]) {
                 planType = PRODUCT_TO_PLAN[productId];
+                foundProduct = true;
                 break;
             }
+        }
+        
+        // Se non è un prodotto GR Perform, ignora l'ordine
+        if (!foundProduct) {
+            console.log('⏭️ Ordine ignorato - non è un prodotto GR Perform');
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ 
+                    success: true, 
+                    message: 'Order ignored - not a GR Perform subscription product'
+                })
+            };
         }
 
         // Verifica se esiste già
@@ -183,7 +202,11 @@ exports.handler = async (event, context) => {
 
         // Invia email
         const firstName = customer.first_name || 'Atleta';
-        const planNames = { monthly: 'Mensile', quarterly: 'Trimestrale', yearly: 'Annuale' };
+        const planNames = { 
+            season: 'Season (16 settimane)', 
+            fullyear: 'Full Year (12 mesi)', 
+            elite: 'Elite (12 mesi)'
+        };
 
         const emailHtml = isRenewal ? `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
